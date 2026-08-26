@@ -1,0 +1,17 @@
+Database: u603509256_myntra
+Username: u603509256_myntra_user
+Password: 9C!sp2q|0
+
+
+composer install --optimize-autoloader --no-dev
+php artisan
+php artisan storage:link
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+composer.json open and change App to app (big culprit)
+"app/Helpers/helpers.php"
+
+require(/home/u603509256/domains/amdavadproperty.in/public_html/testing/vendor/composer/../../App/Helpers/helper.ph
+  p): Failed to open stream: No such file or directory

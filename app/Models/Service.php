@@ -6,28 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model
 {
-    protected $fillable = [
-        'vendor_id',
-        'category_id',
-        'name',
-        'slug',
-        'description',
-        'price',
-        'price_type',
-        'city',
-        'state',
-        'pincode',
-        'status',
-        'is_featured',
-        'admin_note',
-        'approved_at',
-        'views',
-        'search_count',
-        'rating',
-        'total_reviews',
-        'meta_title',
-        'meta_description',
-        'sort_order',
+    protected $fillable = ['vendor_id','category_id','name','slug','description','price','price_type','city','state','pincode',
+        'is_featured','admin_note','approved_at','views','search_count','rating','total_reviews','meta_title','meta_description','sort_order','status',
     ];
 
     protected $casts = [
@@ -37,13 +17,24 @@ class Service extends Model
         'approved_at' => 'datetime',
     ];
 
-    public function vendor()
-    {
+    public function service_images(){
+        return $this->hasMany(ServiceImage::class);
+    }    
+
+    public function vendor(){
         return $this->belongsTo(Vendor::class);
     }
 
-    public function category(){
-        return $this->belongsTo(Category::class, 'category_id');
+    // public function category(){
+    //     return $this->belongsTo(Category::class, 'category_id');
+    // }
+
+    public function category() {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function subCategory() {
+        return $this->belongsTo(SubCategory::class);
     }
 
     // public function images(){

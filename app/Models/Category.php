@@ -2,45 +2,37 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Category extends Model
-{
-    protected $fillable = [
-        'parent_id',
-        'name',
-        'slug',
-        'description',
-        'image',
-        'icon',
-        'meta_title',
-        'meta_description',
-        'sort_order',
-        'status',
-    ];
+class Category extends Model {
+    use HasFactory;
 
-    public function parent()
-    {
-        return $this->belongsTo(self::class, 'parent_id');
+    protected $fillable = [ 'category_name', 'category_slug', 'status'];
+
+    public function sub_category(){
+        return $this->hasMany(SubCategory::class);
     }
 
-    public function children()
-    {
-        return $this->hasMany(self::class, 'parent_id')
-            ->orderBy('sort_order');
+    // public function subCategories(){
+    //     return $this->hasMany(SubCategory::class, 'category_id'); 
+    // }
+
+    public function subCategories() {
+        return $this->hasMany(SubCategory::class);
     }
 
-    public function services()
-    {
-        return $this->hasMany(Service::class, 'category_id');
+    public function products(){
+        return $this->hasMany(Product::class);
     }
 
-    public function vendors() {
-        return $this->belongsToMany(
-            Vendor::class,
-            'vendor_service_categories',
-            'category_id',
-            'vendor_id'
-        );
+    public function parent(){
+        return $this->belongsTo(Category::class, 'parent_id');
     }
+
+    public function children(){
+        return $this->hasMany(Category::class, 'parent_id');
+    }   
+
+    
 }
