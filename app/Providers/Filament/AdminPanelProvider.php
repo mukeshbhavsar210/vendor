@@ -21,38 +21,47 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Navigation\NavigationGroup;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\Blade;
+use App\Filament\Auth\UnifiedLogin;
 
 class AdminPanelProvider extends PanelProvider {    
-    public function panel(Panel $panel): Panel
-    {
+    public function panel(Panel $panel): Panel {
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')   
+            ->path('')
+            ->login(UnifiedLogin::class)
+            ->registration()
+            ->homeUrl('/dashboard')
+            ->pages([
+                \App\Filament\Pages\Dashboard::class,
+            ])
+            // ->pages([
+            //     Dashboard::class,
+            // ])
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
                 fn (): string => Blade::render(
                     '<link rel="stylesheet" href="{{ asset("css/admin.css") }}">'
                 ),
-            )         
-            ->login()
+            )                     
             ->colors([
                 'primary' => Color::Blue,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
-            ->pages([
-                Dashboard::class,
-            ])
+            ->discoverResources(
+                in: app_path('Filament/Resources'),
+                for: 'App\\Filament\\Resources'
+            )
+            ->discoverPages(
+                in: app_path('Filament/Pages'),
+                for: 'App\\Filament\\Pages'
+            )        
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
             ])            
             ->navigationGroups([
-                NavigationGroup::make()
-                    ->label('Home')
-                    ->collapsible(),
+                NavigationGroup::make()->label('Home')->collapsible(),
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -67,7 +76,6 @@ class AdminPanelProvider extends PanelProvider {
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
-            
+            ]);            
     }
 }

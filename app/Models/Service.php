@@ -43,7 +43,7 @@ class Service extends Model
     }
 
     public function category(){
-        return $this->belongsTo(ServiceCategory::class, 'category_id');
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
     // public function images(){
@@ -52,7 +52,7 @@ class Service extends Model
     // }
 
     public function images(){
-        return $this->hasMany(ServiceImage::class, 'service_id')
+        return $this->hasMany(CategoryImage::class, 'category_id')
             ->orderBy('sort_order');
     }
 

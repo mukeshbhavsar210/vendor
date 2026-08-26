@@ -23,7 +23,7 @@ class Vendor extends Model {
 
     public function categories() {
         return $this->belongsToMany(
-            ServiceCategory::class,
+            Category::class,
                 'vendor_service_categories',
                 'vendor_id',
                 'category_id'
