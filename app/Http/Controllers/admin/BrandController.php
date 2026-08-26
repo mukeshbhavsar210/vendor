@@ -1,0 +1,71 @@
+<?php
+
+namespace App\Http\Controllers\admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Brand;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+
+class BrandController extends Controller {
+    public function index(Request $request){
+        $brands = Brand::latest('id');
+
+        if ($request->get('keyword')){
+            $brands = $brands->where('name', 'like', '%'.$request->keyword.'%');
+        }
+
+        $brands = $brands->paginate(10);
+
+        return view('admin.brands.index',compact('brands'));
+    }
+
+
+    
+    public function store(Request $request ){
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'slug' => 'required|unique:brands',
+        ]);
+
+        if($validator->passes()){
+            $brand = new Brand();
+            $brand->name = $request->name;
+            $brand->slug = $request->slug;
+            $brand->status = $request->status;
+            $brand->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Brand added successfully',
+            ]);
+
+        } else {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ]);
+        }
+    }
+
+    public function destroy($id, Request $request){
+        $brand = Brand::find($id);
+
+        if(empty($brand)){
+            $request->session()->flash('error','Record not found');
+            return response([
+                'status' => false,
+                'notFound' => true,
+            ]);
+        }
+
+        $brand->delete();
+
+        $request->session()->flash('success', 'Brand deleted successfully');
+
+        return response([
+            'status' => true,
+            'message' => 'Brand deleted successfully',
+        ]);
+    }
+}
