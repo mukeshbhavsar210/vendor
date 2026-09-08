@@ -22,7 +22,7 @@ class FrontController extends Controller {
         $data['latestProducts'] = $latestProducts;
         $data['featuredProducts'] = $products;    
 
-        return view("front.products.home",$data);
+        return view("front.home.index",$data);
     }
 
 

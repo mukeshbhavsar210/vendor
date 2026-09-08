@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model {
     use HasFactory;
 
-    protected $fillable = [ 'category_name', 'category_slug', 'status'];
+    protected $fillable = [ 'category_name', 'category_slug', 'image', 'showHome', 'category_modal', 'menu_order', 'status'];
 
     public function sub_category(){
         return $this->hasMany(SubCategory::class);

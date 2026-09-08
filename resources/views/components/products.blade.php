@@ -3,8 +3,7 @@
     'category' => null,
     'subcategory' => null,
     'wishlistProductIds' => null,
-    'class' => null,
-    "section" => null,
+    'class' => null,    
     "variable" => null,    
     'hover' => true,
     'producttitle' => null,
@@ -32,6 +31,8 @@
     $rating = $product->average_rating ?? 0;
     $count  = $product->rating_count ?? 0;
 @endphp
+
+<h1>Hello</h1>
 
 <div class="product-card {{ $class }}">
     <div class="product-image-wrapper">

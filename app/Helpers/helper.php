@@ -9,26 +9,23 @@ use App\Models\Page;
 use App\Models\ProductImage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;  
-
-    function getBrands() {
-        return Brand::withCount('products')
-            ->where('status', 1)
-            ->having('products_count', '>', 0) 
-            ->orderBy('brand_order', 'DESC')
-            ->take(10)
-            ->get();
-    }
+use Illuminate\Support\Facades\Mail;    
 
     function getCategories() {
-        return Category::with(['subCategories.subSubCategories'])
-            ->withCount('products')
-            ->where('status', 1)            
-            ->orderBy('id', 'DESC')
-            ->take(20)
+        return Category::with(['subCategories'])
+            ->where('showHome', 'yes')
+            ->orderBy('menu_order', 'ASC')
+            ->take(6)
             ->get();
     }
-    
+
+    function getModalCategories() {
+        return Category::where('showHome', 'no')->where('status', 1)
+            ->orderBy('menu_order', 'ASC')
+            ->take(6)
+            ->get();
+    }
+   
 
     function getProductImage($productId){
         return ProductImage::where('product_id',$productId)->first();

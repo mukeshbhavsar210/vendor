@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model
 {
-    protected $fillable = ['vendor_id','category_id','name','slug','description','price','price_type','city','state','pincode',
+    protected $fillable = ['vendor_id','category_id','sub_category_id','name','slug','description','price','price_type','city','state','pincode',
         'is_featured','admin_note','approved_at','views','search_count','rating','total_reviews','meta_title','meta_description','sort_order','status',
     ];
 

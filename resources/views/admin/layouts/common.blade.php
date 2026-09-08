@@ -58,12 +58,22 @@
                                     @elseif($field['type'] == 'file')                                        
                                         <input type="{{ $field['type'] }}" id="{{ $field['name'] }}" name="{{ $field['name'] }}" class="form-control" placeholder="{{ $field['placeholder'] ?? '' }}">                                        
 
-                                    @elseif($field['type'] == 'select')                                                                                
+                                    @elseif($field['type'] == 'select')
+                                        @php
+                                            $selectedValue = old(
+                                                $field['name'],
+                                                $model->{$field['name']} ?? ($field['default'] ?? null)
+                                            );
+                                        @endphp
+
                                         <select name="{{ $field['name'] }}" class="form-select" id="{{ $field['name'] }}">
                                             @foreach($field['options'] as $value => $label)
-                                                <option value="{{ $value }}">{{ $label }}</option>
+                                                <option value="{{ $value }}"
+                                                    {{ (string) $selectedValue === (string) $value ? 'selected' : '' }}>
+                                                    {{ $label }}
+                                                </option>
                                             @endforeach
-                                        </select>                                                    
+                                        </select>                                                 
                                         
                                     @elseif($field['type'] == 'category')                                                                                
                                         <select name="sub_category_id" id="sub_category" class="form-select" >
@@ -242,13 +252,39 @@
         document.getElementById('form_submit_btn').innerText = 'Create Sub Category';
     }
    
+    // function editCategoryModal(button) {
+    //     let id = button.dataset.id;
+    //     let category_modal = button.dataset.category_modal;
+    //     let category_name = button.dataset.category_name;
+    //     let showHome = button.dataset.showHome;
+    //     let status = button.dataset.status;        
+
+    //     document.querySelector('#categoryModal .modal-title').innerText = 'Edit Category';
+    //     let form = document.getElementById('categoryForm');
+
+    //     // Set action
+    //     form.action = `${update_category}/${id}`;
+    //     document.getElementById('category_method').value = 'PUT';
+
+    //     // Fill values
+    //     document.getElementById('category_modal').value = category_modal;
+    //     document.getElementById('category_name').value = category_name;
+    //     document.getElementById('menu_order').value = menu_order;
+    //     document.getElementById('showHome').value = showHome;
+    //     document.getElementById('status').value = (status == 'Active') ? 1 : 0;        
+    //     document.getElementById('form_submit_btn').innerText = 'Update Category';
+    // }
+
     function editCategoryModal(button) {
         let id = button.dataset.id;
-        let category_name = button.dataset.category_name;
+        let category_modal = button.dataset.categoryModal;
+        let category_name = button.dataset.categoryName;
+        let showHome = button.dataset.showHome;
+        let menu_order = button.dataset.menuOrder;
         let status = button.dataset.status;
-        let showHome = button.dataset.showHome;        
 
         document.querySelector('#categoryModal .modal-title').innerText = 'Edit Category';
+
         let form = document.getElementById('categoryForm');
 
         // Set action
@@ -256,10 +292,14 @@
         document.getElementById('category_method').value = 'PUT';
 
         // Fill values
+        document.getElementById('category_modal').value = category_modal;
         document.getElementById('category_name').value = category_name;
         document.getElementById('menu_order').value = menu_order;
-        document.getElementById('status').value = (status == 'Active') ? 1 : 0;
-        document.getElementById('showHome').value = showHome;
+
+        // Select values
+        document.getElementById('showHome').value = String(showHome);
+        document.getElementById('status').value = String(status);
+
         document.getElementById('form_submit_btn').innerText = 'Update Category';
     }
 

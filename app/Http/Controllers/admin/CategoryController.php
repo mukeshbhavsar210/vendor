@@ -18,12 +18,12 @@ use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller {
     public function index(Request $request) {        
-        $categories = Category::withCount('subCategories')
+        $categories = Category::withCount('subCategories')->orderBy('menu_order', 'ASC')->where('status', 1)
             ->with(['subCategories' => function ($q) {
                 $q->withCount('subSubCategories')
                 ->with('subSubCategories');
             }])
-            ->paginate(10);        
+            ->paginate(20);        
 
         if ($request->filled('keyword')) {
             $categories->where('category_name', 'like', '%' . $request->keyword . '%');
@@ -44,20 +44,60 @@ class CategoryController extends Controller {
                         'action' => '',
                         'method' => 'POST',
                         'button' => 'Submit',
-                        'fields' => [
+                        'fields' => [                            
                             [
                                 'type' => 'text',
-                                'name' => 'category_name',                                
+                                'name' => 'category_name',
                                 'id' => 'category_name', 
                                 'label' => 'Category Name',
                                 'placeholder' => 'Enter Category name',
                                 'slug_create' => 'slug-source',
-                                'class' => 'slug-source',                                
+                                'class' => 'slug-source',
                                 'data'  => [
                                     'target' => '#slug'
                                 ],
-                                'col' => 'col-md-12 col-12'
-                            ],
+                                'col' => 'col-md-9 col-12'
+                            ],    
+                            [
+                                'type' => 'select',
+                                'name' => 'showHome',
+                                'label' => 'Show on Home',
+                                'options' => [
+                                    'yes' => 'Yes',
+                                    'no' => 'No'
+                                ],
+                                'value' => 'yes',
+                                'default' => 'yes',
+                                'col' => 'col-md-3 col-6'
+                            ],      
+                            [
+                                'type' => 'select',
+                                'name' => 'category_modal',
+                                'label' => 'Modal Title',
+                                'options' => [
+                                    'Large Appliances' => 'Large Appliances',
+                                    'Other Appliances' => 'Other Appliances',
+                                    'Home Repairs' => 'Home Repairs',
+                                    'Home Installation' => 'Home Installation',
+                                ],
+                                'col' => 'col-md-9 col-6'
+                            ],                            
+                            [
+                                'type' => 'select',
+                                'name' => 'menu_order',
+                                'label' => 'Menu Order',
+                                'options' => [
+                                    1 => 1,
+                                    2 => 2,
+                                    3 => 3,
+                                    4 => 4,
+                                    5 => 5,
+                                    6 => 6,
+                                ],
+                                'value' => 1,
+                                'default' => 1,
+                                'col' => 'col-md-3 col-6'
+                            ],  
                             [
                                 'type' => 'text',
                                 'name' => 'category_slug',
@@ -65,7 +105,25 @@ class CategoryController extends Controller {
                                 'placeholder' => 'Enter Category name',                                
                                 'id'    => 'slug',
                                 'col' => 'col-md-12 col-12 d-none'
-                            ]
+                            ],
+                            [
+                                'type' => 'file',
+                                'name' => 'image',
+                                'label' => 'Category Image',
+                                'col' => 'col-md-9 col-6'
+                            ],
+                            [
+                                'type' => 'select',
+                                'name' => 'status',
+                                'label' => 'Status',
+                                'options' => [
+                                    1 => 'Active',
+                                    0 => 'Block'
+                                ],
+                                'value' => 1,
+                                'default' => 1,
+                                'col' => 'col-md-3 col-6'
+                            ],                              
                         ]
                     ]
                 ],                
@@ -146,11 +204,37 @@ class CategoryController extends Controller {
         if ($validator->passes()) {
             $category = new Category();
             $category->category_name = $request->category_name;
-            $category->category_slug = $request->category_slug;            
+            $category->category_slug = $request->category_slug;
+            $category->menu_order = $request->menu_order;
+            $category->showHome = $request->showHome;            
+            $category->category_modal = $request->category_modal;
+            $category->status = $request->status;
+            $category->image = $request->image;
             $category->save();
 
             $id = $category->id;
-            $name = Str::slug($category->category_name);            
+            $name = Str::slug($category->category_name);
+
+            // Init Image Manager
+            $manager = new ImageManager(new Driver());
+
+            // Create directory if not exists
+            $path = public_path('uploads/category/');
+            if (!File::exists($path)) {
+                File::makeDirectory($path, 0755, true);
+            }            
+            
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $imageName = $id . '_' . $name . '.' . $image->getClientOriginalExtension();
+                $img = $manager->read($image->getRealPath());
+                //$img->scale(width: 300);
+                //$img->resize(200, 250);
+                $img->save($path.$imageName);
+                $category->image = $imageName;
+                $category->save();
+            }   
+
             $request->session()->flash('success', 'Category added successfully');
 
             return response()->json([
@@ -186,8 +270,47 @@ class CategoryController extends Controller {
         if ($validator->passes()) {
             $category->category_name = $request->category_name;
             $category->category_slug = $request->category_slug;
+            $category->menu_order = $request->menu_order;
+            $category->showHome = $request->showHome;            
+            $category->category_modal = $request->category_modal;
             $category->status = $request->status;
             $category->save();           
+
+            $oldImage = $category->image;
+
+            // Save image here
+            if (!empty($request->image_id)) {
+                $tempImage = TempImage::find($request->image_id);
+
+                if ($tempImage) {
+                    $manager = new ImageManager(new Driver());
+                    $ext = pathinfo($tempImage->name, PATHINFO_EXTENSION);
+                    $slugName = Str::slug($category->category_name);
+                    $newImageName = $category->id. '-' .$slugName. '.' .$ext;
+                    //$newImageName = $category->id. '-' .Str::slug($category->category_name). '.' .$ext;
+
+                    $sourcePath = public_path('/temp/' . $tempImage->name);
+                    $destinationPath = public_path('/uploads/category/' . $newImageName);
+
+                    // Read image
+                    $image = $manager->read($sourcePath);
+                    $image->cover(200, 250);
+                    $image->save($destinationPath, quality: 100);
+
+                    // Update database
+                    $oldImage = $category->image;
+                    $category->image = $newImageName;
+                    $category->save();
+
+                    // Delete old image
+                    if ($oldImage) {
+                        File::delete(public_path('/uploads/category/' . $oldImage));
+                    }
+
+                    // Delete temp image
+                    File::delete($sourcePath);
+                }
+            }
 
             $request->session()->flash('success', 'Category updated successfully');
 

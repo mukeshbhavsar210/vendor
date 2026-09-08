@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 26, 2026 at 09:42 AM
+-- Generation Time: Sep 08, 2026 at 03:50 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `vendor_new`
+-- Database: `vendor`
 --
 
 -- --------------------------------------------------------
@@ -111,8 +111,12 @@ INSERT INTO `brands` (`id`, `name`, `slug`, `model`, `logo`, `status`, `descript
 
 CREATE TABLE `categories` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `category_name` varchar(50) NOT NULL,
-  `category_slug` varchar(50) DEFAULT NULL,
+  `category_name` varchar(100) NOT NULL,
+  `category_slug` varchar(100) DEFAULT NULL,
+  `image` varchar(200) DEFAULT NULL,
+  `showHome` enum('yes','no') DEFAULT NULL,
+  `category_modal` varchar(20) DEFAULT NULL,
+  `menu_order` int(1) DEFAULT NULL,
   `status` int(5) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -122,9 +126,24 @@ CREATE TABLE `categories` (
 -- Dumping data for table `categories`
 --
 
-INSERT INTO `categories` (`id`, `category_name`, `category_slug`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'Electrician', 'electrician', 1, '2026-08-25 22:57:41', '2026-08-25 23:33:49'),
-(2, 'Plumbers', 'plumbers', 1, '2026-08-25 23:13:46', '2026-08-25 23:13:46');
+INSERT INTO `categories` (`id`, `category_name`, `category_slug`, `image`, `showHome`, `category_modal`, `menu_order`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'Electrician', 'electrician', NULL, 'no', NULL, 3, 0, '2026-08-25 22:57:41', '2026-08-25 23:33:49'),
+(2, 'Plumbers', 'plumbers', NULL, 'no', NULL, 4, 0, '2026-08-25 23:13:46', '2026-08-25 23:13:46'),
+(183, 'Women\'s Salon & Spa', 'womens-salon-spa', '183_womens-salon-spa.jpeg', 'yes', '1', 1, 1, '2026-09-08 01:22:59', '2026-09-08 06:25:57'),
+(184, 'Men\'s Salon & Massage', 'mens-salon-massage', '184_mens-salon-massage.jpeg', 'yes', '2', 2, 1, '2026-09-08 01:24:42', '2026-09-08 01:24:42'),
+(185, 'Cleaning', 'cleaning', '185_cleaning.jpeg', 'yes', '3', 3, 1, '2026-09-08 01:25:09', '2026-09-08 01:25:09'),
+(186, 'Home Painting', 'home-painting', '186_home-painting.jpeg', 'yes', '4', 4, 1, '2026-09-08 01:40:29', '2026-09-08 06:24:39'),
+(187, 'AC & Appliance Repair', 'ac-appliance-repair', '187_ac-appliance-repair.jpeg', 'yes', '5', 5, 1, '2026-09-08 01:40:47', '2026-09-08 06:25:29'),
+(188, 'Electrician, Plumber & Carpenter', 'electrician-plumber-carpenter', '188_electrician-plumber-carpenter.jpeg', 'yes', NULL, 6, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(189, 'Washing Machine', 'washing-machine', '189_washing-machine.jpeg', 'no', 'Large Appliances', 5, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(190, 'Refrigerator', 'refrigerator', '190_refrigerator.jpeg', 'no', 'Large Appliances', 5, 1, '2026-09-08 06:55:14', '2026-09-08 06:55:16'),
+(191, 'Television', 'television', '191_television.jpeg', 'no', 'Large Appliances', 5, 1, '2026-09-08 06:55:48', '2026-09-08 06:55:48'),
+(192, 'AC', 'ac', '192_ac.jpeg', 'no', 'Large Appliances', 5, 1, '2026-09-08 07:06:16', '2026-09-08 07:06:16'),
+(193, 'Chimney', 'chimney', '193_chimney.jpeg', 'no', 'Other Appliances', 5, 1, '2026-09-08 07:12:23', '2026-09-08 07:12:23'),
+(194, 'Microwave', 'microwave', '194_microwave.jpeg', 'no', 'Other Appliances', 5, 1, '2026-09-08 07:19:34', '2026-09-08 07:19:34'),
+(195, 'RO/Water Purifier', 'rowater-purifier', '195_rowater-purifier.jpeg', 'no', 'Other Appliances', 5, 1, '2026-09-08 07:19:56', '2026-09-08 07:19:56'),
+(196, 'Geyser', 'geyser', '196_geyser.jpeg', 'no', 'Other Appliances', 5, 1, '2026-09-08 07:20:14', '2026-09-08 07:20:14'),
+(197, 'Air Cooler', 'air-cooler', '197_air-cooler.jpeg', 'no', 'Other Appliances', 5, 1, '2026-09-08 07:20:33', '2026-09-08 07:20:33');
 
 -- --------------------------------------------------------
 
@@ -588,11 +607,7 @@ CREATE TABLE `products` (
   `price` double(10,2) NOT NULL,
   `category_id` bigint(20) UNSIGNED NOT NULL,
   `sub_category_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `sub_sub_category_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `brand_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `discount_percentage_id` bigint(20) UNSIGNED DEFAULT NULL,
   `is_featured` enum('Yes','No') NOT NULL DEFAULT 'No',
-  `sku` varchar(25) DEFAULT NULL,
   `recommended` varchar(10) DEFAULT NULL,
   `views` varchar(10) DEFAULT NULL,
   `discount_percentage` varchar(10) DEFAULT NULL,
@@ -601,6 +616,13 @@ CREATE TABLE `products` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `products`
+--
+
+INSERT INTO `products` (`id`, `title`, `slug`, `description`, `short_description`, `related_products`, `price`, `category_id`, `sub_category_id`, `is_featured`, `recommended`, `views`, `discount_percentage`, `average_rating`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'Foam Jet Service', 'foam_jet_service', 'test', 'test', NULL, 449.00, 192, 14, 'Yes', NULL, NULL, NULL, '4.5', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -693,6 +715,7 @@ CREATE TABLE `services` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `vendor_id` bigint(20) UNSIGNED DEFAULT NULL,
   `category_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `sub_category_id` bigint(20) UNSIGNED DEFAULT NULL,
   `name` varchar(100) NOT NULL,
   `slug` varchar(100) NOT NULL,
   `description` text DEFAULT NULL,
@@ -715,6 +738,13 @@ CREATE TABLE `services` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `services`
+--
+
+INSERT INTO `services` (`id`, `vendor_id`, `category_id`, `sub_category_id`, `name`, `slug`, `description`, `price`, `price_type`, `city`, `state`, `pincode`, `status`, `is_featured`, `admin_note`, `approved_at`, `views`, `search_count`, `rating`, `total_reviews`, `meta_title`, `meta_description`, `sort_order`, `created_at`, `updated_at`) VALUES
+(1, 2, 192, 14, 'test', 'test', NULL, NULL, 'fixed', NULL, NULL, NULL, 'pending', 0, NULL, NULL, 0, 0, 0.00, 0, NULL, NULL, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -891,8 +921,9 @@ INSERT INTO `sub_categories` (`id`, `category_id`, `sub_category_name`, `sub_cat
 (8, 1, 'Switchbox installation', 'switchbox-installation', '8_switchbox-installation.jpeg', 1, '2026-08-26 00:27:18', '2026-08-26 00:27:18'),
 (9, 1, 'Fan repair (ceiling/exhaust/wall)', 'fan-repair-ceilingexhaustwall', '9_fan-repair-ceilingexhaustwall.jpeg', 1, '2026-08-26 00:29:05', '2026-08-26 00:29:05'),
 (10, 1, 'Fan replacement (ceiling/exhaust/wall)', 'fan-replacement-ceilingexhaustwall', '10_fan-replacement-ceilingexhaustwall.jpeg', 1, '2026-08-26 00:29:27', '2026-08-26 00:29:27'),
-(11, 1, 'Fan uninstallation (ceiling/exhaust/wall)', 'fan-uninstallation-ceilingexhaustwall', '11_fan-uninstallation-ceilingexhaustwall.jpeg', 1, '2026-08-26 00:29:45', '2026-08-26 00:29:45'),
-(12, 2, 'Bath accessory installation', 'bath-accessory-installation', '12_bath-accessory-installation.jpeg', 1, '2026-08-26 00:32:57', '2026-08-26 00:32:57');
+(12, 2, 'Bath accessory installation', 'bath-accessory-installation', '12_bath-accessory-installation.jpeg', 1, '2026-08-26 00:32:57', '2026-08-26 00:32:57'),
+(13, 187, 'AC', 'ac', '13_ac.jpeg', 1, '2026-09-08 01:42:43', '2026-09-08 01:42:43'),
+(14, 192, 'AC Service & repair in 60 minutes', 'ac_service_&_repair_in_60_minutes', NULL, 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1224,10 +1255,7 @@ ALTER TABLE `personal_access_tokens`
 ALTER TABLE `products`
   ADD PRIMARY KEY (`id`),
   ADD KEY `products_category_id_foreign` (`category_id`),
-  ADD KEY `products_sub_category_id_foreign` (`sub_category_id`),
-  ADD KEY `products_brand_id_foreign` (`brand_id`),
-  ADD KEY `products_sub_sub_category_id_foreign` (`sub_sub_category_id`),
-  ADD KEY `products_discount_percentage_id_foreign` (`discount_percentage_id`);
+  ADD KEY `products_sub_category_id_foreign` (`sub_category_id`);
 
 --
 -- Indexes for table `product_images`
@@ -1279,7 +1307,8 @@ ALTER TABLE `services`
   ADD KEY `services_city_status_index` (`city`,`status`),
   ADD KEY `services_status_is_featured_index` (`status`,`is_featured`),
   ADD KEY `services_vendor_id_foreign` (`vendor_id`),
-  ADD KEY `services_category_id_foreign` (`category_id`);
+  ADD KEY `services_category_id_foreign` (`category_id`),
+  ADD KEY `services_sub_category_id_foreign` (`sub_category_id`);
 
 --
 -- Indexes for table `service_images`
@@ -1395,7 +1424,7 @@ ALTER TABLE `brands`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=179;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=198;
 
 --
 -- AUTO_INCREMENT for table `colors`
@@ -1563,7 +1592,7 @@ ALTER TABLE `stock_notifications`
 -- AUTO_INCREMENT for table `sub_categories`
 --
 ALTER TABLE `sub_categories`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `sub_sub_categories`
@@ -1667,11 +1696,8 @@ ALTER TABLE `payments`
 -- Constraints for table `products`
 --
 ALTER TABLE `products`
-  ADD CONSTRAINT `products_brand_id_foreign` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `products_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `products_discount_percentage_id_foreign` FOREIGN KEY (`discount_percentage_id`) REFERENCES `discount_percentages` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `products_sub_category_id_foreign` FOREIGN KEY (`sub_category_id`) REFERENCES `sub_categories` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `products_sub_sub_category_id_foreign` FOREIGN KEY (`sub_sub_category_id`) REFERENCES `sub_sub_categories` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+  ADD CONSTRAINT `products_sub_category_id_foreign` FOREIGN KEY (`sub_category_id`) REFERENCES `sub_categories` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `product_images`
@@ -1712,6 +1738,7 @@ ALTER TABLE `reviews`
 --
 ALTER TABLE `services`
   ADD CONSTRAINT `services_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `services_sub_category_id_foreign` FOREIGN KEY (`sub_category_id`) REFERENCES `sub_categories` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `services_vendor_id_foreign` FOREIGN KEY (`vendor_id`) REFERENCES `vendors` (`id`) ON DELETE CASCADE;
 
 --

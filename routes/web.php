@@ -42,8 +42,6 @@ Route::controller(FrontController::class)->group(function() {
     Route::post('/chat-order-status', 'orderStatus')->name('chat.order.status');
 });
 
-
-
 Route::get('/go/{id}', function($id){
     $product = AffiliateProduct::findOrFail($id);
     $product->increment('views');

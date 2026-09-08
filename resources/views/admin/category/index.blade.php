@@ -61,23 +61,11 @@
                         <div class="accordion-button collapsed p-2" data-bs-toggle="collapse" data-bs-target="#catCollapse{{ $category->id }}">
                             <div class="category-card">                                
                                 <div class="flex-grow-1">
-                                    <h5>{{ $category->category_name }}</h5>
-                                </div>                                     
-                                <div class="flex">
-                                    <a href="javascript:0" class="edit-icon"
-                                        data-id="{{ $category->id }}"
-                                        data-category_name="{{ $category->category_name }}"
-                                        data-status="{{ $category->status }}"
-                                        data-showHome="{{ $category->showHome }}"                                        
-                                        onclick="editCategoryModal(this)"                                                
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#categoryModal" >
-                                        <span class="sprites"></span>
-                                    </a>
-                                    <a href="#" class="delete-icon" onclick="deleteCategory({{ $category->id }})" >
-                                        <span class="sprites"></span>
-                                    </a> 
-                                    <div class="counts">{{ $category->sub_categories_count }}</div>
+                                    <h5>{{ $category->category_name }}
+                                        @if ($category->sub_categories_count > 0)
+                                            - {{ $category->sub_categories_count }}    
+                                        @endif                                        
+                                    </h5>
                                 </div>
                             </div>
                         </div>
@@ -85,18 +73,39 @@
 
                     <div id="catCollapse{{ $category->id }}" class="accordion-collapse collapse" data-bs-parent="#categoryAccordion">
                         <div class="accordion-body">
-                            <div class="row justify-content-center">                                
-                                @foreach ($category->subCategories as $sub)
-                                    <div class="col-md-2 col-6">
-                                        <div class="card">
-                                            <img src="{{ asset('uploads/subcategory/' . $sub->image) }}" alt="{{ $sub->name }}" class="card-img-top img-fluid bg-light-alt" >
-                                            <div class="card-header">
-                                                <h4 class="card-title">{{ $sub->sub_category_name }}</h4>
-                                                <a href="#" class="btn btn-outline-danger btn-sm mt-2" onclick="deleteSubCategory({{ $sub->id }})">Delete</a>                                                
+                            <div class="category-card-flex">                                
+                                @foreach ($category->subCategories as $sub)                                    
+                                    <div class="sub-category-card">
+                                        <div class="hover-card">
+                                            <div class="overlay-new">
+                                                <a href="#" class="delete-icon"  onclick="deleteSubCategory({{ $sub->id }})">
+                                                    <span class="sprites"></span>
+                                                </a>
                                             </div>
-                                        </div>                                
-                                    </div>
+                                            <img src="{{ asset('uploads/subcategory/' . $sub->image) }}" alt="{{ $sub->name }}" class="thumb" >
+                                        </div>
+                                        <p class="mb-0">{{ Str::limit($sub->sub_category_name, 22) }}</p>
+                                    </div>                                    
                                 @endforeach                                
+                            </div>
+
+                            <div class="flex">
+                                <a href="javascript:0" 
+                                    class="btn btn-outline-primary btn-sm" 
+                                    data-id="{{ $category->id }}"
+                                    data-category-modal="{{ $category->category_modal }}"
+                                    data-category-name="{{ $category->category_name }}"
+                                    data-show-home="{{ $category->showHome }}"
+                                    data-menu-order="{{ $category->menu_order }}"
+                                    data-status="{{ $category->status }}"
+                                    onclick="editCategoryModal(this)"                                                
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#categoryModal" >
+                                    Edit
+                                </a>
+                                <a href="#" class="btn btn-outline-danger btn-sm" onclick="deleteCategory({{ $category->id }})" >
+                                    Delete
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -118,74 +127,4 @@
     ])
 @endforeach
 
-@endsection
-
-@section('customJs')
-<script>    
-    function deleteCategory(id){
-        var url = '{{ route("category.delete","ID") }}'
-        var newUrl = url.replace("ID",id)
-
-        if(confirm("Are you sure you want to delete?")){
-            $.ajax({
-                url: newUrl,
-                type: 'delete',
-                data: {},
-                dataType: 'json',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response){
-                    if(response["status"]){
-                        window.location.href="{{ route('categories.index') }}"
-                    }
-                }
-            });
-        }
-    }
-
-
-    function deleteSubCategory(id){        
-        var url = '{{ route("sub_category.delete","ID") }}'
-        var newUrl = url.replace("ID",id)
-
-        if(confirm("Are you sure you want to delete?")){
-            $.ajax({
-                url: newUrl,
-                type: 'delete',
-                data: {},
-                dataType: 'json',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response){
-                    window.location.href="{{ route('categories.index') }}"
-                   
-                }
-            });
-        }
-    }
-
-    function deleteSub2Category(id){
-        var url = '{{ route("sub_sub_category.delete","ID") }}'
-        var newUrl = url.replace("ID",id)
-
-        if(confirm("Are you sure you want to delete?")){
-            $.ajax({
-                url: newUrl,
-                type: 'delete',
-                data: {},
-                dataType: 'json',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response){
-                    window.location.href="{{ route('categories.index') }}"
-                    
-                }
-            });
-        }
-    } 
-
-</script>
 @endsection

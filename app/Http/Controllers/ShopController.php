@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Color;
 use App\Models\DiscountCoupon;
@@ -11,6 +10,7 @@ use App\Models\DiscountPercentage;
 use App\Models\Product;
 use App\Models\Rating;
 use App\Models\Review;
+use App\Models\Service;
 use App\Models\Size;
 use App\Models\SubCategory;
 use App\Models\SubSubCategory;
@@ -71,25 +71,11 @@ class ShopController extends Controller {
             $query->where('status', 1);
             if ($selected_item1) {$query->where('category_id', $selected_item1->id);}
             if ($selected_item2) {$query->where('sub_category_id', $selected_item2->id);}
-        };        
-        
-        //Other filters        
-        $brands = Brand::where('status', 1)
-                ->whereHas('products', $filterProducts) 
-                ->withCount(['products as products_count' => $filterProducts])
-                ->orderBy('name', 'ASC')->get();
+        };                   
 
         $discounts = DiscountPercentage::whereHas('products', $filterProducts) 
                 ->withCount(['products as products_count' => $filterProducts])
-                ->orderBy('percentage', 'ASC')->get();     
-                
-        $colors = Color::whereHas('products', $filterProducts) 
-                ->withCount(['products as products_count' => $filterProducts])
-                ->orderBy('name', 'ASC')->get();
-
-        $sizes = Size::whereHas('products', $filterProducts) 
-                ->withCount(['products as products_count' => $filterProducts])
-                ->orderBy('name', 'ASC')->get();
+                ->orderBy('percentage', 'ASC')->get();                         
 
         //Filter logic
         function applyFilter($request, $param, $model, $column, &$selectedArray, &$products, $options = []) {
@@ -114,10 +100,7 @@ class ShopController extends Controller {
                 }
             }
         }
-        
-        applyFilter($request,'color',Color::class,'name',$colorsArray,$products,['relation' => 'colors']);
-        applyFilter($request,'size',Size::class,'name',$sizesArray,$products,['relation' => 'sizes']);        
-        applyFilter( $request, 'brand', Brand::class, 'slug', $brandArray, $products, ['column' => 'brand_id'] );
+                
         applyFilter($request,'discount',DiscountPercentage::class,'percentage',$discountArray,$products,['column' => 'discount_percentage_id']);
 
         // Price slider
@@ -173,11 +156,8 @@ class ShopController extends Controller {
 
         $filtersApplied = false;
 
-        if (
-            $request->filled('brand') ||
+        if (            
             $request->filled('category') ||
-            $request->filled('color') ||
-            $request->filled('size') ||
             $request->filled('item') ||
             $request->filled('price_min') || $request->filled('price_max') ||            
             $request->filled('sort') ||
@@ -215,8 +195,7 @@ class ShopController extends Controller {
         }     
 
         $data = compact(
-            'products', 'wishlistProductIds', 'productCount', 'categories', 'sizes', 'categoryArray', 'brands', 'brandsArray', 'colors', 'colorsArray', 'sizes', 'sizesArray', 
-            'discounts', 'discountArray', 'selected_item1', 'selected_item2', 'selected_item3', 'item1', 'item2', 'item3', 'filtersApplied', 'totalProducts'
+            'products', 'wishlistProductIds','productCount','categories','categoryArray', 'discounts', 'discountArray', 'selected_item1', 'selected_item2', 'selected_item3', 'item1','item2','item3','filtersApplied','totalProducts'
         );
 
         $data = array_merge($data, [
@@ -225,15 +204,13 @@ class ShopController extends Controller {
             'sort'     => $request->get('sort'),
         ]);      
         
-        return view('front.products.listing', $data);
+        return view('front.services.listing', $data);
     }
 
 
 
     public function product($item2=null, $item3=null, $slug, Request $request) {
-        $product = Product::where('slug',$slug)->with(['variants.color', 'colors', 'sizes', 'product_images', 'variants', 'subSubCategory.subCategory.category'])->first();
-        $colors = Color::get();
-        $sizes = Size::get();
+        $product = Product::where('slug',$slug)->with(['product_images', 'variants', 'subSubCategory.subCategory.category'])->first();        
 
         $selectedItems = [
             'item1' => null,
@@ -319,8 +296,6 @@ class ShopController extends Controller {
         $data['totalReviews'] = $totalReviews;
         $data['recommendedCount'] = $recommendedCount;
         $data['percentage'] = $percentage;
-        $data['colors'] = $colors;        
-        $data['sizes'] = $sizes;
         $data['relatedProducts'] = $relatedProducts;              
             
         return view('front.products.details',$data);
@@ -349,21 +324,42 @@ class ShopController extends Controller {
         return view('front.products.reviews', compact('product','reviews','averageRating', 'ratings', 'totalRatings'));
     }
 
-    public function category(Request $request, $item1=null) {    
-        $categories = Product::with('ratings')->where('status',1);
+
+    public function category(Request $request, $item1 = null)
+{
+    $query = Service::with('ratings')
+        ->where('status', 1);
+
+    $selected_category = $item1;
+
+    if ($item1) {
+        $category = Category::where('category_slug', $item1)->firstOrFail();
+
+        $query->where('category_id', $category->id);
+    }
+
+    $services = $query->get();
+
+    return view('front.services.index', compact(
+        'services',
+        'selected_category'
+    ));
+}
+
+    public function category_old(Request $request, $item1=null) {    
+        $services = Service::with('ratings')->where('status',1);
         $selected_category = $item1;
         
-        if (!empty($item1)) {
-            $values = explode(',', $item1);
-            $ids = Category::whereIn('category_slug', $values)->pluck('id')->toArray();
-            $selected_item1 = $values;
-            $categories->whereIn('category_id', $ids);
-        }
-
-        $categories = $categories->paginate(10);        
-
-        return view('front.products.category', compact('categories', 'item1', 'selected_category' ));
+        // if (!empty($item1)) {
+        //     $values = explode(',', $item1);
+        //     $ids = Category::whereIn('category_slug', $values)->pluck('id')->toArray();
+        //     $selected_item1 = $values;
+        //     $services->whereIn('category_id', $ids);
+        // }        
+            
+        return view('front.services.index', compact('services', 'selected_category' ));
     }
+
 
     public function subcategory(Request $request, $item2=null) {            
         $subcategories = Product::with(['subCategory', 'ratings'])->where('status',1);     
@@ -379,32 +375,7 @@ class ShopController extends Controller {
 
         return view('front.products.subcategory', compact('subcategories', 'item2'));
     }
-
-    public function category_old(Request $request, $item1 = null) {
-        $categorySelected = ' ';        
-
-        $categories = Category::orderBy("category_name","ASC")->with('sub_category')->where('status',1)->get();
-        $products = Product::where('status',1);        
-
-        //Apply filters here
-        if (!empty($item1)) {
-            $category = Category::where('category_slug', $item1)->first();
-            if ($category) {
-                $products = $products->where('category_id', $category->id);
-                $categorySelected = $category->id;
-            }
-        }
-       
-        $products = $products->paginate(10);
-
-        $data['categories'] = $categories;
-        $data['products'] = $products;
-        $data['categorySelected'] = $categorySelected;
-
-        //dd($categories);
-
-        return view('front.products.category',$data);
-    }
+    
 
     public function store(Request $request) {
         Rating::create([
