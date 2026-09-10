@@ -94,14 +94,11 @@
                     @foreach ($category->subCategories->whereNotNull('image')->where('image','!=','') as $subcategory)
                         @if ($subcategory->subSubCategories->isNotEmpty())
                             <div class="col-md-2 col-6">
-                                <x-products 
+                                <x-services 
                                     :item="$category"
                                     :category="$category"
                                     :subcategory="$subcategory"
-                                    section="show_subcategory" gallery="category" class="home"
-                                    :hover="false" 
-                                    :producttitle="false" 
-                                    :description="false" 
+                                    section="show_subcategory"
                                     :amount="false" 
                                     :title_limit="20" 
                                     :short_limit="7" 

@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AffiliateProduct;
-use App\Models\AffiliateWishlist;
 use App\Models\DealStockNotification;
 use App\Models\Order;
 use App\Models\Page;
-use App\Models\Product;
+use App\Models\Service;
 use App\Models\StockNotification;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
@@ -16,11 +14,11 @@ use Illuminate\Support\Facades\Validator;
 
 class FrontController extends Controller {
     public function index(){
-        $products = Product::where('is_featured','Yes')->orderBy('id','DESC')->take(4)->where('status',1)->get();
-        $latestProducts = Product::orderBy('id','DESC')->where('status',1)->take(4)->get();
+        $services = Service::take(4)->where('status',1)->get();
+        // $latestProducts = Service::orderBy('id','DESC')->where('status',1)->take(4)->get();
 
-        $data['latestProducts'] = $latestProducts;
-        $data['featuredProducts'] = $products;    
+        // $data['latestProducts'] = $latestProducts;
+        $data['featuredProducts'] = $services;    
 
         return view("front.home.index",$data);
     }

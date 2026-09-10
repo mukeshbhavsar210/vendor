@@ -18,7 +18,7 @@ class Service extends Model {
 
     public function service_images(){
         return $this->hasMany(ServiceImage::class);
-    }    
+    }        
 
     public function discounts(){
         return $this->hasMany(Discount::class, 'service_id');
@@ -26,6 +26,30 @@ class Service extends Model {
 
     public function ratings(){
         return $this->hasMany(Rating::class, 'service_id');
+    }
+
+    public function brand() {
+        return $this->belongsTo(Brand::class, 'brand_id');
+    }
+
+    public function process() {
+        return $this->belongsTo(Process::class, 'process_id');
+    }
+
+    public function waranty() {
+        return $this->belongsTo(Warantees::class, 'waranty_id');
+    }
+
+    public function include() {
+        return $this->belongsTo(Includes::class, 'include_id');
+    }
+
+    public function need() {
+        return $this->belongsTo(Need::class, 'need_id');
+    }
+
+    public function faqs() {
+        return $this->belongsTo(Faqs::class, 'faq_id');
     }
 
     public function vendor(){
