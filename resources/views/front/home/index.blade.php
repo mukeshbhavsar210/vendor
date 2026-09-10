@@ -24,7 +24,7 @@
                                 </div>
                                 
                                 <div class="modal fade" id="category_{{ $category->category_modal }}" tabindex="-1" aria-labelledby="categoryLabel_{{ $category->category_modal }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-custom">
+                                    <div class="modal-dialog modal-dialog-centered modal-custom">
                                         <div class="modal-content">
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
@@ -52,7 +52,6 @@
                                                                         </a>
                                                                     </div>
                                                                 @endif
-
                                                                 <p>{{ $category->category_name }}</p>
                                                             </div>
                                                         @endforeach

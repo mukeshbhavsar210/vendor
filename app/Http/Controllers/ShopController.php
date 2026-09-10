@@ -325,26 +325,27 @@ class ShopController extends Controller {
     }
 
 
-    public function category(Request $request, $item1 = null)
-{
-    $query = Service::with('ratings')
-        ->where('status', 1);
+    public function category(Request $request, $item1 = null) {
+        $services = Service::with('ratings')->with('discounts.discountPercentage')->where('status', 'approved')->get();
 
-    $selected_category = $item1;
+        $services = $services->sortBy(function ($service) {
+            return $service->subCategory?->sort_order ?? 999999;
+        })->groupBy('sub_category_id');
 
-    if ($item1) {
-        $category = Category::where('category_slug', $item1)->firstOrFail();
+        //$query = Service::with('ratings')->where('status', 'approved');        
+        $selected_category = $item1;
+        $category = Category::where('category_slug', $selected_category)->first();
+        $categories = Category::with('subCategories')->where('category_slug', $selected_category)->get();
 
-        $query->where('category_id', $category->id);
+        // if ($item1) {
+        //     $category = Category::where('category_slug', $item1)->firstOrFail();
+        //     $query->where('category_id', $category->id);
+        // }
+
+        //$services = $query->get();        
+        
+        return view('front.services.index', compact('services','selected_category','category','categories'));
     }
-
-    $services = $query->get();
-
-    return view('front.services.index', compact(
-        'services',
-        'selected_category'
-    ));
-}
 
     public function category_old(Request $request, $item1=null) {    
         $services = Service::with('ratings')->where('status',1);

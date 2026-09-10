@@ -14,7 +14,7 @@ class Discount extends Model {
         return $this->belongsTo(Product::class, 'product_id', 'id');
     }
 
-    public function percentage() {
+    public function discountPercentage() {
         return $this->belongsTo(DiscountPercentage::class, 'discount_percentages_id');
     }
 }
