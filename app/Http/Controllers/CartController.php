@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\OrderItem;
-use App\Models\Product;
+use App\Models\Service;
 use App\Models\Order;
 use App\Models\CustomerAddress;
 use App\Models\DiscountCoupon;
@@ -22,102 +22,60 @@ use Illuminate\Support\Facades\Mail;
 
 class CartController extends Controller {
     public function addToCart(Request $request) {
-        $product = Product::with(['product_images','variants','colors','discount'])
-            ->findOrFail($request->product_id);
+        $service = Service::findOrFail($request->service_id);
 
-        // ✅ Color: user selected OR fallback to first
-        $color_id = $request->color_id;
-        // if (empty($color_id)) {
-        //     $color_id = optional($product->colors->first())->id;
-        // }
-
-        // ✅ Size (optional)
-        $size_id = $request->size_id ?? null;
-
-        // ✅ Variant (optional)
-        $variantId = $request->variant_id ?? null;
-        $variant = null;
-
-        if (!empty($variantId)) {
-            $variant = $product->variants->where('id', $variantId)->first();
-        }
-
-        // ✅ FIX: Color logic
-        if ($variant) {
-            // 👉 Priority: variant color
-            $color_id = $variant->color_id;
-        } else {
-            // 👉 fallback: request OR first product image color
-            $color_id = $request->color_id 
-                ?? optional($product->product_images->first())->color_id;
-        }
-
-        // ✅ Image selection (variant > product)
-        $image = ($variant && $variant->image)
-            ? $variant->image
-            : optional($product->product_images->first())->image;
-
-        // ✅ Prevent duplicate (product + variant + size + color)
         $alreadyExists = false;
 
-        foreach (Cart::content() as $item) {
-            if (
-                $item->id == $product->id &&
-                $item->options->variant_id == $variantId &&
-                $item->options->size_id == $size_id &&
-                $item->options->color_id == $color_id 
-            ) {
+        foreach (Cart::content() as $cartItem) {
+            if ($cartItem->id == $service->id) {
                 $alreadyExists = true;
                 break;
             }
         }
 
         if (!$alreadyExists) {
-            // ✅ Discount
-            $discountPercent = (int) optional($product->discount)->percentage;
+            // Discount
+            //$discountPercent = (int) optional($service->discount)->percentage;
+            //$discountPrice = $service->price;
 
-            $discount_price = $product->price;
-            if ($discountPercent > 0) {
-                $discount_price = $product->price - ($product->price * $discountPercent / 100);
-            }
+            // if ($discountPercent > 0) {
+            //     $discountPrice = $service->price -
+            //         ($service->price * $discountPercent / 100);
+            // }
 
             Cart::add([
-                'id'      => $product->id,
-                'name'    => $product->title,
+                'id'      => $service->id,
+                'name'    => $service->title,
                 'qty'     => 1,
-                'price'   => round($product->price),
-                'weight'  => 0,
+                'price'   => round($service->price),
+
                 'options' => [
-                    'original_price'    => $product->price,
-                    'discount_price'    => round($discount_price),
-                    'discount_percent'  => $discountPercent,
-                    'short_description' => $product->short_description,
-                    'productImage'      => $image,
-                    'variant_id'        => $variantId,
-                    'size_id'           => $size_id,
-                    'color_id'          => $color_id, 
-                    'cod'               => $product->cod,
-                    'return_days'       => $product->return_days,
-                    'delivery_min_days' => $product->delivery_min_days,
-                    'delivery_max_days' => $product->delivery_max_days,
-                ]
+                    'original_price'    => $service->price,
+                    // 'discount_price'    => round($discountPrice),
+                    // 'discount_percent'  => $discountPercent,
+                    //'short_description' => $service->short_description,
+                ],
             ]);
 
             $status  = true;
-            $message = $product->title . ' added to Bag.';
+            $message = $service->title . ' added to Bag.';
+
             session()->flash('success', $message);
 
         } else {
+
             $status  = false;
-            $message = $product->title . ' already added in cart';
+            $message = $service->title . ' already added in cart';
         }
 
         return response()->json([
-            "status"    => $status,
-            "message"   => $message,
-            "cartCount" => Cart::count(),
+            'status'    => $status,
+            'message'   => $message,
+            'cartCount' => Cart::count(),
         ]);
     }
+
+
 
      public function cart() {
         $cartContent = Cart::content();
@@ -136,6 +94,7 @@ class CartController extends Controller {
         }else{
             $address = collect(); // empty collection
         }
+
         $addressTypes = CustomerAddress::pluck('address_type')->toArray();        
         $states = State::orderBy('name', 'ASC')->get(); 
         $delivery_address = CustomerAddress::where('user_id', auth()->id())
@@ -199,88 +158,65 @@ class CartController extends Controller {
     } 
 
     public function wishlistToCart(Request $request) { 
-        $product = Product::with(['product_images','variants','discount'])->find($request->product_id);
+        $service = Service::with(['product_images','discount'])->find($request->product_id);
 
-        if (!$product) {
+        if (!$service) {
             return response()->json([
                 "status" => false,
                 "message" => "Product not found"
             ]);
         }
-
-        $variantId = $request->variant_id;
-        $size_id      = $request->size_id ?? null;
-        $color_id     = $request->color_id ?? null;
-
-        // Get selected variant (if exists)
-        $variant = null;
-        if (!empty($variantId)) {
-            $variant = $product->variants->where('id', $variantId)->first();
-        }
-
-        // Determine correct image
-        $image = $variant && $variant->image
-                    ? $variant->image
-                    : optional($product->product_images->first())->image;
-
+                
         // Unique rowId check (product + variant + size)
         $alreadyExists = false;
 
         foreach (Cart::content() as $item) {
             if (
-                $item->id == $product->id &&
-                $item->options->variant_id == $variantId &&
-                $item->options->size_id == $size_id &&
-                $item->options->color_id == $color_id
+                $item->id == $service->id
             ) {
                 $alreadyExists = true;
                 break;
             }
         }
 
-        if (!$alreadyExists) {  
-            
+        if (!$alreadyExists) {              
             $discountPercent = 0;
 
-            if ($product->discount) {
-                $discountPercent = $product->discount->percentage;
+            if ($service->discount) {
+                $discountPercent = $service->discount->percentage;
             }
             // ✅ Get discount percent safely
-            $discountPercent = (int) optional($product->discount)->percentage;
-            //$discountPercent = optional($product->discounts->first())->percentage ?? 0;
+            $discountPercent = (int) optional($service->discount)->percentage;
+            //$discountPercent = optional($service->discounts->first())->percentage ?? 0;
 
             // ✅ Calculate discount price
-            $discount_price = $product->price;
+            $discount_price = $service->price;
 
             if ($discountPercent > 0) {
-                $discount_price = $product->price - ($product->price * $discountPercent / 100);
+                $discount_price = $service->price - ($service->price * $discountPercent / 100);
             }
 
-            // $discountPercent = optional($product->discounts->first())->percentage ?? 0;
-            // $discount_price = $product->price;
+            // $discountPercent = optional($service->discounts->first())->percentage ?? 0;
+            // $discount_price = $service->price;
             // if ($discountPercent > 0) {
-            //     $discount_price = $product->price - ($product->price * $discountPercent / 100);
+            //     $discount_price = $service->price - ($service->price * $discountPercent / 100);
             // }
 
             Cart::add([
-                'id'      => $product->id,
-                'name'    => $product->title,
+                'id'      => $service->id,
+                'name'    => $service->title,
                 'qty'     => 1,                
-                'price'   => round($product->price),                
+                'price'   => round($service->price),                
                 'weight'  => 0,
                 'options' => [
-                    'original_price'    => $product->price,
+                    'original_price'    => $service->price,
                     'discount_price'    => round($discount_price),
                     'discount_percent'  => $discountPercent,                                  
-                    'short_description' => $product->short_description,                    
-                    'productImage'      => $image,
-                    'variant_id'        => $variantId,
-                    'size_id'           => $size_id,
-                    'color_id'          => $color_id,
-                    'cod'               => $product->cod,
-                    'return_days'       => $product->return_days,
-                    'delivery_min_days' => $product->delivery_min_days,
-                    'delivery_max_days' => $product->delivery_max_days,
+                    'short_description' => $service->short_description,
+                    'cod'               => $service->cod,
+                    'return_days'       => $service->return_days,
+                    'delivery_min_days' => $service->delivery_min_days,
+                    'delivery_max_days' => $service->delivery_max_days,
                 ]
             ]);
 
@@ -290,11 +226,11 @@ class CartController extends Controller {
                     ->delete();
 
             $status  = true;
-            $message = $product->title . ' added to Bag.';
+            $message = $service->title . ' added to Bag.';
             session()->flash('success', $message);
         } else {
             $status  = false;
-            $message = $product->title.' already added in cart';
+            $message = $service->title.' already added in cart';
         }
         return response()->json([
             "status"    => $status,
@@ -408,10 +344,7 @@ class CartController extends Controller {
     //     foreach (Cart::content() as $item) {
     //         $orderItem = new OrderItem;
     //         $orderItem->order_id = $order->id;
-    //         $orderItem->product_id = $item->id;
-    //         $orderItem->product_variant_id = $item->options->variant_id ?? null;
-    //         $orderItem->size_id = $item->options->size_id;
-    //         $orderItem->color_id = $item->options->color_id;
+    //         $orderItem->product_id = $item->id;    
     //         $orderItem->discounted_price = $item->options->discount_price ?? null;
     //         $orderItem->discount_percent = $item->options->discount_percent ?? null;            
     //         $orderItem->qty = $item->qty;
@@ -435,10 +368,10 @@ class CartController extends Controller {
     //         }
 
     //         // Update Stock
-    //         $product = Product::find($item->id);
-    //         if ($product && $product->track_qty == 'Yes') {
-    //             $product->qty -= $item->qty;
-    //             $product->save();
+    //         $service = Service::find($item->id);
+    //         if ($service && $service->track_qty == 'Yes') {
+    //             $service->qty -= $item->qty;
+    //             $service->save();
     //         }
     //     }
 
@@ -541,10 +474,7 @@ class CartController extends Controller {
         foreach (Cart::content() as $item) {
             OrderItem::create([
                 'order_id' => $order->id,
-                'product_id' => $item->id,
-                'product_variant_id' => $item->options->variant_id ?? null,
-                'size_id' => $item->options->size_id ?? null,
-                'color_id' => $item->options->color_id ?? null,
+                'product_id' => $item->id,                
                 'discount' => $discount,
                 'coupon_code' => $promoCode,
                 'coupon_id' => $discountCodeId,
@@ -577,10 +507,10 @@ class CartController extends Controller {
         }
 
         // Update Stock
-        $product = Product::find($item->id);
-        if ($product && $product->track_qty == 'Yes') {
-            $product->qty -= $item->qty;
-            $product->save();
+        $service = Service::find($item->id);
+        if ($service && $service->track_qty == 'Yes') {
+            $service->qty -= $item->qty;
+            $service->save();
         }
 
         // Step 9: Send Order Confirmation Email
@@ -973,14 +903,6 @@ class CartController extends Controller {
         
         $options = $item->options->toArray();
 
-        if ($request->has('color_id')) {
-            $options['color_id'] = $request->color_id;
-        }
-
-        if ($request->has('size_id')) {
-            $options['size_id'] = $request->size_id;
-        }
-
         // Important: DO NOT overwrite whole options blindly
         Cart::update($rowId, [
             'options' => $options
@@ -1013,8 +935,6 @@ class CartController extends Controller {
             $request->qty,
             $item->price,
             [
-                'size_id' => $request->size_id,
-                'color_id' => $request->color_id,
                 'short_description' => $item->options->short_description,
             ]
         );
@@ -1030,11 +950,11 @@ class CartController extends Controller {
         $qty = $request->qty;
 
         $itemInfo = Cart::get($rowId);
-        $product = Product::find($itemInfo->id);
+        $service = Service::find($itemInfo->id);
 
         //check qty available in stock
-        if($product->track_qty == "Yes"){
-            if($qty <= $product->qty ){
+        if($service->track_qty == "Yes"){
+            if($qty <= $service->qty ){
                 Cart::update($rowId, $qty);
                 $message = 'Cart updated successfully';
                 $state = true;
@@ -1415,33 +1335,6 @@ class CartController extends Controller {
         }
     }
 
-    public function getProductColors($id) {
-        $product = Product::with('colors')->find($id);
-
-        return response()->json([
-            'colors' => $product->colors->map(function($color){
-                return [
-                    'id' => $color->id,
-                    'name' => $color->name,
-                    'code' => $color->code // optional (hex color)
-                ];
-            })
-        ]);
-    }
-
-    public function getProductSizes($id) {
-        $product = Product::with('sizes')->find($id);
-
-        return response()->json([
-            'sizes' => $product->sizes->map(function($size){
-                return [
-                    'id' => $size->id,
-                    'name' => $size->name,
-                    'code' => $size->code 
-                ];
-            })
-        ]);
-    }
 
     public function removeCoupon(Request $request) {
         // Remove coupon data from session
@@ -1453,8 +1346,5 @@ class CartController extends Controller {
             'message' => 'Coupon removed successfully'
         ]);
     }
-
-
-   
 
 }

@@ -24,7 +24,7 @@
                                 </div>
                                 
                                 <div class="modal fade" id="category_{{ $category->category_modal }}" tabindex="-1" aria-labelledby="categoryLabel_{{ $category->category_modal }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-custom">
+                                    <div class="modal-dialog modal-dialog-centered modal-custom">
                                         <div class="modal-content">
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
@@ -52,7 +52,6 @@
                                                                         </a>
                                                                     </div>
                                                                 @endif
-
                                                                 <p>{{ $category->category_name }}</p>
                                                             </div>
                                                         @endforeach
@@ -95,14 +94,11 @@
                     @foreach ($category->subCategories->whereNotNull('image')->where('image','!=','') as $subcategory)
                         @if ($subcategory->subSubCategories->isNotEmpty())
                             <div class="col-md-2 col-6">
-                                <x-products 
+                                <x-services 
                                     :item="$category"
                                     :category="$category"
                                     :subcategory="$subcategory"
-                                    section="show_subcategory" gallery="category" class="home"
-                                    :hover="false" 
-                                    :producttitle="false" 
-                                    :description="false" 
+                                    section="show_subcategory"
                                     :amount="false" 
                                     :title_limit="20" 
                                     :short_limit="7" 

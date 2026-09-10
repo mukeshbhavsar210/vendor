@@ -4,9 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Service extends Model
-{
-    protected $fillable = ['vendor_id','category_id','sub_category_id','name','slug','description','price','price_type','city','state','pincode',
+class Service extends Model {
+    protected $fillable = ['vendor_id','category_id','sub_category_id','title','slug','description','price','price_type','city','state','pincode',
         'is_featured','admin_note','approved_at','views','search_count','rating','total_reviews','meta_title','meta_description','sort_order','status',
     ];
 
@@ -19,7 +18,39 @@ class Service extends Model
 
     public function service_images(){
         return $this->hasMany(ServiceImage::class);
+    }        
+
+    public function discounts(){
+        return $this->hasMany(Discount::class, 'service_id');
     }    
+
+    public function ratings(){
+        return $this->hasMany(Rating::class, 'service_id');
+    }
+
+    public function brand() {
+        return $this->belongsTo(Brand::class, 'brand_id');
+    }
+
+    public function process() {
+        return $this->belongsTo(Process::class, 'process_id');
+    }
+
+    public function waranty() {
+        return $this->belongsTo(Warantees::class, 'waranty_id');
+    }
+
+    public function include() {
+        return $this->belongsTo(Includes::class, 'include_id');
+    }
+
+    public function need() {
+        return $this->belongsTo(Need::class, 'need_id');
+    }
+
+    public function faqs() {
+        return $this->belongsTo(Faqs::class, 'faq_id');
+    }
 
     public function vendor(){
         return $this->belongsTo(Vendor::class);
@@ -43,8 +74,7 @@ class Service extends Model
     // }
 
     public function images(){
-        return $this->hasMany(CategoryImage::class, 'category_id')
-            ->orderBy('sort_order');
+        return $this->hasMany(ServiceImage::class, 'service_id');
     }
 
     public function reviews(){

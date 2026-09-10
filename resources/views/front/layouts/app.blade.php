@@ -168,46 +168,33 @@
     });   
     
     function addToCart(id, btn2){
-        let btn = event.target;
-        let hasSizes = btn.getAttribute('data-has-sizes');
-
-        if(hasSizes == 1 && (selectedSize == '' || selectedSize == null)){
-            $('.size-list li').addClass('shake');
-             setTimeout(function(){
-                $('.size-list li').removeClass('shake');
-            },400);            
-            return;
-        }       
-        
-        let urlParams = new URLSearchParams(window.location.search);
-        let variantId = urlParams.get('variant'); 
+        let btn = event.target;        
+        let urlParams = new URLSearchParams(window.location.search);        
 
         $.ajax({
             url: '{{ route("front.addToCart") }}',
             type: 'POST',
             data: {
                 _token: '{{ csrf_token() }}',
-                product_id: id,
-                variant_id: variantId ? variantId : '',
-                size_id: selectedSize,
-                color_id: selectedColor,
+                service_id: id,                
             },
             dataType: 'json',
-            success: function(response){
-                if(response.status == true){
+
+            success: function(response) {
+                if (response.status == true) {
                     $('#cartCount').text(response.cartCount);
-                    showAlert(response.message,'success');
-                    selectedSize = '';
-                    selectedColor = '';
-                    $(btn2).text('Added to Bag');                  
-                    $(btn2).addClass('disabled');                   
-                }else{
-                    showAlert(response.message,'error');
+                    showAlert(response.message, 'success');
+                    $(btn2).text('Added to Bag');
+                    $(btn2).addClass('disabled');
+                } else {
+                    showAlert(response.message, 'error');
                 }
-            },
-            error: function(xhr){
-                console.log(xhr.responseText);
-                alert('Something went wrong');
+            },            
+
+            error: function(xhr) {
+                console.log('Status:', xhr.status);
+                console.log('Response:', xhr.responseText);
+                showAlert('Something went wrong while adding to cart.', 'error');
             }
         });
     }  

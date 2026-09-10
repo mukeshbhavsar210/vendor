@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 08, 2026 at 03:50 PM
+-- Generation Time: Sep 10, 2026 at 03:19 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -82,14 +82,8 @@ INSERT INTO `affiliate_wishlists` (`id`, `user_id`, `affiliate_product_id`, `cre
 
 CREATE TABLE `brands` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `slug` varchar(255) NOT NULL,
-  `model` varchar(50) DEFAULT NULL,
-  `logo` varchar(50) DEFAULT NULL,
-  `status` int(11) NOT NULL,
-  `description` varchar(50) DEFAULT NULL,
-  `discount` varchar(50) DEFAULT NULL,
-  `brand_order` int(3) DEFAULT NULL,
+  `title` varchar(100) NOT NULL,
+  `image` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -98,10 +92,8 @@ CREATE TABLE `brands` (
 -- Dumping data for table `brands`
 --
 
-INSERT INTO `brands` (`id`, `name`, `slug`, `model`, `logo`, `status`, `description`, `discount`, `brand_order`, `created_at`, `updated_at`) VALUES
-(45, 'H&M', 'hm', '45_hm_model.jpg', '45_hm_logo.png', 1, 'Cool Casuals', 'Flat 40% Off', 1, '2026-03-20 02:07:16', '2026-03-20 02:07:16'),
-(46, 'Lux Cozi', 'lux-cozi', '46_lux-cozi_model.jpg', '46_lux-cozi_logo.png', 1, 'Best Product', 'Min 50% Off', 1, '2026-03-20 08:59:57', '2026-03-20 08:59:57'),
-(47, 'Boat', 'boat', '47_boat_model.jpg', '47_boat_logo.png', 1, 'Best Speaker', 'Max 10% Discount', 1, '2026-03-24 06:43:39', '2026-03-24 06:43:39');
+INSERT INTO `brands` (`id`, `title`, `image`, `created_at`, `updated_at`) VALUES
+(1, 'We service all brands', 'ac_brand.jpeg', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -114,8 +106,13 @@ CREATE TABLE `categories` (
   `category_name` varchar(100) NOT NULL,
   `category_slug` varchar(100) DEFAULT NULL,
   `image` varchar(200) DEFAULT NULL,
+  `price` varchar(10) DEFAULT NULL,
   `showHome` enum('yes','no') DEFAULT NULL,
   `category_modal` varchar(20) DEFAULT NULL,
+  `banner_title` varchar(50) DEFAULT NULL,
+  `banner_label` varchar(50) DEFAULT NULL,
+  `banner_details` varchar(50) DEFAULT NULL,
+  `banner_image` varchar(50) DEFAULT NULL,
   `menu_order` int(1) DEFAULT NULL,
   `status` int(5) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -126,24 +123,24 @@ CREATE TABLE `categories` (
 -- Dumping data for table `categories`
 --
 
-INSERT INTO `categories` (`id`, `category_name`, `category_slug`, `image`, `showHome`, `category_modal`, `menu_order`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'Electrician', 'electrician', NULL, 'no', NULL, 3, 0, '2026-08-25 22:57:41', '2026-08-25 23:33:49'),
-(2, 'Plumbers', 'plumbers', NULL, 'no', NULL, 4, 0, '2026-08-25 23:13:46', '2026-08-25 23:13:46'),
-(183, 'Women\'s Salon & Spa', 'womens-salon-spa', '183_womens-salon-spa.jpeg', 'yes', '1', 1, 1, '2026-09-08 01:22:59', '2026-09-08 06:25:57'),
-(184, 'Men\'s Salon & Massage', 'mens-salon-massage', '184_mens-salon-massage.jpeg', 'yes', '2', 2, 1, '2026-09-08 01:24:42', '2026-09-08 01:24:42'),
-(185, 'Cleaning', 'cleaning', '185_cleaning.jpeg', 'yes', '3', 3, 1, '2026-09-08 01:25:09', '2026-09-08 01:25:09'),
-(186, 'Home Painting', 'home-painting', '186_home-painting.jpeg', 'yes', '4', 4, 1, '2026-09-08 01:40:29', '2026-09-08 06:24:39'),
-(187, 'AC & Appliance Repair', 'ac-appliance-repair', '187_ac-appliance-repair.jpeg', 'yes', '5', 5, 1, '2026-09-08 01:40:47', '2026-09-08 06:25:29'),
-(188, 'Electrician, Plumber & Carpenter', 'electrician-plumber-carpenter', '188_electrician-plumber-carpenter.jpeg', 'yes', NULL, 6, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
-(189, 'Washing Machine', 'washing-machine', '189_washing-machine.jpeg', 'no', 'Large Appliances', 5, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
-(190, 'Refrigerator', 'refrigerator', '190_refrigerator.jpeg', 'no', 'Large Appliances', 5, 1, '2026-09-08 06:55:14', '2026-09-08 06:55:16'),
-(191, 'Television', 'television', '191_television.jpeg', 'no', 'Large Appliances', 5, 1, '2026-09-08 06:55:48', '2026-09-08 06:55:48'),
-(192, 'AC', 'ac', '192_ac.jpeg', 'no', 'Large Appliances', 5, 1, '2026-09-08 07:06:16', '2026-09-08 07:06:16'),
-(193, 'Chimney', 'chimney', '193_chimney.jpeg', 'no', 'Other Appliances', 5, 1, '2026-09-08 07:12:23', '2026-09-08 07:12:23'),
-(194, 'Microwave', 'microwave', '194_microwave.jpeg', 'no', 'Other Appliances', 5, 1, '2026-09-08 07:19:34', '2026-09-08 07:19:34'),
-(195, 'RO/Water Purifier', 'rowater-purifier', '195_rowater-purifier.jpeg', 'no', 'Other Appliances', 5, 1, '2026-09-08 07:19:56', '2026-09-08 07:19:56'),
-(196, 'Geyser', 'geyser', '196_geyser.jpeg', 'no', 'Other Appliances', 5, 1, '2026-09-08 07:20:14', '2026-09-08 07:20:14'),
-(197, 'Air Cooler', 'air-cooler', '197_air-cooler.jpeg', 'no', 'Other Appliances', 5, 1, '2026-09-08 07:20:33', '2026-09-08 07:20:33');
+INSERT INTO `categories` (`id`, `category_name`, `category_slug`, `image`, `price`, `showHome`, `category_modal`, `banner_title`, `banner_label`, `banner_details`, `banner_image`, `menu_order`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'Electrician', 'electrician', NULL, NULL, 'no', NULL, NULL, NULL, NULL, NULL, 3, 0, '2026-08-25 22:57:41', '2026-08-25 23:33:49'),
+(2, 'Plumbers', 'plumbers', NULL, NULL, 'no', NULL, NULL, NULL, NULL, NULL, 4, 0, '2026-08-25 23:13:46', '2026-08-25 23:13:46'),
+(183, 'Women\'s Salon & Spa', 'womens-salon-spa', '183_womens-salon-spa.jpeg', NULL, 'yes', '1', NULL, NULL, NULL, NULL, 1, 1, '2026-09-08 01:22:59', '2026-09-08 06:25:57'),
+(184, 'Men\'s Salon & Massage', 'mens-salon-massage', '184_mens-salon-massage.jpeg', NULL, 'yes', '2', NULL, NULL, NULL, NULL, 2, 1, '2026-09-08 01:24:42', '2026-09-08 01:24:42'),
+(185, 'Cleaning', 'cleaning', '185_cleaning.jpeg', NULL, 'yes', '3', NULL, NULL, NULL, NULL, 3, 1, '2026-09-08 01:25:09', '2026-09-08 01:25:09'),
+(186, 'Home Painting', 'home-painting', '186_home-painting.jpeg', NULL, 'yes', '4', NULL, NULL, NULL, NULL, 4, 1, '2026-09-08 01:40:29', '2026-09-08 06:24:39'),
+(187, 'AC & Appliance Repair', 'ac-appliance-repair', '187_ac-appliance-repair.jpeg', NULL, 'yes', '5', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 01:40:47', '2026-09-08 06:25:29'),
+(188, 'Electrician, Plumber & Carpenter', 'electrician-plumber-carpenter', '188_electrician-plumber-carpenter.jpeg', NULL, 'yes', NULL, NULL, NULL, NULL, NULL, 6, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(189, 'Washing Machine', 'washing-machine', '189_washing-machine.jpeg', NULL, 'no', 'Large Appliances', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(190, 'Refrigerator', 'refrigerator', '190_refrigerator.jpeg', NULL, 'no', 'Large Appliances', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 06:55:14', '2026-09-08 06:55:16'),
+(191, 'Television', 'television', '191_television.jpeg', NULL, 'no', 'Large Appliances', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 06:55:48', '2026-09-08 06:55:48'),
+(192, 'AC Repair & Service', 'ac_service_repair', '192_ac.jpeg', '449', 'no', 'Large Appliances', 'Foam-jet AC Service', 'Free gas check', 'Deep clean AC vents for efficient cooling', '17_banner.jpeg', 5, 1, '2026-09-08 07:06:16', '2026-09-08 07:06:16'),
+(193, 'Chimney', 'chimney', '193_chimney.jpeg', NULL, 'no', 'Other Appliances', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 07:12:23', '2026-09-08 07:12:23'),
+(194, 'Microwave', 'microwave', '194_microwave.jpeg', NULL, 'no', 'Other Appliances', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 07:19:34', '2026-09-08 07:19:34'),
+(195, 'RO/Water Purifier', 'rowater-purifier', '195_rowater-purifier.jpeg', NULL, 'no', 'Other Appliances', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 07:19:56', '2026-09-08 07:19:56'),
+(196, 'Geyser', 'geyser', '196_geyser.jpeg', NULL, 'no', 'Other Appliances', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 07:20:14', '2026-09-08 07:20:14'),
+(197, 'Air Cooler', 'air-cooler', '197_air-cooler.jpeg', NULL, 'no', 'Other Appliances', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 07:20:33', '2026-09-08 07:20:33');
 
 -- --------------------------------------------------------
 
@@ -246,7 +243,7 @@ INSERT INTO `deal_stock_notifications` (`id`, `user_id`, `affiliate_product_id`,
 
 CREATE TABLE `discounts` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `product_id` bigint(20) UNSIGNED NOT NULL,
+  `service_id` bigint(20) UNSIGNED NOT NULL,
   `discount_percentages_id` bigint(20) UNSIGNED DEFAULT NULL,
   `start_date` date DEFAULT NULL,
   `end_date` date DEFAULT NULL,
@@ -254,6 +251,14 @@ CREATE TABLE `discounts` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `discounts`
+--
+
+INSERT INTO `discounts` (`id`, `service_id`, `discount_percentages_id`, `start_date`, `end_date`, `status`, `created_at`, `updated_at`) VALUES
+(1, 1, 2, '2026-09-01', '2026-09-30', 1, NULL, NULL),
+(28, 2, 3, '2026-09-01', '2026-09-30', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -332,6 +337,64 @@ CREATE TABLE `failed_jobs` (
   `exception` longtext NOT NULL,
   `failed_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `faqs`
+--
+
+CREATE TABLE `faqs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `title` varchar(100) NOT NULL,
+  `details` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`details`)),
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `faqs`
+--
+
+INSERT INTO `faqs` (`id`, `title`, `details`, `created_at`, `updated_at`) VALUES
+(1, 'Frequently asked questions', '[\r\n    {\r\n        \"question\": \"Are spare parts covered under warranty?\",\r\n        \"answer\": \"Yes, parts sourced by us are covered under warranty. Parts provided by the customer are not covered under warranty.\"\r\n    },\r\n{\r\n        \"question\": \"What if the same issue occurs again?\",\r\n        \"answer\": \"We offer a warranty after repair. If the same issue occurs again, we will fix it for free.\"\r\n    },\r\n{\r\n        \"question\": \"Are spare parts covered under warranty?\",\r\n        \"answer\": \"Yes, parts sourced by us are covered under warranty. Parts provided by the customer are not covered under warranty.\"\r\n    },\r\n{\r\n        \"question\": \"Are spare parts covered under warranty?\",\r\n        \"answer\": \"Yes, parts sourced by us are covered under warranty. Parts provided by the customer are not covered under warranty.\"\r\n    },\r\n{\r\n        \"question\": \"Are spare parts covered under warranty?\",\r\n        \"answer\": \"Yes, parts sourced by us are covered under warranty. Parts provided by the customer are not covered under warranty.\"\r\n    },\r\n{\r\n        \"question\": \"Are spare parts covered under warranty?\",\r\n        \"answer\": \"Yes, parts sourced by us are covered under warranty. Parts provided by the customer are not covered under warranty.\"\r\n    }\r\n]', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `highlights`
+--
+
+CREATE TABLE `highlights` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `label` varchar(255) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `includes`
+--
+
+CREATE TABLE `includes` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `title` varchar(100) NOT NULL,
+  `details` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`details`)),
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `includes`
+--
+
+INSERT INTO `includes` (`id`, `title`, `details`, `created_at`, `updated_at`) VALUES
+(1, 'What\'s included', '[\r\n    {        \r\n        \"description\": \"Free inspection & gas check followed by a service quotation.\"\r\n    },\r\n    {\r\n        \"description\": \"Final system check after repair.\"\r\n    },\r\n    {\r\n        \"description\": \"Clean-up of the work area.\"\r\n    }\r\n]', '2026-09-10 11:39:49', '2026-09-10 11:39:49');
 
 -- --------------------------------------------------------
 
@@ -427,7 +490,35 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (75, '2026_08_26_052818_create_sub_categories_table', 66),
 (76, '2026_08_26_063234_add_user_id_to_vendors_table', 67),
 (77, '2026_08_26_063818_add_vendor_id_to_services_table', 68),
-(78, '2026_08_26_064557_create_service_images_table', 69);
+(78, '2026_08_26_064557_create_service_images_table', 69),
+(79, '2026_09_10_070647_create_processes_table', 70),
+(80, '2026_09_10_071000_create_needs_table', 71),
+(81, '2026_09_10_071100_create_brands_table', 71),
+(82, '2026_09_10_071448_create_faqs_table', 72),
+(83, '2026_09_10_071615_create_includes_table', 72),
+(84, '2026_09_10_071656_create_warantees_table', 72),
+(85, '2026_09_10_071745_create_highlights_table', 72);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `needs`
+--
+
+CREATE TABLE `needs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `needs`
+--
+
+INSERT INTO `needs` (`id`, `title`, `image`, `created_at`, `updated_at`) VALUES
+(1, 'What we will need from you', 'need_from_you.jpeg', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -594,6 +685,27 @@ CREATE TABLE `personal_access_tokens` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `processes`
+--
+
+CREATE TABLE `processes` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `details` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`details`)),
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `processes`
+--
+
+INSERT INTO `processes` (`id`, `title`, `details`, `created_at`, `updated_at`) VALUES
+(1, 'Our Process', '[\r\n    {\r\n        \"name\": \"Pre-service checks\",\r\n        \"description\": \"Pre-service inspection includes a free gas level check via the Co-Pilot machine.\",\r\n        \"image\": \"process_01.jpeg\"\r\n    },\r\n    {\r\n        \"name\": \"Indoor unit cleaning\",\r\n        \"description\": \"Indoor unit cleaned via foam and jet spray this includes coils and tray with spill protection.\",\r\n        \"image\": \"process_02.jpeg\"\r\n    },\r\n    {\r\n        \"name\": \"Outdoor unit cleaning\",\r\n        \"description\": \"The outdoor unit cleaned thoroughly using a jet spray to remove accumulated dirt.\",\r\n        \"image\": \"process_03.jpeg\"\r\n    },\r\n    {\r\n        \"name\": \"Gas refilling (if required)\",\r\n        \"description\": \"We\'ll provide a quote and only refill after your approval.\",\r\n        \"image\": \"process_04.jpeg\"\r\n    },\r\n    {\r\n        \"name\": \"Final clean-up\",\r\n        \"description\": \"The indoor unit & surrounding area are cleaned to ensure a neat finish.\",\r\n        \"image\": \"process_04.jpeg\"\r\n    }\r\n]', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `products`
 --
 
@@ -680,13 +792,21 @@ CREATE TABLE `product_variants` (
 
 CREATE TABLE `ratings` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `product_id` bigint(20) UNSIGNED NOT NULL,
+  `service_id` bigint(20) UNSIGNED NOT NULL,
+  `vendor_id` bigint(20) UNSIGNED DEFAULT NULL,
   `user_id` bigint(20) UNSIGNED DEFAULT NULL,
   `rating` tinyint(4) NOT NULL,
   `review` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `ratings`
+--
+
+INSERT INTO `ratings` (`id`, `service_id`, `vendor_id`, `user_id`, `rating`, `review`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 7, 5, 'Great', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -716,9 +836,21 @@ CREATE TABLE `services` (
   `vendor_id` bigint(20) UNSIGNED DEFAULT NULL,
   `category_id` bigint(20) UNSIGNED DEFAULT NULL,
   `sub_category_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `name` varchar(100) NOT NULL,
+  `brand_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `process_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `faq_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `need_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `highlight_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `waranty_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `include_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `discount_percentage_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `title` varchar(100) NOT NULL,
   `slug` varchar(100) NOT NULL,
+  `image` varchar(100) NOT NULL,
+  `short_description` varchar(100) DEFAULT NULL,
   `description` text DEFAULT NULL,
+  `qty` int(11) DEFAULT NULL,
+  `time` varchar(10) DEFAULT NULL,
   `price` decimal(12,2) DEFAULT NULL,
   `price_type` enum('fixed','hourly','starting_from','quote') NOT NULL DEFAULT 'fixed',
   `city` varchar(50) DEFAULT NULL,
@@ -743,8 +875,10 @@ CREATE TABLE `services` (
 -- Dumping data for table `services`
 --
 
-INSERT INTO `services` (`id`, `vendor_id`, `category_id`, `sub_category_id`, `name`, `slug`, `description`, `price`, `price_type`, `city`, `state`, `pincode`, `status`, `is_featured`, `admin_note`, `approved_at`, `views`, `search_count`, `rating`, `total_reviews`, `meta_title`, `meta_description`, `sort_order`, `created_at`, `updated_at`) VALUES
-(1, 2, 192, 14, 'test', 'test', NULL, NULL, 'fixed', NULL, NULL, NULL, 'pending', 0, NULL, NULL, 0, 0, 0.00, 0, NULL, NULL, 0, NULL, NULL);
+INSERT INTO `services` (`id`, `vendor_id`, `category_id`, `sub_category_id`, `brand_id`, `process_id`, `faq_id`, `need_id`, `highlight_id`, `waranty_id`, `include_id`, `discount_percentage_id`, `title`, `slug`, `image`, `short_description`, `description`, `qty`, `time`, `price`, `price_type`, `city`, `state`, `pincode`, `status`, `is_featured`, `admin_note`, `approved_at`, `views`, `search_count`, `rating`, `total_reviews`, `meta_title`, `meta_description`, `sort_order`, `created_at`, `updated_at`) VALUES
+(1, 2, 192, 17, 1, 1, 1, 1, NULL, 1, 1, 2, 'Foam-jet service (2 ACs)', 'foam-jet_service_(2_ACs)', '1_foam-jet-service.jpeg', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, '2 hrs', 549.00, 'fixed', NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, 0.00, 5, NULL, NULL, 0, NULL, NULL),
+(2, 2, 192, 17, 1, 1, 1, 1, NULL, 1, 1, NULL, 'Foam-jet service (3 ACs)', 'foam-jet_service_(3_ACs)', '', NULL, NULL, NULL, NULL, 699.00, 'fixed', NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, 0.00, 0, NULL, NULL, 0, NULL, NULL),
+(3, 2, 192, 14, 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, 'Foam-jet AC service', 'foam-jet_ac_service', '', NULL, NULL, NULL, NULL, 699.00, 'fixed', NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, 0.00, 0, NULL, NULL, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -907,6 +1041,7 @@ CREATE TABLE `sub_categories` (
   `sub_category_name` varchar(100) NOT NULL,
   `sub_category_slug` varchar(100) NOT NULL,
   `image` varchar(100) DEFAULT NULL,
+  `sort_order` int(5) DEFAULT NULL,
   `status` tinyint(3) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -916,14 +1051,17 @@ CREATE TABLE `sub_categories` (
 -- Dumping data for table `sub_categories`
 --
 
-INSERT INTO `sub_categories` (`id`, `category_id`, `sub_category_name`, `sub_category_slug`, `image`, `status`, `created_at`, `updated_at`) VALUES
-(7, 1, 'Electrician Consultation', 'electrician-consultation', '7_electrician-consultation.jpeg', 1, '2026-08-26 00:26:46', '2026-08-26 00:26:46'),
-(8, 1, 'Switchbox installation', 'switchbox-installation', '8_switchbox-installation.jpeg', 1, '2026-08-26 00:27:18', '2026-08-26 00:27:18'),
-(9, 1, 'Fan repair (ceiling/exhaust/wall)', 'fan-repair-ceilingexhaustwall', '9_fan-repair-ceilingexhaustwall.jpeg', 1, '2026-08-26 00:29:05', '2026-08-26 00:29:05'),
-(10, 1, 'Fan replacement (ceiling/exhaust/wall)', 'fan-replacement-ceilingexhaustwall', '10_fan-replacement-ceilingexhaustwall.jpeg', 1, '2026-08-26 00:29:27', '2026-08-26 00:29:27'),
-(12, 2, 'Bath accessory installation', 'bath-accessory-installation', '12_bath-accessory-installation.jpeg', 1, '2026-08-26 00:32:57', '2026-08-26 00:32:57'),
-(13, 187, 'AC', 'ac', '13_ac.jpeg', 1, '2026-09-08 01:42:43', '2026-09-08 01:42:43'),
-(14, 192, 'AC Service & repair in 60 minutes', 'ac_service_&_repair_in_60_minutes', NULL, 1, NULL, NULL);
+INSERT INTO `sub_categories` (`id`, `category_id`, `sub_category_name`, `sub_category_slug`, `image`, `sort_order`, `status`, `created_at`, `updated_at`) VALUES
+(7, 1, 'Electrician Consultation', 'electrician-consultation', '7_electrician-consultation.jpeg', NULL, 1, '2026-08-26 00:26:46', '2026-08-26 00:26:46'),
+(8, 1, 'Switchbox installation', 'switchbox-installation', '8_switchbox-installation.jpeg', NULL, 1, '2026-08-26 00:27:18', '2026-08-26 00:27:18'),
+(9, 1, 'Fan repair (ceiling/exhaust/wall)', 'fan-repair-ceilingexhaustwall', '9_fan-repair-ceilingexhaustwall.jpeg', NULL, 1, '2026-08-26 00:29:05', '2026-08-26 00:29:05'),
+(10, 1, 'Fan replacement (ceiling/exhaust/wall)', 'fan-replacement-ceilingexhaustwall', '10_fan-replacement-ceilingexhaustwall.jpeg', NULL, 1, '2026-08-26 00:29:27', '2026-08-26 00:29:27'),
+(12, 2, 'Bath accessory installation', 'bath-accessory-installation', '12_bath-accessory-installation.jpeg', NULL, 1, '2026-08-26 00:32:57', '2026-08-26 00:32:57'),
+(13, 187, 'AC', 'ac', '13_ac.jpeg', NULL, 1, '2026-09-08 01:42:43', '2026-09-08 01:42:43'),
+(14, 192, 'Service', 'service', '14_service.jpeg', 2, 1, NULL, NULL),
+(15, 192, 'Repair & gas refill', 'repair_&_gas_refill', '15_repair_&_gas_refill.jpeg', 3, 1, NULL, NULL),
+(16, 192, 'Installation/Uninstallation', 'installation_uninstallation', '16_installation_uninstallation.jpeg', 4, 1, NULL, NULL),
+(17, 192, 'Super Saver Packages', 'super_saver_packages', '17_super_saver_packages.jpeg', 1, 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1092,6 +1230,28 @@ INSERT INTO `vendors` (`id`, `user_id`, `business_name`, `slug`, `phone`, `email
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `warantees`
+--
+
+CREATE TABLE `warantees` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` varchar(100) DEFAULT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `warantees`
+--
+
+INSERT INTO `warantees` (`id`, `name`, `description`, `image`, `created_at`, `updated_at`) VALUES
+(1, '10-day warranty', 'With upto 10,000 damage cover & more', 'waranty_shield.jpeg', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `wishlists`
 --
 
@@ -1168,7 +1328,7 @@ ALTER TABLE `deal_stock_notifications`
 --
 ALTER TABLE `discounts`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `discounts_product_id_foreign` (`product_id`),
+  ADD KEY `discounts_product_id_foreign` (`service_id`),
   ADD KEY `discounts_discount_percentages_id_foreign` (`discount_percentages_id`);
 
 --
@@ -1191,9 +1351,33 @@ ALTER TABLE `failed_jobs`
   ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
 
 --
+-- Indexes for table `faqs`
+--
+ALTER TABLE `faqs`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `highlights`
+--
+ALTER TABLE `highlights`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `includes`
+--
+ALTER TABLE `includes`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `migrations`
 --
 ALTER TABLE `migrations`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `needs`
+--
+ALTER TABLE `needs`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -1250,6 +1434,12 @@ ALTER TABLE `personal_access_tokens`
   ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`);
 
 --
+-- Indexes for table `processes`
+--
+ALTER TABLE `processes`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
@@ -1285,7 +1475,7 @@ ALTER TABLE `product_variants`
 --
 ALTER TABLE `ratings`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `ratings_product_id_foreign` (`product_id`),
+  ADD KEY `ratings_product_id_foreign` (`service_id`),
   ADD KEY `ratings_user_id_foreign` (`user_id`);
 
 --
@@ -1308,7 +1498,15 @@ ALTER TABLE `services`
   ADD KEY `services_status_is_featured_index` (`status`,`is_featured`),
   ADD KEY `services_vendor_id_foreign` (`vendor_id`),
   ADD KEY `services_category_id_foreign` (`category_id`),
-  ADD KEY `services_sub_category_id_foreign` (`sub_category_id`);
+  ADD KEY `services_sub_category_id_foreign` (`sub_category_id`),
+  ADD KEY `services_brand_id_foreign` (`brand_id`),
+  ADD KEY `services_faq_id_foreign` (`faq_id`),
+  ADD KEY `services_need_id_foreign` (`need_id`),
+  ADD KEY `services_highlight_id_foreign` (`highlight_id`),
+  ADD KEY `services_waranty_id_foreign` (`waranty_id`),
+  ADD KEY `services_include_id_foreign` (`include_id`),
+  ADD KEY `services_process_id_foreign` (`process_id`),
+  ADD KEY `services_discount_percentage_id_foreign` (`discount_percentage_id`);
 
 --
 -- Indexes for table `service_images`
@@ -1391,6 +1589,12 @@ ALTER TABLE `vendors`
   ADD KEY `vendors_user_id_foreign` (`user_id`);
 
 --
+-- Indexes for table `warantees`
+--
+ALTER TABLE `warantees`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `wishlists`
 --
 ALTER TABLE `wishlists`
@@ -1418,7 +1622,7 @@ ALTER TABLE `affiliate_wishlists`
 -- AUTO_INCREMENT for table `brands`
 --
 ALTER TABLE `brands`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -1454,7 +1658,7 @@ ALTER TABLE `deal_stock_notifications`
 -- AUTO_INCREMENT for table `discounts`
 --
 ALTER TABLE `discounts`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `discount_coupons`
@@ -1475,10 +1679,34 @@ ALTER TABLE `failed_jobs`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `faqs`
+--
+ALTER TABLE `faqs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `highlights`
+--
+ALTER TABLE `highlights`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `includes`
+--
+ALTER TABLE `includes`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
+
+--
+-- AUTO_INCREMENT for table `needs`
+--
+ALTER TABLE `needs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `orders`
@@ -1515,6 +1743,12 @@ ALTER TABLE `payments`
 --
 ALTER TABLE `personal_access_tokens`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `processes`
+--
+ALTER TABLE `processes`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -1556,7 +1790,7 @@ ALTER TABLE `reviews`
 -- AUTO_INCREMENT for table `services`
 --
 ALTER TABLE `services`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `service_images`
@@ -1592,7 +1826,7 @@ ALTER TABLE `stock_notifications`
 -- AUTO_INCREMENT for table `sub_categories`
 --
 ALTER TABLE `sub_categories`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `sub_sub_categories`
@@ -1617,6 +1851,12 @@ ALTER TABLE `users`
 --
 ALTER TABLE `vendors`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `warantees`
+--
+ALTER TABLE `warantees`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `wishlists`
@@ -1661,7 +1901,7 @@ ALTER TABLE `deal_stock_notifications`
 --
 ALTER TABLE `discounts`
   ADD CONSTRAINT `discounts_discount_percentages_id_foreign` FOREIGN KEY (`discount_percentages_id`) REFERENCES `discount_percentages` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `discounts_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `discounts_service_id_foreign` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `orders`
@@ -1723,7 +1963,7 @@ ALTER TABLE `product_variants`
 -- Constraints for table `ratings`
 --
 ALTER TABLE `ratings`
-  ADD CONSTRAINT `ratings_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `ratings_service_id_foreign` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `ratings_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
@@ -1737,9 +1977,17 @@ ALTER TABLE `reviews`
 -- Constraints for table `services`
 --
 ALTER TABLE `services`
+  ADD CONSTRAINT `services_brand_id_foreign` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `services_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `services_discount_percentage_id_foreign` FOREIGN KEY (`discount_percentage_id`) REFERENCES `discount_percentages` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `services_faq_id_foreign` FOREIGN KEY (`faq_id`) REFERENCES `faqs` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `services_highlight_id_foreign` FOREIGN KEY (`highlight_id`) REFERENCES `highlights` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `services_include_id_foreign` FOREIGN KEY (`include_id`) REFERENCES `includes` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `services_need_id_foreign` FOREIGN KEY (`need_id`) REFERENCES `needs` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `services_process_id_foreign` FOREIGN KEY (`process_id`) REFERENCES `processes` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `services_sub_category_id_foreign` FOREIGN KEY (`sub_category_id`) REFERENCES `sub_categories` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `services_vendor_id_foreign` FOREIGN KEY (`vendor_id`) REFERENCES `vendors` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `services_vendor_id_foreign` FOREIGN KEY (`vendor_id`) REFERENCES `vendors` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `services_waranty_id_foreign` FOREIGN KEY (`waranty_id`) REFERENCES `warantees` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `service_images`

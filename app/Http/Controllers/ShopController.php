@@ -17,6 +17,8 @@ use App\Models\SubSubCategory;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use Gloudemans\Shoppingcart\Facades\Cart;
 
 class ShopController extends Controller {
 
@@ -207,8 +209,6 @@ class ShopController extends Controller {
         return view('front.services.listing', $data);
     }
 
-
-
     public function product($item2=null, $item3=null, $slug, Request $request) {
         $product = Product::where('slug',$slug)->with(['product_images', 'variants', 'subSubCategory.subCategory.category'])->first();        
 
@@ -324,27 +324,68 @@ class ShopController extends Controller {
         return view('front.products.reviews', compact('product','reviews','averageRating', 'ratings', 'totalRatings'));
     }
 
+    public function category(Request $request, $item1 = null) {
+        $services = Service::with(
+                'category','subCategory','ratings',
+                'process','brand','discounts.discountPercentage',
+                'waranty','include','need','faqs')
+                ->where('status', 'approved')->get();
 
-    public function category(Request $request, $item1 = null)
-{
-    $query = Service::with('ratings')
-        ->where('status', 1);
+        $services = $services->sortBy(function ($service) {
+            return $service->subCategory?->sort_order ?? 999999;
+        })->groupBy('sub_category_id');
 
-    $selected_category = $item1;
+        //$query = Service::with('ratings')->where('status', 'approved');        
+        $selected_category = $item1;
+        $category = Category::where('category_slug', $selected_category)->first();
+        $categories = Category::with('subCategories','ratings')->where('category_slug', $selected_category)->get();
 
-    if ($item1) {
-        $category = Category::where('category_slug', $item1)->firstOrFail();
+        // if ($item1) {
+        //     $category = Category::where('category_slug', $item1)->firstOrFail();
+        //     $query->where('category_id', $category->id);
+        // }
 
-        $query->where('category_id', $category->id);
+        //$services = $query->get();    
+        
+        $cartContent = Cart::content();
+        $appliedCouponId = session('coupon_discount.id');                                   
+        $qty = Cart::count();
+        $selectedIds = $request->cart_ids ?? [];
+        $shipping_charge = 0;                
+
+        $cartItems = Cart::content()->filter(function($item) use ($selectedIds){
+            return in_array($item->rowId, $selectedIds);
+        });
+
+        // IMPORTANT: remove formatting to avoid string math
+        $cartItems = Cart::content();
+
+        $discount_price = $cartItems->sum(function ($item) {
+            return ($item->options->discount_price ?? 0) * $item->qty;
+        });
+                        
+        $store_discount = session()->get('coupon_discount');
+        $coupon_discount = session()->get('coupon_discount.discount', 0);
+        $coupon_code = session()->get('coupon_discount.code', 0);    
+        
+        $hasValidCoupon = DiscountCoupon::where('status', 1)
+            ->whereDate('expires_at', '>=', Carbon::today())
+            ->exists();
+
+            return view('front.services.index', [
+                'services'          => $services,
+                'selected_category' => $selected_category,
+                'category'          => $category,
+                'categories'        => $categories,
+                'discount_price'    => $discount_price,
+                'store_discount'    => $store_discount,
+                'coupon_code'       => $coupon_code,
+                'coupon_discount'   => $coupon_discount,
+                'cartContent'       => $cartContent,
+        ]);
+        
+        //return view('front.services.index', compact('services','selected_category','category','categories'));
     }
-
-    $services = $query->get();
-
-    return view('front.services.index', compact(
-        'services',
-        'selected_category'
-    ));
-}
 
     public function category_old(Request $request, $item1=null) {    
         $services = Service::with('ratings')->where('status',1);
