@@ -20,9 +20,9 @@ class Service extends Model {
         return $this->hasMany(ServiceImage::class);
     }        
 
-    public function discounts(){
+    public function discounts() {
         return $this->hasMany(Discount::class, 'service_id');
-    }    
+    }
 
     public function ratings(){
         return $this->hasMany(Rating::class, 'service_id');

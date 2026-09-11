@@ -372,6 +372,8 @@ class ShopController extends Controller {
             ->whereDate('expires_at', '>=', Carbon::today())
             ->exists();
 
+            //dd(Cart::content());
+
             return view('front.services.index', [
                 'services'          => $services,
                 'selected_category' => $selected_category,
