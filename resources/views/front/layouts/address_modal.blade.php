@@ -2,11 +2,21 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="deliveryAddressLabel">Select Delivery address</h5>
+                <h5 class="modal-title" id="deliveryAddressLabel">Saved addresses</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             
             <div class="modal-body">
+                @php
+                    $types = $delivery_address->pluck('address_type')->toArray();
+                @endphp
+
+                @if(!(in_array('Home', $types) && in_array('Office', $types)))
+                    <a href="#" class="btn btn-outline-dark mb-4" data-bs-toggle="modal" data-bs-target="#createAddressModal">
+                        + Add another address
+                    </a>
+                @endif
+
                 <form method="POST" action="{{ route('address.default') }}">
                     @csrf
 
@@ -27,9 +37,11 @@
                                     </label>
 
                                     <div class="address-content">
-                                        <div class="left">                                                    
-                                            <p>{{ $value->default_address ? 'Default' : 'Other' }} Address</p>
-                                            <h6>{{ $value->name }} - {{ $value->mobile }}</h6>
+                                        <div class="left">
+                                            <p><b>{{ $value->address_type }}</b></p>
+
+                                            {{-- <p>{{ $value->default_address ? 'Default' : 'Other' }} Address</p> --}}
+                                            {{-- <h6>{{ $value->name }} - {{ $value->mobile }}</h6> --}}
                                             <p class="text-muted mb-0">{{ Str::limit($value->address, 50, '...') }}</p>
 
                                             <div class="d-none control-btn">
@@ -60,7 +72,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="badge-right">{{ $value->address_type }}</div>
+                                        
                                     </div>
                                 </div>
                             </label>
@@ -68,15 +80,7 @@
                     @endforeach
                 </form>
 
-                @php
-                    $types = $delivery_address->pluck('address_type')->toArray();
-                @endphp
-
-                @if(!(in_array('Home', $types) && in_array('Office', $types)))
-                    <a href="#" class="btn btn-outline-dark" style="margin-left: 35px" data-bs-toggle="modal" data-bs-target="#createAddressModal">
-                        + Add New Address
-                    </a>
-                @endif
+                
             </div>
         </div>
     </div>

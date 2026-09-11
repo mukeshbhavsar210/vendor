@@ -56,62 +56,83 @@
 <script src="{{ asset('front-assets/js/documentReady.js') }}"></script>
 <script>
     $(document).on('click', '.qty-btn', function () {
+        let button = $(this);
+        let rowId = button.data('rowid');
+        let qtyElement = $('#qty-' + rowId);
+        let currentQty = parseInt(qtyElement.text()) || 1;
+        let newQty = currentQty;
 
-    let button = $(this);
-    let rowId = button.data('rowid');
+        if (button.hasClass('qty-plus')) {
+            newQty++;
+        }
 
-    let qtyElement = $('#qty-' + rowId);
-    let currentQty = parseInt(qtyElement.text()) || 1;
+        if (button.hasClass('qty-minus')) {
+            newQty--;
+        }
 
-    let newQty = currentQty;
+        // Minimum quantity = 1
+        if (newQty < 1) {
+            return;
+        }
 
-    if (button.hasClass('qty-plus')) {
-        newQty++;
-    }
+        $.ajax({
+            url: "{{ route('cart.updateQty') }}",
+            type: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                rowId: rowId,
+                qty: newQty
+            },
 
-    if (button.hasClass('qty-minus')) {
-        newQty--;
-    }
+            success: function (response) {
+                if (response.status == true) {
+                    qtyElement.text(response.qty);
+                    location.reload();
+                }
+            },
 
-    // Minimum quantity = 1
-    if (newQty < 1) {
-        return;
-    }
-
-    $.ajax({
-        url: "{{ route('cart.updateQty') }}",
-        type: "POST",
-
-        data: {
-            _token: "{{ csrf_token() }}",
-            rowId: rowId,
-            qty: newQty
-        },
-
-        success: function (response) {
-
-            if (response.status == true) {
-
-                // Update quantity first
-                qtyElement.text(response.qty);
-
-                // Then refresh page
-                location.reload();
+            error: function (xhr) {
+                console.log('Status:', xhr.status);
+                console.log('Response:', xhr.responseText);
+                showAlert(
+                    'Unable to update cart quantity.',
+                    'error'
+                );
             }
-        },
+        });
+    });
 
-        error: function (xhr) {
+    //cart radio cards
+    $(document).on('change', '.card-radio', function () {
+        let target = $(this).closest('.card-details').data('target');
 
-            console.log('Status:', xhr.status);
-            console.log('Response:', xhr.responseText);
+        $('.accordion-collapse').collapse('hide');        
+        $(target).collapse('show');
+    });
 
-            showAlert(
-                'Unable to update cart quantity.',
-                'error'
-            );
+    $(document).on('change', 'input[name="date"]', function () {
+        $('input[name="date"]').closest('.date').removeClass('selected_date');
+        $(this).closest('.date').addClass('selected_date');
+
+        // Check if selected date is today
+        let selectedDate = $(this).val();
+        let today = "{{ now()->format('Y-m-d') }}";
+
+        if (selectedDate !== today) {
+            $('#online-payment-message').show();
+        } else {
+            $('#online-payment-message').hide();
         }
     });
-});
+
+    $(document).on('change', 'input[name="time"]', function () {
+        $('input[name="time"]').closest('.time').removeClass('selected_time');
+        $(this).closest('.time').addClass('selected_time');
+    });
+
+    // Set active class for the initially checked radio
+    $('input[name="date"]:checked').closest('.date').addClass('selected_date');
+    $('input[name="time"]:checked').closest('.time').addClass('selected_time');
 
 
     $(document).ready(function(){                
