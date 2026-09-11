@@ -27,6 +27,8 @@
     $discount = $service->discounts->first();
     $discount_percent = $discount?->discountPercentage?->percentage ?? 0;
     $discount_price = $price - ($price * $discount_percent / 100);         
+    $cartItems = Cart::content();
+    $cartServiceIds = $cartItems->pluck('id')->toArray();
 @endphp
 
 <div class="service-card">    
@@ -237,8 +239,21 @@
         <div class="thumb-details">
             <a data-bs-toggle="modal" data-bs-target="#service_{{ $item->id }}">
                 <img src="{{ $single ? asset('uploads/services/small/' . $single) : asset('admin-assets/img/default-150x150.png') }}" alt="{{ $item->title }}" />                
-            </a>            
-            <a href="javascript:void(0);" class="overlap-btn btn btn-outline-primary add-to-cart-btn" onclick="addToCart({{ $item->id }}, this)">Add</a>
+            </a>                        
+
+            @if (in_array($item->id, $cartServiceIds))
+                @php
+                    $cartItem = $cartItems->firstWhere('id', $item->id);
+                @endphp
+
+                <div class="qty-control overlap-qty">
+                    <button type="button" class="qty-btn qty-minus" data-rowid="{{ $cartItem->rowId }}">−</button>
+                    <span class="cart-qty" id="qty-{{ $cartItem->rowId }}">{{ $cartItem->qty }}</span>
+                    <button type="button" class="qty-btn qty-plus" data-rowid="{{ $cartItem->rowId }}">+</button>
+                </div>
+            @else
+                <a href="javascript:void(0);" class="overlap-btn btn btn-outline-primary add-to-cart-btn" onclick="addToCart({{ $item->id }}, this)">Add</a>
+            @endif           
         </div>
     </div> 
         

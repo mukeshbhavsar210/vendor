@@ -32,10 +32,6 @@
 </head>
 <body data-instant-intensity="mousedown" class="{{ request()->routeIs(['front.cart']) ? 'cart-wrapper' : 'default' }}" >
 
-<div class="container">
-    @include('front.layouts.toast')
-</div>
-
 @include(request()->routeIs(['front.cart','front.checkout','front.checkout.thankyou']) ? 'front.layouts.header.cart_header' : 'front.layouts.header.index')
 
 <main>
@@ -59,6 +55,65 @@
 <script src="{{ asset('front-assets/js/ion.rangeSlider.min.js') }}"></script>
 <script src="{{ asset('front-assets/js/documentReady.js') }}"></script>
 <script>
+    $(document).on('click', '.qty-btn', function () {
+
+    let button = $(this);
+    let rowId = button.data('rowid');
+
+    let qtyElement = $('#qty-' + rowId);
+    let currentQty = parseInt(qtyElement.text()) || 1;
+
+    let newQty = currentQty;
+
+    if (button.hasClass('qty-plus')) {
+        newQty++;
+    }
+
+    if (button.hasClass('qty-minus')) {
+        newQty--;
+    }
+
+    // Minimum quantity = 1
+    if (newQty < 1) {
+        return;
+    }
+
+    $.ajax({
+        url: "{{ route('cart.updateQty') }}",
+        type: "POST",
+
+        data: {
+            _token: "{{ csrf_token() }}",
+            rowId: rowId,
+            qty: newQty
+        },
+
+        success: function (response) {
+
+            if (response.status == true) {
+
+                // Update quantity first
+                qtyElement.text(response.qty);
+
+                // Then refresh page
+                location.reload();
+            }
+        },
+
+        error: function (xhr) {
+
+            console.log('Status:', xhr.status);
+            console.log('Response:', xhr.responseText);
+
+            showAlert(
+                'Unable to update cart quantity.',
+                'error'
+            );
+        }
+    });
+});
+
+
     $(document).ready(function(){                
         $('.track-order-btn').click(function(){
             let orderId = $(this).data('order-id');
@@ -165,9 +220,10 @@
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
-    });   
+    });         
+        
     
-    function addToCart(id, btn2){
+    function addToCart(id){
         let btn = event.target;        
         let urlParams = new URLSearchParams(window.location.search);        
 
@@ -184,8 +240,9 @@
                 if (response.status == true) {
                     $('#cartCount').text(response.cartCount);
                     showAlert(response.message, 'success');
-                    $(btn2).text('Added to Bag');
-                    $(btn2).addClass('disabled');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 300);
                 } else {
                     showAlert(response.message, 'error');
                 }
@@ -220,107 +277,22 @@
                 console.log(xhr.responseText); 
             }
         })
-    } 
-
-    function addToAffiliate(id){    
-        $.ajax({
-            url: '{{ route("front.addToAffiliate") }}',
-            type: 'POST',
-            data: {
-                id: id,
-                _token: '{{ csrf_token() }}' 
-            },
-            dataType: 'json',
-            success: function(response){
-                if(response.status == true){
-                    $("#wishlistToastBody").html(response.message);
-                    showAlert(response.message,'success');                   
-                } else {
-                    window.location.href= "{{ route('front.deals') }}";
-                }
-            },
-            error: function(xhr){
-                console.log(xhr.responseText); 
-            }
-        })
-    } 
-
-
-    function notifyMe(id){            
-        $.ajax({
-            url: '{{ route("front.notify") }}',
-            type: 'POST',
-            data: {
-                product_id: id,
-                _token: '{{ csrf_token() }}' 
-            },
-            dataType: 'json',
-            success: function(response){
-                if(response.status == true){
-                    $("#wishlistToastBody").html(response.message);
-                    showAlert(response.message,'success');                   
-                } else {
-                    window.location.href= "{{ route('front.addToWishlist') }}";
-                }
-            },
-            error: function(xhr){
-                console.log(xhr.responseText); 
-            }
-        })
-    } 
-
-    function affiliateNotify(id){        
-        $.ajax({
-            url: '{{ route("front.affiliate.notify") }}',
-            type: 'POST',
-            data: {
-                affiliate_product_id: id,
-                _token: '{{ csrf_token() }}' 
-            },
-            dataType: 'json',
-            success: function(response){
-                if(response.status){
-                    let btn = $("a[onclick='affiliateNotify("+id+")']");
-                    btn.text("Requested")
-                    .addClass("disabled")
-                    .removeAttr("onclick");
-
-                    showAlert(response.message,'success');
-                } else {
-                    showAlert(response.message,'error');
-                }
-
-                if(response.status == true){
-                    $("#wishlistToastBody").html(response.message);
-                    showAlert(response.message,'success');                   
-                } else {
-                    window.location.href= "{{ route('front.addToWishlist') }}";
-                }
-            },
-            error: function(xhr){
-                console.log(xhr.responseText); 
-            }
-        })
-    } 
-
+    }    
+   
     $(document).on('click', '.move-to-cart', function(){
         let wishlistId = $(this).data('wishlist-id');
-        let productId  = $(this).data('product-id');
-        let size_id    = $(this).data('size-id') || null;
-        let color_id   = $(this).data('color-id') || null;
+        let productId  = $(this).data('product-id');        
 
-        wishlistToCart(wishlistId, productId, size_id, color_id);
+        wishlistToCart(wishlistId, productId);
     });
 
-    function wishlistToCart(wishlistId, productId, size_id = null, color_id = null) {        
+    function wishlistToCart(wishlistId, productId, ) {
         $.ajax({
             url: '{{ route("front.wishlistToCart") }}',
             type: 'POST',
             data: {
                 wishlist_id: wishlistId,
-                product_id: productId,
-                size_id: size_id,     // ✅ added
-                color_id: color_id,   // ✅ added
+                product_id: productId,                
                 _token: '{{ csrf_token() }}'
             },
             success:function(response){

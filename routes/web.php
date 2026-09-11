@@ -75,7 +75,9 @@ Route::controller(ShopController::class)->group(function() {
 
 Route::controller(CartController::class)->group(function() {
     //Bag
-    Route::get('/checkout/cart','cart')->name('front.cart');    
+    Route::post('/cart/update-qty', 'updateQty')->name('cart.updateQty');  
+    
+    Route::get('/checkout/cart','cart')->name('front.cart');      
     Route::post('/checkout/update-cart','updateCart')->name('front.updateCart');
     Route::post('/checkout/add-to-cart','addToCart')->name('front.addToCart');
     Route::post('/checkout/wishlist-to-cart','wishlistToCart')->name('front.wishlistToCart');

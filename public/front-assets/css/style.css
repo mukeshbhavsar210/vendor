@@ -44,7 +44,7 @@ table {
 
 :root{
     --primary:#6e42e5;--primary-light:#e7f6fd;--secondary:#6c757d;--white:#fff;--black:#212529;--gray:#6c757d; 
-    --primary-dark:#ca0d90;
+    --primary-dark:#572ac8;
     --green:rgb(3, 166, 133); --green-dark:#137c51; --orange:orangered; 
     --gray-light:#efeeee; --gray-dark:#e5e5e5; --success:#198754;--info:#0dcaf0;--warning:#ffc107;--danger:#dc3545;--light:#f8f9fa;
     --body-font:"Manrope", sans-serif;    
@@ -396,7 +396,28 @@ header { position:relative; z-index:999; }
 .services .service-listings .category-banner .details .right img { border-radius: 0 10px 0 0;}
 
 .services .service-right { width: 34%; padding: 50px 0;}
-.card-custom { border: 1px solid rgb(237, 237, 237); border-radius: 10px; padding: 20px; }
+.card-custom { border: 1px solid rgb(237, 237, 237); border-radius: 10px; padding: 15px; position: relative; }
+
+
+.cart { border: 1px solid rgb(237, 237, 237); border-radius: 10px; position: relative; }
+.cart .cart-body { padding: 15px 15px 5px 15px; }
+.cart .cart-body .cart-repeate { display: flex; justify-content: space-between; margin: 10px 0; align-items: center; justify-content: center; }
+.cart .cart-body .cart-repeate .item { width: 55%; padding-right:20px; font-size: 13px;}
+.cart .cart-body .cart-repeate .right { width: 45%; display: flex; justify-content: space-between; }
+.cart .cart-body .cart-repeate .right .amount { text-align: right; font-size: 12px; }
+.cart .cart-body .cart-repeate .right .amount del { color: var(--gray);}
+
+.cart .empty-cart { text-align: center; color: var(--gray);}
+.cart .empty-cart svg { width: 90px; margin-bottom: 5px;}
+.cart .cart-footer { padding: 0 15px 15px 15px; border-top: 1px solid rgb(237, 237, 237);}
+.cart .cart-footer .view-cart { background-color: var(--primary); color: var(--white); border-radius: 6px; padding:10px 15px; display: flex; justify-content: space-between; width: 100%; margin-top: 15px;}
+.cart .cart-footer .view-cart:hover { background-color: var(--primary-dark); color: var(--white); border-radius: 6px; padding:10px 15px; display: flex; justify-content: space-between; width: 100%; margin-top: 15px;}
+.cart .cart-footer .view-cart .view { font-weight: bold;}
+
+.qty-control { height: 35px; align-items: center; justify-content: center; border-radius: 6px; background-color: rgb(245, 242, 253); border-style: solid; border:1px solid rgb(197, 180, 245); display: flex; justify-content: space-between; column-gap: 6px; }
+.qty-control button { background: none; padding: 0 6px; border: none; font-weight: bold; color: var(--primary); cursor: pointer; }
+.qty-control button:hover { color: var(--primary-dark); }
+.qty-control .cart-qty { color: var(--primary); }
 
 .sections { border-top: 1px #ccc solid; padding: 20px 0; margin: 20px 0 0 0;}
 .sections .process-list { padding-left: 30px; }
@@ -462,6 +483,7 @@ header { position:relative; z-index:999; }
 .service-card .right .thumb-details { position: relative; display: block; }
 .service-card .right .thumb-details img { width:100%; border-radius: 10px;}
 .service-card .right .thumb-details .overlap-btn { position: absolute; bottom:-15px; left:30%; background-color: var(--white);}
+.service-card .right .thumb-details .overlap-qty { position: absolute; bottom:-15px; left:25%; }
 .service-card .price span.dark { font-weight: bold; font-size: 14px;}
 .service-card .price span.mrp { color: var(--gray); font-size: 12px;}
 .service-card .price span.text-underline { font-weight: normal; font-size: 12px; color: var(--gray); margin-left: 4px; margin-right: 4px;}
@@ -748,8 +770,8 @@ header { position:relative; z-index:999; }
 .filter-size .test { display: flex; column-gap: 20px; }
 .filter-size .test .form-check { width: 100px;}
 
-.toast { width: auto !important; display: flex; column-gap: 10px; background-color: var(--black) !important; color: var(--white); position: fixed; top:75px; right:105px; padding:0 12px 3px 6px; border-radius:6px; font-size: 14px; z-index: 99; }
-.toast .btn-close { color: var(--white); position: relative; top:12px;}
+.toast { display: flex; justify-content: space-between; background-color: var(--black) !important; color: var(--white); position: absolute; top:0; left:0; padding:9px 13px; border-radius:10px 10px 0 0; font-size: 12px; z-index: 99; }
+.toast .btn-close { color: var(--white); position: relative; }
 
 .navbar-listings { margin-top: 10px; display: block;}
 .navbar-listings li a {  color: var(--gray); }
