@@ -22,12 +22,8 @@ use Razorpay\Api\Api;
 use Illuminate\Support\Facades\Mail;
 
 class CartController extends Controller {
-    
     public function addToCart(Request $request){
-        $service = Service::with([
-            'discounts.discountPercentage'
-        ])->findOrFail($request->service_id);
-
+        $service = Service::with(['discounts.discountPercentage'])->findOrFail($request->service_id);
         $alreadyExists = false;
 
         // Check if service already exists in cart
@@ -60,6 +56,7 @@ class CartController extends Controller {
                 'qty'   => 1,
                 'price' => round($discountPrice, 2),
                 'options' => [
+                    'image'            => $service->image,
                     'original_price'   => round($originalPrice, 2),
                     'discount_price'   => round($discountPrice, 2),
                     'discount_percent' => $discountPercent,

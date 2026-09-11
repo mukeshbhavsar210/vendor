@@ -24,7 +24,7 @@
             <div class="shpping-address">
                 <div class="row mb-1">
                     <div class="col-md-9 col-12">
-                        <h5 class="title mt-2">Select Delivery Address</h5>
+                        <h5 class="title mt-2">Saved Addresses</h5>
                     </div>
                     <div class="col-md-3 col-12">
                         @if(!in_array('Home', $addressTypes) || !in_array('Office', $addressTypes))

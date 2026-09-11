@@ -12,16 +12,6 @@
                         </a>
                     </div>
                 </div>
-                <div class="col-md-8 col-7">                    
-                    <ol class="checkout-steps">
-                        <li class="{{ request()->routeIs('front.cart') ? 'active' : '' }}" >BAG</li>
-                        <li class="divider"></li>
-                        <li>PAYMENT</li>
-                    </ol>
-                </div>
-                <div class="col-md-2 col-4 d-none d-md-block">
-                    <p class="float-end">100% Secure</p>
-                </div>											
             </nav>
         </div>							
     </div>    

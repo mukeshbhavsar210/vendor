@@ -5,9 +5,10 @@
 @section('content')
     
 <div class="container">    
+    <h1>{{ $category->category_name }}</h1>
+
     <div class="row">
-        <div class="col-md-4 col-6">
-            <h1>{{ $category->category_name }}</h1>
+        <div class="col-md-3 col-6">
             <div class="card mt-3">
                 <div class="card-body">
                     <h5>UC Cover</h5>
@@ -34,7 +35,7 @@
             </div>
         </div>
         
-        <div class="col-md-8 col-6">
+        <div class="col-md-9 col-6">
             <div class="gallery-big">
                 <div class="card">
                     <div class="card-header">
