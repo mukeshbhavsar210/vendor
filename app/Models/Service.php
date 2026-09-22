@@ -24,8 +24,16 @@ class Service extends Model {
         return $this->hasMany(Discount::class, 'service_id');
     }
 
-    public function ratings(){
-        return $this->hasMany(Rating::class, 'service_id');
+    public function subCategory(){
+        return $this->belongsTo(SubCategory::class, 'sub_category_id');
+    }
+
+    public function subCategories(){
+        return $this->hasMany(SubCategory::class, 'category_id');
+    }  
+
+    public function ratings() {
+        return $this->hasMany(Rating::class, 'category_id', 'category_id');
     }
 
     public function brand() {
@@ -64,9 +72,9 @@ class Service extends Model {
         return $this->belongsTo(Category::class);
     }
 
-    public function subCategory() {
-        return $this->belongsTo(SubCategory::class);
-    }
+    // public function subCategory() {
+    //     return $this->belongsTo(SubCategory::class);
+    // }
 
     // public function images(){
     //     return $this->hasMany(ServiceImage::class)

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model {
     use HasFactory;
 
-    protected $fillable = [ 'category_name', 'category_slug', 'image', 'showHome', 'price', 'category_modal', 'menu_order', 'status'];
+    protected $fillable = [ 'category_name', 'category_slug', 'image', 'thumb', 'showHome', 'price', 'category_modal', 'menu_order', 'status'];
 
     public function sub_category(){
         return $this->hasMany(SubCategory::class);
@@ -18,12 +18,12 @@ class Category extends Model {
         return $this->hasMany(SubCategory::class, 'category_id')->orderBy('sort_order', 'ASC');
     }
 
-    public function products(){
-        return $this->hasMany(Product::class);
+    public function services() {
+        return $this->hasMany(Service::class, 'sub_category_id');
     }
 
     public function ratings(){
-        return $this->hasMany(Rating::class, 'service_id');
+        return $this->hasMany(Rating::class, 'category_id');
     }
 
     public function parent(){

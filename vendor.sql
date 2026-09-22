@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 10, 2026 at 03:19 PM
+-- Generation Time: Sep 22, 2026 at 03:10 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,59 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `vendor`
 --
-
--- --------------------------------------------------------
-
---
--- Table structure for table `affiliate_products`
---
-
-CREATE TABLE `affiliate_products` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `image` varchar(255) DEFAULT NULL,
-  `affiliate_platform` enum('Amazon','Flipkart','Meesho') NOT NULL DEFAULT 'Amazon',
-  `affiliate_url` varchar(255) NOT NULL,
-  `price` decimal(10,2) DEFAULT NULL,
-  `discounted_percentage` int(11) NOT NULL,
-  `views` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
-  `likes` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
-  `in_stock` tinyint(1) DEFAULT 1,
-  `status` tinyint(1) NOT NULL DEFAULT 1,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `affiliate_products`
---
-
-INSERT INTO `affiliate_products` (`id`, `title`, `image`, `affiliate_platform`, `affiliate_url`, `price`, `discounted_percentage`, `views`, `likes`, `in_stock`, `status`, `created_at`, `updated_at`) VALUES
-(4, 'test 1', '4_test-1_image.JPG', 'Amazon', 'amazon.in link', 1000.00, 10, 1, 1, 0, 1, '2026-04-16 01:46:24', '2026-04-24 00:26:19'),
-(5, 'test 2', '5_test-2.JPG', 'Flipkart', 'flipkart.com', 1000.00, 20, 3, 0, 1, 1, '2026-04-16 01:47:40', '2026-04-24 00:19:42'),
-(6, 'test 33', NULL, 'Meesho', 'meesho.com/test', 3141.00, 30, 1, 0, 1, 1, '2026-04-16 01:48:54', '2026-04-24 00:27:53');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `affiliate_wishlists`
---
-
-CREATE TABLE `affiliate_wishlists` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
-  `affiliate_product_id` bigint(20) UNSIGNED NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `affiliate_wishlists`
---
-
-INSERT INTO `affiliate_wishlists` (`id`, `user_id`, `affiliate_product_id`, `created_at`, `updated_at`) VALUES
-(16, 7, 5, '2026-04-24 02:13:31', '2026-04-24 02:13:31'),
-(17, 7, 4, '2026-04-24 06:43:48', '2026-04-24 06:43:48');
 
 -- --------------------------------------------------------
 
@@ -106,13 +53,11 @@ CREATE TABLE `categories` (
   `category_name` varchar(100) NOT NULL,
   `category_slug` varchar(100) DEFAULT NULL,
   `image` varchar(200) DEFAULT NULL,
+  `thumb` varchar(50) DEFAULT NULL,
   `price` varchar(10) DEFAULT NULL,
+  `instant` enum('yes','no') NOT NULL DEFAULT 'no',
   `showHome` enum('yes','no') DEFAULT NULL,
   `category_modal` varchar(20) DEFAULT NULL,
-  `banner_title` varchar(50) DEFAULT NULL,
-  `banner_label` varchar(50) DEFAULT NULL,
-  `banner_details` varchar(50) DEFAULT NULL,
-  `banner_image` varchar(50) DEFAULT NULL,
   `menu_order` int(1) DEFAULT NULL,
   `status` int(5) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -123,52 +68,24 @@ CREATE TABLE `categories` (
 -- Dumping data for table `categories`
 --
 
-INSERT INTO `categories` (`id`, `category_name`, `category_slug`, `image`, `price`, `showHome`, `category_modal`, `banner_title`, `banner_label`, `banner_details`, `banner_image`, `menu_order`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'Electrician', 'electrician', NULL, NULL, 'no', NULL, NULL, NULL, NULL, NULL, 3, 0, '2026-08-25 22:57:41', '2026-08-25 23:33:49'),
-(2, 'Plumbers', 'plumbers', NULL, NULL, 'no', NULL, NULL, NULL, NULL, NULL, 4, 0, '2026-08-25 23:13:46', '2026-08-25 23:13:46'),
-(183, 'Women\'s Salon & Spa', 'womens-salon-spa', '183_womens-salon-spa.jpeg', NULL, 'yes', '1', NULL, NULL, NULL, NULL, 1, 1, '2026-09-08 01:22:59', '2026-09-08 06:25:57'),
-(184, 'Men\'s Salon & Massage', 'mens-salon-massage', '184_mens-salon-massage.jpeg', NULL, 'yes', '2', NULL, NULL, NULL, NULL, 2, 1, '2026-09-08 01:24:42', '2026-09-08 01:24:42'),
-(185, 'Cleaning', 'cleaning', '185_cleaning.jpeg', NULL, 'yes', '3', NULL, NULL, NULL, NULL, 3, 1, '2026-09-08 01:25:09', '2026-09-08 01:25:09'),
-(186, 'Home Painting', 'home-painting', '186_home-painting.jpeg', NULL, 'yes', '4', NULL, NULL, NULL, NULL, 4, 1, '2026-09-08 01:40:29', '2026-09-08 06:24:39'),
-(187, 'AC & Appliance Repair', 'ac-appliance-repair', '187_ac-appliance-repair.jpeg', NULL, 'yes', '5', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 01:40:47', '2026-09-08 06:25:29'),
-(188, 'Electrician, Plumber & Carpenter', 'electrician-plumber-carpenter', '188_electrician-plumber-carpenter.jpeg', NULL, 'yes', NULL, NULL, NULL, NULL, NULL, 6, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
-(189, 'Washing Machine', 'washing-machine', '189_washing-machine.jpeg', NULL, 'no', 'Large Appliances', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
-(190, 'Refrigerator', 'refrigerator', '190_refrigerator.jpeg', NULL, 'no', 'Large Appliances', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 06:55:14', '2026-09-08 06:55:16'),
-(191, 'Television', 'television', '191_television.jpeg', NULL, 'no', 'Large Appliances', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 06:55:48', '2026-09-08 06:55:48'),
-(192, 'AC Repair & Service', 'ac_service_repair', '192_ac.jpeg', '449', 'no', 'Large Appliances', 'Foam-jet AC Service', 'Free gas check', 'Deep clean AC vents for efficient cooling', '17_banner.jpeg', 5, 1, '2026-09-08 07:06:16', '2026-09-08 07:06:16'),
-(193, 'Chimney', 'chimney', '193_chimney.jpeg', NULL, 'no', 'Other Appliances', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 07:12:23', '2026-09-08 07:12:23'),
-(194, 'Microwave', 'microwave', '194_microwave.jpeg', NULL, 'no', 'Other Appliances', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 07:19:34', '2026-09-08 07:19:34'),
-(195, 'RO/Water Purifier', 'rowater-purifier', '195_rowater-purifier.jpeg', NULL, 'no', 'Other Appliances', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 07:19:56', '2026-09-08 07:19:56'),
-(196, 'Geyser', 'geyser', '196_geyser.jpeg', NULL, 'no', 'Other Appliances', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 07:20:14', '2026-09-08 07:20:14'),
-(197, 'Air Cooler', 'air-cooler', '197_air-cooler.jpeg', NULL, 'no', 'Other Appliances', NULL, NULL, NULL, NULL, 5, 1, '2026-09-08 07:20:33', '2026-09-08 07:20:33');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `colors`
---
-
-CREATE TABLE `colors` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `name` varchar(10) NOT NULL,
-  `code` varchar(10) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `colors`
---
-
-INSERT INTO `colors` (`id`, `name`, `code`) VALUES
-(1, 'Black', '#36454f'),
-(2, 'White', '#FFFFFF'),
-(3, 'Blue', '#0074d9'),
-(4, 'Red', '#FF0000'),
-(5, 'Grey', '#9fa8ab'),
-(6, 'Navy Blue', '#3c4477'),
-(7, 'Brown', '#915039'),
-(8, 'Green', '#5eb160'),
-(9, 'Olive', '#3d9970'),
-(12, 'Yellow', '#3d9970');
+INSERT INTO `categories` (`id`, `category_name`, `category_slug`, `image`, `thumb`, `price`, `instant`, `showHome`, `category_modal`, `menu_order`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'Electrician', 'electrician', NULL, NULL, NULL, '', 'no', NULL, 3, 0, '2026-08-25 22:57:41', '2026-08-25 23:33:49'),
+(2, 'Plumbers', 'plumbers', NULL, NULL, NULL, '', 'no', NULL, 4, 0, '2026-08-25 23:13:46', '2026-08-25 23:13:46'),
+(183, 'Women\'s Salon & Spa', 'womens-salon-spa', '183_womens-salon-spa.jpeg', '183_womens-salon-spa.jpeg', '499', 'no', 'yes', '1', 1, 1, '2026-09-08 01:22:59', '2026-09-08 06:25:57'),
+(184, 'Men\'s Salon & Massage', 'mens-salon-massage', '184_mens-salon-massage.jpeg', NULL, '499', '', 'yes', '2', 2, 1, '2026-09-08 01:24:42', '2026-09-08 01:24:42'),
+(185, 'Cleaning', 'cleaning', '185_cleaning.jpeg', NULL, NULL, '', 'yes', '3', 3, 1, '2026-09-08 01:25:09', '2026-09-08 01:25:09'),
+(186, 'Home Painting', 'home-painting', '186_home-painting.jpeg', '186_home-painting.jpeg', NULL, 'no', 'yes', '4', 4, 1, '2026-09-08 01:40:29', '2026-09-08 06:24:39'),
+(187, 'AC & Appliance Repair', 'ac-appliance-repair', '187_ac-appliance-repair.jpeg', NULL, '999', '', 'yes', '5', 5, 1, '2026-09-08 01:40:47', '2026-09-08 06:25:29'),
+(188, 'Electrician, Plumber & Carpenter', 'electrician-plumber-carpenter', '188_electrician-plumber-carpenter.jpeg', NULL, '399', '', 'yes', NULL, 6, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(189, 'Washing Machine', 'washing-machine', '189_washing-machine.jpeg', NULL, NULL, '', 'no', 'Large Appliances', 5, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(190, 'Refrigerator', 'refrigerator', '190_refrigerator.jpeg', NULL, NULL, '', 'no', 'Large Appliances', 5, 1, '2026-09-08 06:55:14', '2026-09-08 06:55:16'),
+(191, 'Television', 'television', '191_television.jpeg', NULL, NULL, '', 'no', 'Large Appliances', 5, 1, '2026-09-08 06:55:48', '2026-09-08 06:55:48'),
+(192, 'AC Repair & Service', 'ac_service_repair', '192_ac.jpeg', '192_ac.jpeg', '449', 'yes', 'no', 'Large Appliances', 5, 1, '2026-09-08 07:06:16', '2026-09-08 07:06:16'),
+(193, 'Chimney', 'chimney', '193_chimney.jpeg', NULL, NULL, '', 'no', 'Other Appliances', 5, 1, '2026-09-08 07:12:23', '2026-09-08 07:12:23'),
+(194, 'Microwave', 'microwave', '194_microwave.jpeg', NULL, NULL, '', 'no', 'Other Appliances', 5, 1, '2026-09-08 07:19:34', '2026-09-08 07:19:34'),
+(195, 'RO/Water Purifier', 'rowater-purifier', '195_rowater-purifier.jpeg', NULL, NULL, '', 'no', 'Other Appliances', 5, 1, '2026-09-08 07:19:56', '2026-09-08 07:19:56'),
+(196, 'Geyser', 'geyser', '196_geyser.jpeg', NULL, NULL, '', 'no', 'Other Appliances', 5, 1, '2026-09-08 07:20:14', '2026-09-08 07:20:14'),
+(197, 'Air Cooler', 'air-cooler', '197_air-cooler.jpeg', NULL, NULL, '', 'no', 'Other Appliances', 5, 1, '2026-09-08 07:20:33', '2026-09-08 07:20:33');
 
 -- --------------------------------------------------------
 
@@ -211,7 +128,8 @@ CREATE TABLE `customer_addresses` (
 --
 
 INSERT INTO `customer_addresses` (`id`, `user_id`, `address_type`, `default_address`, `name`, `mobile`, `address`, `locality`, `city`, `state_id`, `zip`, `created_at`, `updated_at`) VALUES
-(1, 7, 'Home', 1, 'Dhruv Bhavsar', '9978812345', 'Shlok Heights, Next to Mirada Banquet hall, Mansarovar road, New Chandkheda', 'Gandhinagar', 'Ahmedabad', 7, '382424', NULL, '2026-04-09 03:00:31');
+(22, 1, 'Home', 1, 'Mukesh', '9978835005', 'B-1003, Shlok Heights, Mansarovar road,', 'Chandkheda', 'Ahmedabad', 7, '382424', '2026-09-11 05:54:05', '2026-09-11 06:10:30'),
+(23, 1, 'Office', 0, 'Priyanka', '09538135005', 'Surayansh  Vedura', 'Chandkheda', 'Ahmedabad', 7, '382424', '2026-09-11 05:58:35', '2026-09-11 06:10:30');
 
 -- --------------------------------------------------------
 
@@ -547,8 +465,8 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `user_id`, `customer_address_id`, `subtotal`, `grandtotal`, `razorpay_order_id`, `transaction_id`, `razorpay_signature`, `payment_status`, `payment_method`, `status`, `created_at`, `updated_at`) VALUES
-(329, 7, 1, 5176.00, 4227.00, 'order_SbiFimoPDvWIZr', 'pay_SbiFmTOTKicNb3', '098d259e87affa2f431855bd8a9c119016a7130907401c6b1052b70882dca1ad', 'paid', 'razorpay', 'Delivered', '2026-04-10 02:17:48', '2026-04-10 02:34:04'),
-(330, 7, 1, 5176.00, 4227.00, 'order_SbiFimoPDvWIZr', 'pay_SbiFmTOTKicNb3', '098d259e87affa2f431855bd8a9c119016a7130907401c6b1052b70882dca1ad', 'paid', 'razorpay', 'Cancelled', '2026-04-10 02:17:48', '2026-04-10 02:34:04');
+(329, 7, NULL, 5176.00, 4227.00, 'order_SbiFimoPDvWIZr', 'pay_SbiFmTOTKicNb3', '098d259e87affa2f431855bd8a9c119016a7130907401c6b1052b70882dca1ad', 'paid', 'razorpay', 'Delivered', '2026-04-10 02:17:48', '2026-04-10 02:34:04'),
+(330, 7, NULL, 5176.00, 4227.00, 'order_SbiFimoPDvWIZr', 'pay_SbiFmTOTKicNb3', '098d259e87affa2f431855bd8a9c119016a7130907401c6b1052b70882dca1ad', 'paid', 'razorpay', 'Cancelled', '2026-04-10 02:17:48', '2026-04-10 02:34:04');
 
 -- --------------------------------------------------------
 
@@ -571,6 +489,8 @@ CREATE TABLE `order_items` (
   `discount_percent` int(10) DEFAULT NULL,
   `discounted_price` double(10,2) DEFAULT NULL,
   `shipping` double(10,2) DEFAULT NULL,
+  `scheduled_date` date DEFAULT NULL,
+  `scheduled_time` time(6) DEFAULT NULL,
   `subtotal` double(10,2) NOT NULL DEFAULT 0.00,
   `grandtotal` double(10,2) NOT NULL,
   `return_days` varchar(10) DEFAULT NULL,
@@ -792,7 +712,7 @@ CREATE TABLE `product_variants` (
 
 CREATE TABLE `ratings` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `service_id` bigint(20) UNSIGNED NOT NULL,
+  `category_id` bigint(20) UNSIGNED DEFAULT NULL,
   `vendor_id` bigint(20) UNSIGNED DEFAULT NULL,
   `user_id` bigint(20) UNSIGNED DEFAULT NULL,
   `rating` tinyint(4) NOT NULL,
@@ -805,8 +725,10 @@ CREATE TABLE `ratings` (
 -- Dumping data for table `ratings`
 --
 
-INSERT INTO `ratings` (`id`, `service_id`, `vendor_id`, `user_id`, `rating`, `review`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 7, 5, 'Great', NULL, NULL);
+INSERT INTO `ratings` (`id`, `category_id`, `vendor_id`, `user_id`, `rating`, `review`, `created_at`, `updated_at`) VALUES
+(1, 192, 7, 7, 5, 'Great', NULL, NULL),
+(3, 192, 7, 7, 5, 'Great', NULL, NULL),
+(4, 186, 7, 7, 5, 'Great', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -877,8 +799,11 @@ CREATE TABLE `services` (
 
 INSERT INTO `services` (`id`, `vendor_id`, `category_id`, `sub_category_id`, `brand_id`, `process_id`, `faq_id`, `need_id`, `highlight_id`, `waranty_id`, `include_id`, `discount_percentage_id`, `title`, `slug`, `image`, `short_description`, `description`, `qty`, `time`, `price`, `price_type`, `city`, `state`, `pincode`, `status`, `is_featured`, `admin_note`, `approved_at`, `views`, `search_count`, `rating`, `total_reviews`, `meta_title`, `meta_description`, `sort_order`, `created_at`, `updated_at`) VALUES
 (1, 2, 192, 17, 1, 1, 1, 1, NULL, 1, 1, 2, 'Foam-jet service (2 ACs)', 'foam-jet_service_(2_ACs)', '1_foam-jet-service.jpeg', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, '2 hrs', 549.00, 'fixed', NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, 0.00, 5, NULL, NULL, 0, NULL, NULL),
-(2, 2, 192, 17, 1, 1, 1, 1, NULL, 1, 1, NULL, 'Foam-jet service (3 ACs)', 'foam-jet_service_(3_ACs)', '', NULL, NULL, NULL, NULL, 699.00, 'fixed', NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, 0.00, 0, NULL, NULL, 0, NULL, NULL),
-(3, 2, 192, 14, 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, 'Foam-jet AC service', 'foam-jet_ac_service', '', NULL, NULL, NULL, NULL, 699.00, 'fixed', NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, 0.00, 0, NULL, NULL, 0, NULL, NULL);
+(2, 2, 192, 14, 1, 1, 1, 1, NULL, 1, 1, NULL, 'Foam-jet service (3 ACs)', 'foam-jet_service_(3_ACs)', '', NULL, NULL, NULL, NULL, 699.00, 'fixed', NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, 0.00, 0, NULL, NULL, 0, NULL, NULL),
+(3, 2, 192, 17, 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, 'Foam-jet AC service', 'foam-jet_ac_service', '', NULL, NULL, NULL, NULL, 699.00, 'fixed', NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, 0.00, 0, NULL, NULL, 0, NULL, NULL),
+(10, 2, 192, 15, 1, 1, 1, 1, NULL, NULL, NULL, NULL, 'test', '', '', NULL, NULL, NULL, NULL, NULL, 'fixed', NULL, NULL, NULL, 'pending', 0, NULL, NULL, 0, 0, 0.00, 0, NULL, NULL, 0, NULL, NULL),
+(14, 2, 192, 15, 1, 1, 1, 1, NULL, 1, 1, 2, 'Test', 'test', '1_foam-jet-service.jpeg', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, '2 hrs', 549.00, 'fixed', NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, 0.00, 5, NULL, NULL, 0, NULL, NULL),
+(15, 2, 192, 16, 1, 1, 1, 1, NULL, 1, 1, 2, 'Test2', 'test2', '1_foam-jet-service.jpeg', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, '2 hrs', 549.00, 'fixed', NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, 0.00, 5, NULL, NULL, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -933,29 +858,6 @@ INSERT INTO `shipping_charges` (`id`, `state_id`, `amount`, `created_at`, `updat
 (21, 37, 11.00, '2026-02-19 01:02:59', '2026-02-19 01:02:59'),
 (22, 3, 60.00, '2026-02-26 00:12:00', '2026-02-26 00:12:00'),
 (23, 4, 55.00, '2026-02-26 00:12:43', '2026-02-26 00:12:43');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `sizes`
---
-
-CREATE TABLE `sizes` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `name` varchar(20) NOT NULL,
-  `code` varchar(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `sizes`
---
-
-INSERT INTO `sizes` (`id`, `name`, `code`) VALUES
-(1, 'Small', 'S'),
-(2, 'Medium', 'M'),
-(3, 'Large', 'L'),
-(4, 'Extra Large', 'XL'),
-(5, 'Extra Extra Small', 'XXS');
 
 -- --------------------------------------------------------
 
@@ -1041,6 +943,11 @@ CREATE TABLE `sub_categories` (
   `sub_category_name` varchar(100) NOT NULL,
   `sub_category_slug` varchar(100) NOT NULL,
   `image` varchar(100) DEFAULT NULL,
+  `banner` enum('yes','no') DEFAULT 'no',
+  `banner_title` varchar(50) DEFAULT NULL,
+  `banner_label` varchar(50) DEFAULT NULL,
+  `banner_details` varchar(50) DEFAULT NULL,
+  `banner_image` varchar(50) DEFAULT NULL,
   `sort_order` int(5) DEFAULT NULL,
   `status` tinyint(3) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -1051,17 +958,18 @@ CREATE TABLE `sub_categories` (
 -- Dumping data for table `sub_categories`
 --
 
-INSERT INTO `sub_categories` (`id`, `category_id`, `sub_category_name`, `sub_category_slug`, `image`, `sort_order`, `status`, `created_at`, `updated_at`) VALUES
-(7, 1, 'Electrician Consultation', 'electrician-consultation', '7_electrician-consultation.jpeg', NULL, 1, '2026-08-26 00:26:46', '2026-08-26 00:26:46'),
-(8, 1, 'Switchbox installation', 'switchbox-installation', '8_switchbox-installation.jpeg', NULL, 1, '2026-08-26 00:27:18', '2026-08-26 00:27:18'),
-(9, 1, 'Fan repair (ceiling/exhaust/wall)', 'fan-repair-ceilingexhaustwall', '9_fan-repair-ceilingexhaustwall.jpeg', NULL, 1, '2026-08-26 00:29:05', '2026-08-26 00:29:05'),
-(10, 1, 'Fan replacement (ceiling/exhaust/wall)', 'fan-replacement-ceilingexhaustwall', '10_fan-replacement-ceilingexhaustwall.jpeg', NULL, 1, '2026-08-26 00:29:27', '2026-08-26 00:29:27'),
-(12, 2, 'Bath accessory installation', 'bath-accessory-installation', '12_bath-accessory-installation.jpeg', NULL, 1, '2026-08-26 00:32:57', '2026-08-26 00:32:57'),
-(13, 187, 'AC', 'ac', '13_ac.jpeg', NULL, 1, '2026-09-08 01:42:43', '2026-09-08 01:42:43'),
-(14, 192, 'Service', 'service', '14_service.jpeg', 2, 1, NULL, NULL),
-(15, 192, 'Repair & gas refill', 'repair_&_gas_refill', '15_repair_&_gas_refill.jpeg', 3, 1, NULL, NULL),
-(16, 192, 'Installation/Uninstallation', 'installation_uninstallation', '16_installation_uninstallation.jpeg', 4, 1, NULL, NULL),
-(17, 192, 'Super Saver Packages', 'super_saver_packages', '17_super_saver_packages.jpeg', 1, 1, NULL, NULL);
+INSERT INTO `sub_categories` (`id`, `category_id`, `sub_category_name`, `sub_category_slug`, `image`, `banner`, `banner_title`, `banner_label`, `banner_details`, `banner_image`, `sort_order`, `status`, `created_at`, `updated_at`) VALUES
+(7, 1, 'Electrician Consultation', 'electrician-consultation', '7_electrician-consultation.jpeg', 'no', NULL, NULL, NULL, NULL, NULL, 1, '2026-08-26 00:26:46', '2026-08-26 00:26:46'),
+(8, 1, 'Switchbox installation', 'switchbox-installation', '8_switchbox-installation.jpeg', 'no', NULL, NULL, NULL, NULL, NULL, 1, '2026-08-26 00:27:18', '2026-08-26 00:27:18'),
+(9, 1, 'Fan repair (ceiling/exhaust/wall)', 'fan-repair-ceilingexhaustwall', '9_fan-repair-ceilingexhaustwall.jpeg', 'no', NULL, NULL, NULL, NULL, NULL, 1, '2026-08-26 00:29:05', '2026-08-26 00:29:05'),
+(10, 1, 'Fan replacement (ceiling/exhaust/wall)', 'fan-replacement-ceilingexhaustwall', '10_fan-replacement-ceilingexhaustwall.jpeg', 'no', NULL, NULL, NULL, NULL, NULL, 1, '2026-08-26 00:29:27', '2026-08-26 00:29:27'),
+(12, 2, 'Bath accessory installation', 'bath-accessory-installation', '12_bath-accessory-installation.jpeg', 'no', NULL, NULL, NULL, NULL, NULL, 1, '2026-08-26 00:32:57', '2026-08-26 00:32:57'),
+(13, 187, 'AC', 'ac', '13_ac.jpeg', 'no', NULL, NULL, NULL, NULL, NULL, 1, '2026-09-08 01:42:43', '2026-09-08 01:42:43'),
+(14, 192, 'Service', 'service', '14_service.jpeg', 'yes', 'Foam-jet AC Service', 'Free gas check', 'Deep clean AC vents for efficient cooling', '17_banner.jpeg', 2, 1, NULL, NULL),
+(15, 192, 'Repair & gas refill', 'repair_&_gas_refill', '15_repair_&_gas_refill.jpeg', 'no', NULL, NULL, NULL, NULL, 3, 1, NULL, NULL),
+(16, 192, 'Installation/Uninstallation', 'installation_uninstallation', '16_installation_uninstallation.jpeg', 'no', NULL, NULL, NULL, NULL, 4, 1, NULL, NULL),
+(17, 192, 'Super Saver Packages', 'super_saver_packages', '17_super_saver_packages.jpeg', 'yes', 'Foam-jet AC Service', 'Free gas check', 'Deep clean AC vents for efficient cooling', '17_banner.jpeg', 1, 1, NULL, NULL),
+(18, 183, 'Women Salon Spa', 'women-salon-spa', '14_service.jpeg', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1268,20 +1176,6 @@ CREATE TABLE `wishlists` (
 --
 
 --
--- Indexes for table `affiliate_products`
---
-ALTER TABLE `affiliate_products`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `affiliate_wishlists`
---
-ALTER TABLE `affiliate_wishlists`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `affiliate_wishlists_user_id_affiliate_product_id_unique` (`user_id`,`affiliate_product_id`),
-  ADD KEY `affiliate_wishlists_affiliate_product_id_foreign` (`affiliate_product_id`);
-
---
 -- Indexes for table `brands`
 --
 ALTER TABLE `brands`
@@ -1291,12 +1185,6 @@ ALTER TABLE `brands`
 -- Indexes for table `categories`
 --
 ALTER TABLE `categories`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `colors`
---
-ALTER TABLE `colors`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -1475,8 +1363,8 @@ ALTER TABLE `product_variants`
 --
 ALTER TABLE `ratings`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `ratings_product_id_foreign` (`service_id`),
-  ADD KEY `ratings_user_id_foreign` (`user_id`);
+  ADD KEY `ratings_user_id_foreign` (`user_id`),
+  ADD KEY `ratings_category_id_foreign` (`category_id`);
 
 --
 -- Indexes for table `reviews`
@@ -1529,12 +1417,6 @@ ALTER TABLE `sessions`
 ALTER TABLE `shipping_charges`
   ADD PRIMARY KEY (`id`),
   ADD KEY `shipping_charges_state_id_foreign` (`state_id`);
-
---
--- Indexes for table `sizes`
---
-ALTER TABLE `sizes`
-  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `states`
@@ -1607,18 +1489,6 @@ ALTER TABLE `wishlists`
 --
 
 --
--- AUTO_INCREMENT for table `affiliate_products`
---
-ALTER TABLE `affiliate_products`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT for table `affiliate_wishlists`
---
-ALTER TABLE `affiliate_wishlists`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
-
---
 -- AUTO_INCREMENT for table `brands`
 --
 ALTER TABLE `brands`
@@ -1631,12 +1501,6 @@ ALTER TABLE `categories`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=198;
 
 --
--- AUTO_INCREMENT for table `colors`
---
-ALTER TABLE `colors`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
-
---
 -- AUTO_INCREMENT for table `coupon_product`
 --
 ALTER TABLE `coupon_product`
@@ -1646,7 +1510,7 @@ ALTER TABLE `coupon_product`
 -- AUTO_INCREMENT for table `customer_addresses`
 --
 ALTER TABLE `customer_addresses`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `deal_stock_notifications`
@@ -1682,7 +1546,7 @@ ALTER TABLE `failed_jobs`
 -- AUTO_INCREMENT for table `faqs`
 --
 ALTER TABLE `faqs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `highlights`
@@ -1778,7 +1642,7 @@ ALTER TABLE `product_variants`
 -- AUTO_INCREMENT for table `ratings`
 --
 ALTER TABLE `ratings`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `reviews`
@@ -1790,7 +1654,7 @@ ALTER TABLE `reviews`
 -- AUTO_INCREMENT for table `services`
 --
 ALTER TABLE `services`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `service_images`
@@ -1803,12 +1667,6 @@ ALTER TABLE `service_images`
 --
 ALTER TABLE `shipping_charges`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
-
---
--- AUTO_INCREMENT for table `sizes`
---
-ALTER TABLE `sizes`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `states`
@@ -1826,7 +1684,7 @@ ALTER TABLE `stock_notifications`
 -- AUTO_INCREMENT for table `sub_categories`
 --
 ALTER TABLE `sub_categories`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `sub_sub_categories`
@@ -1867,13 +1725,6 @@ ALTER TABLE `wishlists`
 --
 -- Constraints for dumped tables
 --
-
---
--- Constraints for table `affiliate_wishlists`
---
-ALTER TABLE `affiliate_wishlists`
-  ADD CONSTRAINT `affiliate_wishlists_affiliate_product_id_foreign` FOREIGN KEY (`affiliate_product_id`) REFERENCES `affiliate_products` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `affiliate_wishlists_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `coupon_product`
@@ -1963,8 +1814,10 @@ ALTER TABLE `product_variants`
 -- Constraints for table `ratings`
 --
 ALTER TABLE `ratings`
+  ADD CONSTRAINT `ratings_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `ratings_service_id_foreign` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `ratings_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `ratings_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `ratings_vendor_id_foreign` FOREIGN KEY (`vendor_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `reviews`

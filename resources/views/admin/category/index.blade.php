@@ -59,54 +59,58 @@
                 <div class="accordion-item">                                
                     <div class="accordion-header" id="cat{{ $category->id }}">
                         <div class="accordion-button collapsed p-2" data-bs-toggle="collapse" data-bs-target="#catCollapse{{ $category->id }}">
-                            <div class="category-card">                                
-                                <div class="flex-grow-1">
+                            <div class="category-card">
+                                <div class="icon-head">
+                                    <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}" class="thumb" >
                                     <h5>{{ $category->category_name }}
                                         @if ($category->sub_categories_count > 0)
                                             - {{ $category->sub_categories_count }}    
                                         @endif                                        
                                     </h5>
                                 </div>
+
+                                <div class="flex">
+                                    <a href="javascript:0"                                         
+                                        data-id="{{ $category->id }}"
+                                        data-category-modal="{{ $category->category_modal }}"
+                                        data-category-name="{{ $category->category_name }}"
+                                        data-show-home="{{ $category->showHome }}"
+                                        data-menu-order="{{ $category->menu_order }}"
+                                        data-status="{{ $category->status }}"
+                                        onclick="editCategoryModal(this)"                                                
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#categoryModal" >
+                                        <i class="las la-pen text-secondary fs-18"></i>
+                                    </a>
+                                    <a href="#" onclick="deleteCategory({{ $category->id }})" >
+                                        <i class="las la-trash-alt text-secondary fs-18"></i>
+                                    </a>
+                                </div>                                
                             </div>
                         </div>
                     </div>
 
                     <div id="catCollapse{{ $category->id }}" class="accordion-collapse collapse" data-bs-parent="#categoryAccordion">
-                        <div class="accordion-body">
-                            <div class="category-card-flex">                                
-                                @foreach ($category->subCategories as $sub)                                    
-                                    <div class="sub-category-card">
-                                        <div class="hover-card">
-                                            <div class="overlay-new">
-                                                <a href="#" class="delete-icon"  onclick="deleteSubCategory({{ $sub->id }})">
-                                                    <span class="sprites"></span>
-                                                </a>
+                        <div class="accordion-body">                            
+                            @if ($category->sub_categories_count > 0)                                                          
+                                <div class="category-card-flex">
+                                    @foreach ($category->subCategories as $sub)                                    
+                                        <div class="sub-category-card">
+                                            <div class="hover-card">
+                                                <div class="overlay-new">
+                                                    <a href="#" onclick="deleteSubCategory({{ $sub->id }})">
+                                                        <i class="las la-trash-alt text-secondary fs-18"></i>
+                                                    </a>
+                                                </div>
+                                                <img src="{{ asset('uploads/subcategory/' . $sub->image) }}" alt="{{ $sub->name }}" class="thumb" >
                                             </div>
-                                            <img src="{{ asset('uploads/subcategory/' . $sub->image) }}" alt="{{ $sub->name }}" class="thumb" >
-                                        </div>
-                                        <p class="mb-0">{{ Str::limit($sub->sub_category_name, 22) }}</p>
-                                    </div>                                    
-                                @endforeach                                
-                            </div>
-
-                            <div class="flex">
-                                <a href="javascript:0" 
-                                    class="btn btn-outline-primary btn-sm" 
-                                    data-id="{{ $category->id }}"
-                                    data-category-modal="{{ $category->category_modal }}"
-                                    data-category-name="{{ $category->category_name }}"
-                                    data-show-home="{{ $category->showHome }}"
-                                    data-menu-order="{{ $category->menu_order }}"
-                                    data-status="{{ $category->status }}"
-                                    onclick="editCategoryModal(this)"                                                
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#categoryModal" >
-                                    Edit
-                                </a>
-                                <a href="#" class="btn btn-outline-danger btn-sm" onclick="deleteCategory({{ $category->id }})" >
-                                    Delete
-                                </a>
-                            </div>
+                                            <p class="mb-0">{{ Str::limit($sub->sub_category_name, 22) }}</p>
+                                        </div>                                    
+                                    @endforeach                                
+                                </div>
+                            @else
+                                <p>No Sub-Category</p>
+                            @endif                            
                         </div>
                     </div>
                 </div>                                                    

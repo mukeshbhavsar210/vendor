@@ -51,7 +51,7 @@ Route::get('/go/{id}', function($id){
 Route::post('/set-intended-url', function (Request $request) {session(['url.intended' => $request->url]);});
 
 Route::controller(ShopController::class)->group(function() {
-    Route::get('/products/{item1?}/{item2?}/{item3?}','listing')->name('front.shop');
+    Route::get('/services/{item1?}/{item2?}/{item3?}','listing')->name('front.shop');
     Route::get('/details/{item2?}-{item3?}/{slug}', 'product')->name('front.product');
 
     //Category

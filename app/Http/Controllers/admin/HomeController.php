@@ -18,7 +18,7 @@ class HomeController extends Controller {
         $newOrdersToday = Order::whereDate('created_at', today())->count();
         //$recentOrders = Order::with('user')->where('status', 'delivered')->latest()->take(5)->get();
         $recentOrders = Order::with('user')->whereDate('created_at', today())->latest()->take(5)->get();
-        $categories = Category::withCount('products')->orderByDesc('products_count')->take(8)->get();
+        $categories = Category::withCount('services')->take(8)->get();
 
         $percentageChange = 0;
         if ($yesterdayRevenue > 0) {
