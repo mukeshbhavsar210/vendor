@@ -63,29 +63,13 @@
                                 </div>
                             @endforeach
                         </div>
-                    @endif
-
-                        {{-- @if (getCategories()->isNotEmpty())                            
-                                @foreach (getCategories() as $category)
-                                <div class="repeate-card">
-                                    @php
-                                        $subCategory = $category->subCategories->first();
-                                    @endphp
-
-                                    @if ($subCategory)                                        
-                                        @if ($subCategory->image)
-                                            <img src="{{ asset('uploads/subcategory/' . $subCategory->image) }}" >
-                                        @endif
-                                        <p>{{ $subCategory->sub_category_name }}</p>                                        
-                                    @endif
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endif                         --}}                  
+                    @endif                                      
                 </div>
             </div>
         </div>
-        <div class="col-md-7 col-12">2</div>
+        <div class="col-md-7 col-12">
+            <img src="{{ asset('front-assets/images/home_banner.jpeg') }}" alt="Urban Clap">
+        </div>
     </div>
 
         @if (getCategories()->isNotEmpty())
@@ -108,7 +92,43 @@
                     @endforeach
                 @endif
             @endforeach
-        @endif           
-    </div> 
+        @endif
+
+        <section class="cmn-home">
+            <h2>New and noteworthy</h2>        
+            <div class="services-gallery">   
+                @foreach(getSubCategories() as $value)                         
+                    <x-services 
+                        class="home-gallery"
+                        :item="$value"
+                        :data="$value"
+                        gallery="homeSubCategory"
+                        :hover="false"
+                        :price="true"                        
+                        :title_limit="25"
+                        :short_limit="7"
+                    />                    
+                @endforeach               
+            </div>
+        </section>
+
+        <section class="cmn-home">
+            <h2>Most booked services</h2>        
+            <div class="services-gallery">
+                @foreach(getServices() as $value)                         
+                    <x-services 
+                        :item="$value"
+                        :data="$value"
+                        :hover="false"
+                        :price="true"
+                        :title_limit="25"
+                        :short_limit="7"
+                        gallery="homeServices"
+                        show="services_new"
+                        class="home-gallery"
+                    />
+                @endforeach
+            </div> 
+        </section>
     </div>      
 @endsection

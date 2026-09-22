@@ -1,22 +1,47 @@
 <?php
 
 use App\Models\Category;
+use App\Models\Service;
 use App\Models\State;
 use App\Models\Wishlist;
 use App\Models\Brand;
 use App\Models\Order;
 use App\Models\Page;
 use App\Models\ProductImage;
+use App\Models\SubCategory;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;    
 
+    function homeCategories() {
+        return Category::with([
+            'subCategories' => function ($query) {
+                $query->whereNotNull('image')
+                    ->where('image', '!=', '')
+                    ->with([
+                        'subSubCategories',
+                        'services'
+                    ]);
+            }
+        ])
+        ->withCount('services')
+        ->where('status', 1)
+        ->orderBy('menu_order', 'asc')
+        ->orderBy('id', 'DESC')
+        ->take(20)
+        ->get();
+    }
+
     function getCategories() {
-        return Category::with(['subCategories'])
-            ->where('showHome', 'yes')
-            ->orderBy('menu_order', 'ASC')
-            ->take(6)
-            ->get();
+        return Category::with(['subCategories'])->with('ratings')->where('showHome', 'yes')->orderBy('menu_order', 'ASC')->take(20)->get();
+    }
+
+    function getServices() {
+        return Service::with(['category','subCategories','ratings'])->take(20)->get();
+    }
+
+    function getSubCategories() {
+        return SubCategory::where('status', 1)->take(20)->get();
     }
 
     function getModalCategories() {

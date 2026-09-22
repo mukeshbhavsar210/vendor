@@ -34,15 +34,16 @@
             <div class="col-md-10 col-12">
                 <div class="row">
                     <div class="col-md-10 col-12">
-                        <div class="custom-dropdown">
-                            <a href="javascript:0" class="dropdown">
-                                Size
-                                <span class="rotate">
-                                    <span class="sprites down-arrow-icon"></span>                                    
-                                </span>
-                            </a>
+                        <div class="custom-dropdown">                           
                             <div class="dropdown-menu-select">
-                                <x-filters :items="$sizes" type="size" valueField="name" labelField="code" title="" :showColor="false" :showPercent="false" :sizeFilter="true" :mobileView="false" />
+                                {{-- <x-filters 
+                                    type="size" 
+                                    valueField="name" 
+                                    labelField="code" title="" 
+                                    :showPercent="false" 
+                                    :sizeFilter="true" 
+                                    :mobileView="false" 
+                                /> --}}
                             </div>
                         </div>
                     </div>
@@ -66,8 +67,7 @@
                                         <li><a href="{{ request()->fullUrlWithQuery(['sort' => 'rating']) }}" class="sort-item {{ request('sort') == 'rating' ? 'active' : '' }}">Customer Rating</a></li>
                                     </ul>
                                 </div>
-                            </div>                            
-                        
+                            </div>
                     </div>
                 </div>
             </div>
@@ -77,15 +77,14 @@
     <div class="row border-product">
         <div class="col-md-2 col-12 sticky right-border d-none d-md-block">
             <x-filters :items="$item3" type="category" valueField="sub_sub_category_slug" labelField="sub_sub_category_name" nameClass="name" title="Categories" :showColor="false" :showPercent="false" :limit="17" :selected="$categoryArray" :sizeFilter="false" :mobileView="false"  />
-            <x-filters :items="$brands" type="brand" valueField="slug" labelField="name" nameClass="name" title="Brands" :showColor="false" :showPercent="false" :limit="17" :sizeFilter="false"  :mobileView="false" />
+            {{-- <x-filters :items="$brands" type="brand" valueField="slug" labelField="name" nameClass="name" title="Brands" :showColor="false" :showPercent="false" :limit="17" :sizeFilter="false"  :mobileView="false" /> --}}
 
             <div class="filter-group">
                 <h5 class="h5 mb-2">Price</h5>
                 <input type="text" class="js-range-slider-desktop" name="my_range" value="" />
             </div>
-
-            <x-filters :items="$colors" type="color" valueField="name" labelField="name" title="Color" :showColor="true" :showPercent="false" :sizeFilter="false" :mobileView="false"  />
-            <x-filters :items="$discounts" type="discount" valueField="percentage" labelField="percentage" title="Discount Range" :showColor="false" :showPercent="true" :sizeFilter="false" :mobileView="false" />
+            
+            {{-- <x-filters :items="$discounts" type="discount" valueField="percentage" labelField="percentage" title="Discount Range" :showColor="false" :showPercent="true" :sizeFilter="false" :mobileView="false" /> --}}
         </div>
 
         <div class="col-md-10 col-12">
@@ -168,7 +167,7 @@
                         <x-filters :items="$item3" type="category" valueField="sub_sub_category_slug" labelField="sub_sub_category_name" nameClass="name" title="" :showColor="false" :showPercent="false" :limit="17" :selected="$categoryArray" :sizeFilter="false" :mobileView="true" />
                     </div>
                     <div class="tab-pane fade" id="tab2">
-                        <x-filters :items="$sizes" type="size" valueField="name" labelField="code" title="Size" :showColor="false" :showPercent="false" :sizeFilter="true" :mobileView="true" />
+                        {{-- <x-filters :items="$sizes" type="size" valueField="name" labelField="code" title="Size" :showColor="false" :showPercent="false" :sizeFilter="true" :mobileView="true" /> --}}
                     </div>
                     <div class="tab-pane fade" id="tab3">                        
                         <div class="filter-group">
@@ -178,13 +177,13 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="tab4">
-                        <x-filters :items="$brands" type="brand" valueField="slug" labelField="name" nameClass="name" title="Brands" :showColor="false" :showPercent="false" :limit="17" :sizeFilter="false" :mobileView="true" />
+                        {{-- <x-filters :items="$brands" type="brand" valueField="slug" labelField="name" nameClass="name" title="Brands" :showColor="false" :showPercent="false" :limit="17" :sizeFilter="false" :mobileView="true" /> --}}
                     </div>
                     <div class="tab-pane fade" id="tab5">
-                        <x-filters :items="$colors" type="color" valueField="name" labelField="name" title="Color" :showColor="true" :showPercent="false" :sizeFilter="false" :mobileView="true" />
+                        {{-- <x-filters :items="$colors" type="color" valueField="name" labelField="name" title="Color" :showColor="true" :showPercent="false" :sizeFilter="false" :mobileView="true" /> --}}
                     </div>
                     <div class="tab-pane fade" id="tab6">
-                        <x-filters :items="$discounts" type="discount" valueField="percentage" labelField="percentage" title="Discount" :showColor="false" :showPercent="true" :sizeFilter="false" :mobileView="true" />
+                        {{-- <x-filters :items="$discounts" type="discount" valueField="percentage" labelField="percentage" title="Discount" :showColor="false" :showPercent="true" :sizeFilter="false" :mobileView="true" /> --}}
                     </div>
                     <div class="tab-pane fade" id="tab7">
                         More filters

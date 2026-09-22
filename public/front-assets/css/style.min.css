@@ -2120,7 +2120,7 @@ legend{font-size:1.5rem}
 .fs-4{font-size:1.5rem!important}
 }
 @media (min-width:1400px) {
-.container-xxl,.container-xl,.container-lg,.container-md,.container-sm,.container{max-width:1140px}
+.container-xxl,.container-xl,.container-lg,.container-md,.container-sm,.container{max-width:1240px}
 .col-xxl{flex:1 0 0}
 .row-cols-xxl-auto>*{flex:0 0 auto;width:auto}
 .row-cols-xxl-1>*{flex:0 0 auto;width:100%}
@@ -2371,7 +2371,7 @@ h1 span,h2 span,h3 span,h4 span,h5 span,h6 span{font-size:inherit;font-family:in
 ul{margin:0;padding:0}
 ul li{list-style:none}
 .bg-dark{background:#001d3d}
-a.link{color:#001d3d}
+a.link{color:#000000}
 a.link:hover{color:#f7ca0d}
 .btn-dark{padding:10px 20px;background-color:#001d3d;border-radius:0}
 .btn-dark:hover{background-color:#f7ca0d;border-color:#f7ca0d}

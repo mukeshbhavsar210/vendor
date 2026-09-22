@@ -5,10 +5,9 @@
 @section('content')
     
 <div class="container">    
-    <h1>{{ $category->category_name }}</h1>
-
     <div class="row">
-        <div class="col-md-3 col-6">
+        <div class="col-md-3 col-6 sticky">
+            <h1>{{ $category->category_name }}</h1>
             <div class="card mt-3">
                 <div class="card-body">
                     <h5>UC Cover</h5>
@@ -22,12 +21,12 @@
                     <div class="flex-card">
                         @foreach($categories as $category)
                             @foreach($category->subCategories as $subcategory)
-                                <div class="thumb">
-                                    <a href="{{ route('front.category', [$subcategory->category_slug]) }}">
-                                        <img src="{{ asset('uploads/subcategory/' . $subcategory->image) }}" alt="{{ $subcategory->category_name }}">
-                                    </a>
+                                <a href="#{{ $subcategory->sub_category_slug }}" data-id="{{ $subcategory->id }}" class="subcategory-thumb" >
+                                    <div class="thumb">
+                                        <img src="{{ asset('uploads/subcategory/' . $subcategory->image) }}" alt="{{ $subcategory->category_name }}" />
+                                    </div>
                                     <p>{{ $subcategory->sub_category_name }}</p>
-                                </div>
+                                </a>
                             @endforeach
                         @endforeach
                     </div>
@@ -53,55 +52,68 @@
             
             <div class="services">                        
                 <div class="service-listings">
-                    @foreach($services as $subCategoryId => $subCategoryServices)
-                        @php
-                            $firstService = $subCategoryServices->first();
-                            $subCategory = $firstService?->subCategory;
-                            $category = $firstService?->category;
-                        @endphp
+                    @if($services->isNotEmpty())
+                        @foreach($services as $subCategoryId => $subCategoryServices)                            
+                            @php
+                                $subCategory = $subCategoryServices->first()?->subCategory;
+                            @endphp
 
-                        @if($subCategory)
-                            <h2>{{ $subCategory->sub_category_name }}</h2>
-                        @endif
+                            <div class="subcategory-right" id="{{ $subCategory->sub_category_slug }}" data-id="{{ $subCategory->id }}" >
+                                @if($subCategory)                                
+                                    <div class="subcategory-heading" >
+                                        <h4 class="mb-2">{{ $subCategory->sub_category_name }}</h4>
+                                    </div>
+                                @endif
 
-                        @if($category)
-                            <div class="category-banner">                                
-                                <div class="details">
-                                    <div class="left">
-                                        <p class="label">{{ $category->banner_label }}</p>
-                                        <div class="text">
-                                            <h3>{{ $category->banner_title }}</h3>
-                                            <p>{{ $category->banner_details }}</p>
+                                @if($subCategory->banner == 'yes')
+                                    <div class="category-banner">
+                                        <div class="details">
+                                            <div class="left">
+                                                <p class="label">{{ $subCategory->banner_label }}</p>
+                                                <div class="text">
+                                                    <h3>{{ $subCategory->banner_title }}</h3>
+                                                    <p>{{ $subCategory->banner_details }}</p>
+                                                </div>
+                                            </div>
+
+                                            @if($subCategory->banner_image)
+                                                <div class="right">
+                                                    <img src="{{ asset('uploads/category/' . $subCategory->banner_image) }}" alt="{{ $subCategory->banner_title }}" />
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
-                                    <div class="right">
-                                        <img src="{{ asset('uploads/category/' . $category->banner_image) }}" alt="{{ $category->banner_title }}">
-                                    </div>
+                                @endif
+                                                        
+                                <div class="services-list">                                
+                                    @foreach($subCategoryServices as $value)
+                                        <x-services
+                                            class="service-card"
+                                            show="services"
+                                            :item="$value"
+                                            :category="$category"
+                                            :subcategory="$subCategory"
+                                            :ratings="$value->ratings"
+                                            :brand="$value->brand"
+                                            :process="$value->process"
+                                            :waranty="$value->waranty"
+                                            :include="$value->include"
+                                            :need="$value->need"
+                                            :faqs="$value->faqs"
+                                            :hover="false"
+                                            :price="true"
+                                            :title_limit="25"
+                                            :short_limit="7"
+                                        />
+                                    @endforeach
                                 </div>
                             </div>
-                        @else
-                            <p>Coming Soon</p>
-                        @endif
-
-                        @foreach($subCategoryServices as $value)                            
-                                <x-services 
-                                    :item="$value"
-                                    :category="$category"
-                                    :subcategory="$subCategory"
-                                    :ratings="$value->ratings"
-                                    :brand="$value->brand"
-                                    :process="$value->process"
-                                    :waranty="$value->waranty"
-                                    :include="$value->include"
-                                    :need="$value->need"
-                                    :faqs="$value->faqs"
-                                    :hover="false"                                    
-                                    :amount="true"
-                                    :title_limit="25"
-                                    :short_limit="7"
-                                />                            
                         @endforeach
-                    @endforeach                                                               
+                    @else
+                        <div class="no-services">
+                            <p>No services available in this category.</p>
+                        </div>
+                    @endif                                                                                 
                 </div>
                 
                 <div class="service-right">

@@ -28,16 +28,13 @@ class ShopController extends Controller {
         $selected_item3 = null;
 
         $categoryArray = [];
-        $brandsArray = [];
-        $colorsArray = [];
-        $sizesArray = [];
+        $brandsArray = [];        
         $discountArray = [];            
         
-        $products = Product::with(['category','subCategory','subSubCategory','ratings','sizes','variant_images'])->where('status',1);
+        $products = Service::with(['category','subCategory','ratings',])->where('status',1);
         $categories = Category::orderBy("category_name","ASC")->with(['sub_category'])->where('status',1)->get();                       
-        $productCount = Product::where('status', 1)->count();
-        $totalProducts = $products->count();     
-        $sizes  = Size::orderBy('id','ASC')->get();
+        $productCount = Service::where('status', 1)->count();
+        $totalProducts = $products->count();             
         
         function applySlugFilter($slug, $model, $slugColumn, $productColumn, &$selectedItem, &$products){
             if (!empty($slug)) {
@@ -54,13 +51,13 @@ class ShopController extends Controller {
 
         $item3 = collect();
 
-        if ($selected_item2) {
-            $item3 = SubSubCategory::where('sub_category_id', $selected_item2->id)
-                ->withCount(['products' => function ($query) {
-                    $query->where('status', 1);
-                }])
-                ->get();
-        }                
+        // if ($selected_item2) {
+        //     $item3 = SubSubCategory::where('sub_category_id', $selected_item2->id)
+        //         ->withCount(['products' => function ($query) {
+        //             $query->where('status', 1);
+        //         }])
+        //         ->get();
+        // }                
 
         if (!empty($request->get('category'))) {
             $values = explode(',', $request->get('category'));
@@ -75,9 +72,9 @@ class ShopController extends Controller {
             if ($selected_item2) {$query->where('sub_category_id', $selected_item2->id);}
         };                   
 
-        $discounts = DiscountPercentage::whereHas('products', $filterProducts) 
-                ->withCount(['products as products_count' => $filterProducts])
-                ->orderBy('percentage', 'ASC')->get();                         
+        // $discounts = DiscountPercentage::whereHas('products', $filterProducts) 
+        //         ->withCount(['products as products_count' => $filterProducts])
+        //         ->orderBy('percentage', 'ASC')->get();                         
 
         //Filter logic
         function applyFilter($request, $param, $model, $column, &$selectedArray, &$products, $options = []) {
@@ -197,7 +194,7 @@ class ShopController extends Controller {
         }     
 
         $data = compact(
-            'products', 'wishlistProductIds','productCount','categories','categoryArray', 'discounts', 'discountArray', 'selected_item1', 'selected_item2', 'selected_item3', 'item1','item2','item3','filtersApplied','totalProducts'
+            'products', 'wishlistProductIds','productCount','categories','categoryArray', 'discountArray', 'selected_item1', 'selected_item2', 'selected_item3', 'item1','item2','item3','filtersApplied','totalProducts'
         );
 
         $data = array_merge($data, [
@@ -325,69 +322,96 @@ class ShopController extends Controller {
     }
 
     public function category(Request $request, $item1 = null) {
-        $services = Service::with(
-                'category','subCategory','ratings',
-                'process','brand','discounts.discountPercentage',
-                'waranty','include','need','faqs')
-                ->where('status', 'approved')->get();
-
-        $services = $services->sortBy(function ($service) {
-            return $service->subCategory?->sort_order ?? 999999;
-        })->groupBy('sub_category_id');
-
-        //$query = Service::with('ratings')->where('status', 'approved');        
         $selected_category = $item1;
-        $category = Category::where('category_slug', $selected_category)->first();
-        $categories = Category::with('subCategories','ratings')->where('category_slug', $selected_category)->get();
 
-        // if ($item1) {
-        //     $category = Category::where('category_slug', $item1)->firstOrFail();
-        //     $query->where('category_id', $category->id);
-        // }
+        // Category from URL
+        $category = Category::with([
+            'subCategories' => function ($query) {
+                $query->orderBy('sort_order', 'asc');
+            },
+            'ratings'
+        ])
+        ->where('category_slug', $selected_category)
+        ->firstOrFail();
 
-        //$services = $query->get();    
-        
+        // All approved services belonging to this category
+        $services = Service::with([
+            'category',
+            'subCategory',
+            'ratings',
+            'process',
+            'brand',
+            'discounts.discountPercentage',
+            'waranty',
+            'include',
+            'need',
+            'faqs',
+        ])
+        ->where('status', 'approved')
+        ->where('category_id', $category->id)
+        ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Group services by sub-category
+        |--------------------------------------------------------------------------
+        */
+        $services = $services
+            ->sortBy(function ($service) {
+                return $service->subCategory?->sort_order ?? 999999;
+            })
+            ->groupBy('sub_category_id');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Category
+        |--------------------------------------------------------------------------
+        */
+        $categories = Category::with([
+            'subCategories',
+            'ratings',
+        ])
+        ->where('id', $category->id)
+        ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Cart
+        |--------------------------------------------------------------------------
+        */
         $cartContent = Cart::content();
-        $appliedCouponId = session('coupon_discount.id');                                   
-        $qty = Cart::count();
+
         $selectedIds = $request->cart_ids ?? [];
-        $shipping_charge = 0;                
 
-        $cartItems = Cart::content()->filter(function($item) use ($selectedIds){
-            return in_array($item->rowId, $selectedIds);
-        });
-
-        // IMPORTANT: remove formatting to avoid string math
-        $cartItems = Cart::content();
-
-        $discount_price = $cartItems->sum(function ($item) {
+        $discount_price = $cartContent->sum(function ($item) {
             return ($item->options->discount_price ?? 0) * $item->qty;
         });
-                        
+
         $store_discount = session()->get('coupon_discount');
-        $coupon_discount = session()->get('coupon_discount.discount', 0);
-        $coupon_code = session()->get('coupon_discount.code', 0);    
-        
-        $hasValidCoupon = DiscountCoupon::where('status', 1)
-            ->whereDate('expires_at', '>=', Carbon::today())
-            ->exists();
 
-            //dd(Cart::content());
+        $coupon_discount = session()->get(
+            'coupon_discount.discount',
+            0
+        );
 
-            return view('front.services.index', [
-                'services'          => $services,
-                'selected_category' => $selected_category,
-                'category'          => $category,
-                'categories'        => $categories,
-                'discount_price'    => $discount_price,
-                'store_discount'    => $store_discount,
-                'coupon_code'       => $coupon_code,
-                'coupon_discount'   => $coupon_discount,
-                'cartContent'       => $cartContent,
-        ]);
-        
-        //return view('front.services.index', compact('services','selected_category','category','categories'));
+        $coupon_code = session()->get(
+            'coupon_discount.code',
+            0
+        );
+
+        return view('front.services.index', compact(
+            'services',
+            'selected_category',
+            'category',
+            'categories',
+            'discount_price',
+            'store_discount',
+            'coupon_code',
+            'coupon_discount',
+            'cartContent'
+        ));
     }
+   
 
     public function category_old(Request $request, $item1=null) {    
         $services = Service::with('ratings')->where('status',1);
