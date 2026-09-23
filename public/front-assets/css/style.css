@@ -272,8 +272,8 @@ header.sticky { position:fixed; top:0; left:0; width:100%; animation: slideDown 
 .product-repeate .photo { filter: grayscale(100%); }
 
 
-.cmn-home { margin: 50px 0;}
-.cmn-home h2 { margin-bottom: 20px;}
+.cmn-home { margin: 80px 0;}
+.cmn-home .title-group { margin-bottom: 25px;}
 
 .home-gallery { margin: 0 10px; }
 .home-gallery .link { color: var(--black); }
@@ -380,12 +380,20 @@ body.active .menu-overlay{
 
 .sticky { position: sticky; top: 80px; height: fit-content; }
 
+.slick-disabled { display: none !important;}
+.slick-arrow { border: 1px #ccc solid; height: 42px; width: 42px; border-radius: 100px; display: block; padding:11px 10px; cursor: pointer; position: absolute; top:90px; background-color: var(--white); z-index: 9;}
+.slick-arrow:hover { border-color: var(--black);}
+.slick-arrow svg { height: 18px; width: 18px; }
+.arrow-left { left:-15px;}
+.arrow-right { right:-15px;}
+
 .flex-card { display: flex; gap: 10px; flex-wrap: wrap; padding: 20px 0;}
 .flex-card .subcategory-thumb { width: 30%; cursor: pointer; color: var(--gray);}
 .flex-card .subcategory-thumb:hover { color: var(--black);}
 .flex-card .subcategory-thumb:hover .thumb { border-color:var(--gray-dark); }
 .flex-card .subcategory-thumb p { font-size: 12px; line-height: 15px; padding: 4px;}
 .flex-card .subcategory-thumb .thumb { border: 2px solid transparent; border-radius: 7px; padding: 3px; height: 77px;}
+.flex-card .subcategory-thumb .thumb img { border-radius: 7px; }
 .flex-card .subcategory-thumb.anchor-active .thumb { border-color:var(--black);}
 .flex-card .subcategory-thumb.anchor-active p { color: var(--black);}
 

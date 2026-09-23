@@ -102,11 +102,11 @@
                                                         <i class="las la-trash-alt text-secondary fs-18"></i>
                                                     </a>
                                                 </div>
-                                                <img src="{{ asset('uploads/subcategory/' . $sub->image) }}" alt="{{ $sub->name }}" class="thumb" >
+                                                <img src="{{ asset('uploads/subcategory/'.$sub->category->category_slug.'/'.$sub->image) }}" alt="{{ $sub->name }}" class="thumb">                                                
                                             </div>
                                             <p class="mb-0">{{ Str::limit($sub->sub_category_name, 22) }}</p>
                                         </div>                                    
-                                    @endforeach                                
+                                    @endforeach
                                 </div>
                             @else
                                 <p>No Sub-Category</p>

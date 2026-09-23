@@ -36,9 +36,9 @@ use Illuminate\Support\Facades\Mail;
         return Category::with(['subCategories'])->with('ratings')->where('showHome', 'yes')->orderBy('menu_order', 'ASC')->take(20)->get();
     }
 
-    function getServices() {
-        return Service::with(['category','subCategories','ratings'])->take(20)->get();
-    }
+    // function getServices() {
+    //     return Service::with(['category','subCategories','ratings'])->take(20)->get();
+    // }
 
     function getSubCategories() {
         return SubCategory::where('status', 1)->take(20)->get();
