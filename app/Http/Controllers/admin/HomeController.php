@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -18,7 +19,7 @@ class HomeController extends Controller {
         $newOrdersToday = Order::whereDate('created_at', today())->count();
         //$recentOrders = Order::with('user')->where('status', 'delivered')->latest()->take(5)->get();
         $recentOrders = Order::with('user')->whereDate('created_at', today())->latest()->take(5)->get();
-        $categories = Category::withCount('services')->take(8)->get();
+        $categories = Category::withCount('services')->take(8)->get();        
 
         $percentageChange = 0;
         if ($yesterdayRevenue > 0) {

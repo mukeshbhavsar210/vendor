@@ -123,13 +123,7 @@ class CategoryController extends Controller {
                                 'value' => 1,
                                 'default' => 1,
                                 'col' => 'col-md-3 col-6'
-                            ],  
-                            [
-                                'type' => 'file',
-                                'name' => 'thumb',
-                                'label' => 'Category Thumb',
-                                'col' => 'col-md-9 col-6'
-                            ],                            
+                            ]                         
                         ]
                     ]
                 ],                
@@ -215,8 +209,7 @@ class CategoryController extends Controller {
             $category->showHome = $request->showHome;            
             $category->category_modal = $request->category_modal;
             $category->status = $request->status;
-            $category->image = $request->image;
-            $category->thumb = $request->thumb;
+            $category->image = $request->image;            
             $category->save();
 
             $id = $category->id;
@@ -233,6 +226,7 @@ class CategoryController extends Controller {
             
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
+                //$imageName = $name . '.' . $image->getClientOriginalExtension();
                 $imageName = $id . '_' . $name . '.' . $image->getClientOriginalExtension();
                 $img = $manager->read($image->getRealPath());
                 //$img->scale(width: 300);
@@ -241,28 +235,7 @@ class CategoryController extends Controller {
                 $category->image = $imageName;
                 $category->save();
             }  
-            
-            
-            // Init Image Manager
-            $thumb = new ImageManager(new Driver());
-
-            // Create directory if not exists
-            $path = public_path('uploads/category/thumb');
-            if (!File::exists($path)) {
-                File::makeDirectory($path, 0755, true);
-            }            
-            
-            if ($request->hasFile('thumb')) {
-                $thumb = $request->file('thumb');
-                $imageName = $id . '_' . $name . '.' . $thumb->getClientOriginalExtension();
-                $img = $thumb->read($thumb->getRealPath());
-                //$img->scale(width: 300);
-                $img->resize(466, 466);
-                $img->save($path.$imageName);
-                $category->thumb = $imageName;
-                $category->save();
-            }  
-
+                       
             $request->session()->flash('success', 'Category added successfully');
 
             return response()->json([
@@ -371,11 +344,13 @@ class CategoryController extends Controller {
         ]);
 
         if ($validator->passes()) {
-            $subCategory = new SubCategory();
-            $category = Category::find($request->category_id);
+           $subCategory = new SubCategory();
+
+            $category = Category::findOrFail($request->category_id);
+
             $subCategory->category_id = $request->category_id;
             $subCategory->sub_category_name = $request->sub_category_name;
-            $subCategory->sub_category_slug = $request->sub_category_slug;            
+            $subCategory->sub_category_slug = $request->sub_category_slug;
             $subCategory->status = $request->status;
             $subCategory->save();
 
@@ -385,21 +360,31 @@ class CategoryController extends Controller {
             // Init Image Manager
             $manager = new ImageManager(new Driver());
 
-            // Create directory if not exists
-            $path = public_path('uploads/subcategory/');
-            if (!File::exists($path)) {
-                File::makeDirectory($path, 0755, true);
-            }            
-            
             if ($request->hasFile('image')) {
+
                 $image = $request->file('image');
-                $imageName = $id . '_' . $name . '.' . $image->getClientOriginalExtension();
-                $img = $manager->read($image->getRealPath());                
+
+                $imageName = $name . '.' . $image->getClientOriginalExtension();
+
+                // Dynamic folder based on category_slug
+                $categorySlug = $category->category_slug;
+
+                $path = public_path('uploads/subcategory/' . $categorySlug . '/');
+
+                // Create directory if not exists
+                if (!File::exists($path)) {
+                    File::makeDirectory($path, 0755, true);
+                }
+
+                $img = $manager->read($image->getRealPath());
+
                 $img->resize(144, 144);
-                $img->save($path.$imageName);
+
+                $img->save($path . $imageName);
+
                 $subCategory->image = $imageName;
                 $subCategory->save();
-            }           
+            }         
 
             $request->session()->flash('success', 'Sub Category added successfully');
 

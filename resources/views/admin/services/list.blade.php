@@ -42,96 +42,123 @@
                 </div>                        
             </div>
         
-            <div class="table-responsive mt-1">
+            <div class="accordion" id="categoryAccordion">
                 @php
                     use Illuminate\Support\Str;
                 @endphp
 
-                <table class="table mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="border-top-0">Service</th>                            
-                            <th class="border-top-0 text-end" width="150">Price</th>                            
-                            <th class="border-top-0 text-end" width="100">Status</th>
-                            <th class="border-top-0 text-end" width="100">Action</th>
-                        </tr>
-                    </thead>                     
-                    <tbody id="productAccordion">
-                        @if ($services->isNotEmpty())
-                            @foreach($services as $key => $service)
-                                @php
-                                    $serviceImage = $service->service_images->first();
-                                @endphp
-                                <tr>
-                                    <td>
-                                        <div class="product-row">
-                                            <a href="{{ route('services.edit', $service->id) }}" class="show-tooltip">
-                                                @if (!empty($serviceImage->image))
-                                                    <img src="{{ asset('uploads/services/thumb/'.$serviceImage->image) }}" height="110" class="me-3 align-self-center rounded" >
-                                                @else
-                                                    <img src="{{ asset('admin-assets/img/default-150x150.png') }}" alt="" height="110" class="me-3 align-self-center rounded" />
-                                                @endif
-                                                <span class="tooltip" style="bottom: 0; left:100px;">{{ $service->category?->category_name ?? 'No Category' }}</span>
-                                            </a>
-                                            <div class="flex-grow-1 text-truncate">
-                                                <h5 class="product-title">
-                                                    <a href="{{ route('services.edit', $service->id) }}">
-                                                        {{ Str::limit($service->name, 70, '...') }}                                                                                                              
-                                                    </a>                                                    
-                                                </h5>
-                                                <div class="small-fonts">                                                    
-                                                    <p class="mb-0 text-muted">
-                                                        <span class=""><b>{{ $service->id }}</b> / </span>
-                                                    </p>                                                    
-                                                </div>
-                                            </div>
+                @if ($services->isNotEmpty())
+                    @php
+                        $groupedServices = $services->groupBy('category_id');
+                    @endphp
+                    
+                    @foreach($groupedServices as $categoryId => $categoryServices)
+                        @php
+                            $category = $categoryServices->first()->category;
+                            $accordionId = 'cat' . $categoryId;
+                        @endphp
+
+                        <div class="accordion-item">
+                            <div class="accordion-header" id="cat{{ $categoryId }}" >
+                                <div class="accordion-button collapsed p-2" data-bs-toggle="collapse" data-bs-target="#catCollapse{{ $accordionId }}">
+                                    <div class="category-card">
+                                        <div class="icon-head">
+                                            <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}" class="thumb" >
+                                            <h5>{{ $category?->category_name ?? 'No Category' }}
+                                                - {{ $categoryServices->count() }}
+                                            </h5>
                                         </div>
-                                    </td> 
-                                                                                                                                      
-                                    <td class="text-end"> 
-                                        <div class="price">
-                                            @if($service->discount_percent > 0)
-                                                <h5 class="mb-1">₹{{ round($service->discount_price) }}</h5>
-                                                <p class="text-muted tiny-font">
-                                                    MRP <del>₹{{ $service->price }}</del><br />
-                                                    <span class="discount">{{ $service->discount_percent }}% OFF</span>                                                    
-                                                </p>
-                                            @else
-                                                <h5 class="mb-0">₹{{ number_format($service->price, 2) }}</h5>
-                                            @endif
-                                        </div>
-                                    </td> 
-                                             
-                                    <td class="text-end">
-                                        <div class="pull-right">
-                                            @if ($service->status == 1)  
-                                                <span class="sprites green-tick-icon"></span>
-                                            @else
-                                                <span class="sprites red-tick-icon"></span>
-                                            @endif
-                                        </div>
-                                    </td>                  
-                                    <td class="text-end">
-                                        <div class="pull-right">
-                                            <div class="flex">
-                                                <a href="{{ route('services.edit', $service->id ) }}" class="edit-icon">
-                                                    <span class="sprites"></span>
-                                                </a>
-                                                <a href="#" onclick="deleteService( {{ $service->id }} )" class="delete-icon" >
-                                                    <span class="sprites"></span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </td> 
-                                </tr>
-                                @endforeach
-                            @else
-                                <tr>
-                                    <td>Records not found</td>
-                                </tr>
-                            @endif
-                    </tbody>
-                </table>
+                                    </div>
+                                </div>                                
+                            </div>
+
+                        <div id="catCollapse{{ $accordionId }}" class="accordion-collapse collapse" data-bs-parent="#categoryAccordion">
+                            <div class="table-responsive">
+                                <table class="table mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="border-top-0" width="60">ID</th>
+                                            <th class="border-top-0">All Services</th>
+                                            <th class="border-top-0" width="180">Category</th>                            
+                                            <th class="border-top-0 text-end" width="150">Price</th>
+                                            <th class="border-top-0 text-end" width="100">Status</th>
+                                            <th class="border-top-0 text-end" width="100">Action</th>
+                                        </tr>
+                                    </thead>  
+                                    <tbody>
+                                        @foreach($categoryServices as $service)
+                                            @php
+                                                $serviceImage = $service->service_images->first();
+                                            @endphp
+                                            <tr>
+                                                <td>{{ $service->id }}</td>
+                                                <td>
+                                                    <a href="{{ route('services.edit', $service->id) }}" class="h5">
+                                                        {{ Str::limit($service->title, 100, '...') }}
+                                                    </a>
+                                                    <p class="text-muted tiny-font">
+                                                        {{ Str::limit($service->short_description, 50, '...') }}
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="tiny-font">
+                                                        {{ $service->category?->category_name ?? 'No Category' }}
+                                                    </p>
+                                                    <p class="text-muted tiny-font">
+                                                        {{ $service->subCategory?->sub_category_name ?? 'No Sub Category' }}
+                                                    </p>
+                                                </td>
+
+                                                <td class="text-end">
+                                                    <div class="price">
+                                                        @if($service->discount_percent > 0)
+                                                            ₹{{ round($service->discount_price) }}
+                                                            <p class="text-muted tiny-font">
+                                                                MRP
+                                                                <del>₹{{ $service->price }}</del>
+                                                                <br>
+                                                                <span class="discount">
+                                                                    {{ $service->discount_percent }}% OFF
+                                                                </span>
+                                                            </p>
+                                                        @else
+                                                            ₹{{ number_format($service->price, 2) }}
+                                                        @endif
+                                                    </div>
+                                                </td>
+                                                
+                                                <td class="text-end">
+                                                    @if ($service->status == 'approved')
+                                                        <span class="sprites green-tick-icon"></span>
+                                                    @else
+                                                        <span class="sprites red-tick-icon"></span>
+                                                    @endif
+                                                </td>
+
+                                                <td class="text-end">
+                                                    <div class="pull-right">
+                                                        <div class="flex">
+                                                            <a href="{{ route('services.edit', $service->id) }}" class="edit-icon">
+                                                                <span class="sprites"></span>
+                                                            </a>
+
+                                                            <a href="#" onclick="deleteService({{ $service->id }})" class="delete-icon">
+                                                                <span class="sprites"></span>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach                    
+                @else
+                    <div class="text-center py-4">Records not found</div>
+                @endif
             </div>
         </div>        
         <div class="card-body pb-0 clearfix">

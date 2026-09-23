@@ -13,12 +13,31 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class FrontController extends Controller {
-    public function index(){
-        $services = Service::take(4)->where('status',1)->get();
-        // $latestProducts = Service::orderBy('id','DESC')->where('status',1)->take(4)->get();
+    public function index(){        
+        $services = Service::with(['category', 'subCategories', 'ratings'])
+            ->where('status', 'approved')
+            ->whereIn('id', function ($query) {
+                $query->selectRaw('MIN(id)')->from('services')->where('status', 'approved')->groupBy('category_id');
+            })->take(20)->get();
 
-        // $data['latestProducts'] = $latestProducts;
-        $data['featuredProducts'] = $services;    
+        function getServicesByCategorySlug($categorySlug) {
+            return Service::with(['category', 'subCategory', 'ratings'])
+                ->whereHas('category', function ($query) use ($categorySlug) {
+                    $query->where('category_slug', $categorySlug);
+                })
+                ->where('status', 'approved')->get()->groupBy('category_id');
+        }
+
+        $women_spa = getServicesByCategorySlug('womens-salon-spa');
+        $men_spa = getServicesByCategorySlug('mens-salon-massage');
+        $appliances = getServicesByCategorySlug('ac-appliance-repair');
+        $installation = getServicesByCategorySlug('home-repair-&-installation');
+
+        $data['services'] = $services;
+        $data['women_spa'] = $women_spa;
+        $data['men_spa'] = $men_spa;
+        $data['appliances'] = $appliances;
+        $data['installation'] = $installation;
 
         return view("front.home.index",$data);
     }
@@ -32,9 +51,9 @@ class FrontController extends Controller {
             ]);
         }
 
-        $product = Product::find($request->id);
+        $service = Service::find($request->id);
 
-        if ($product == null){
+        if ($service == null){
             return response()->json([
                 'status' => true,
                 'message' => '<div class="alert alert-danger">Product not found.</div>'
@@ -44,17 +63,17 @@ class FrontController extends Controller {
         Wishlist::updateOrCreate(
             [
                 'user_id' => Auth::user()->id,
-                'product_id' => $request->id,
+                'service_id' => $request->id,
             ],
             [
                 'user_id' => Auth::user()->id,
-                'product_id' => $request->id,
+                'service_id' => $request->id,
             ],
         );
 
         return response()->json([
             'status' => true,
-            'message' => $product->title.' added in yout wishlist!'
+            'message' => $service->title.' added in yout wishlist!'
         ]);
     }
 
@@ -89,207 +108,11 @@ class FrontController extends Controller {
                 'errors' => $validator->errors()
             ]);
         }
-    }
-
-    
-
-    public function like($id) {
-        $product = AffiliateProduct::findOrFail($id);
-
-        // Prevent multiple likes (basic using session)
-        if (!session()->has('liked_product_'.$id)) {
-            $product->increment('likes');
-            session()->put('liked_product_'.$id, true);
-
-            return response()->json([
-                'success' => true,
-                'likes' => $product->likes
-            ]);
-        }
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Already liked'
-        ]);
-    }
-
-
-    public function view($id) {
-        $product = AffiliateProduct::findOrFail($id);
-
-        // Optional: prevent multiple counts within session
-        if (!session()->has('viewed_product_'.$id)) {
-
-            $product->increment('views');
-
-            session()->put('viewed_product_'.$id, true);
-        }
-
-        return response()->json([
-            'success' => true,
-            'views' => $product->views
-        ]);
-    }
-
-
-    public function addToAffiliate(Request $request){
-        if(Auth::check() == false){
-            session(['url.intended' => url()->previous() ]);
-            return response()->json([
-                'status' => false,
-            ]);
-        }
-
-        $product = AffiliateProduct::find($request->id);
-
-        if ($product == null){
-            return response()->json([
-                'status' => true,
-                'message' => '<div class="alert alert-danger">Product not found.</div>'
-            ]);
-        }
-
-        AffiliateWishlist::updateOrCreate(
-            [
-                'user_id' => Auth::user()->id,
-                'affiliate_product_id' => $request->id,
-            ],
-            [
-                'user_id' => Auth::user()->id,
-                'affiliate_product_id' => $request->id,
-            ],
-        );
-
-        return response()->json([
-            'status' => true,
-            'message' => $product->title.' added in yout Deals wishlist!'
-        ]);
-    }
-
-
-
-    public function addToNotify(Request $request) {
-        if (!Auth::check()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Please login first'
-            ]);
-        }
-
-        $request->validate([
-            'product_id' => 'required|exists:products,id'
-        ]);
-
-        $product = Product::find($request->product_id);
-
-        if (!$product) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Product not found.'
-            ]);
-        }
-
-        // Optional (but smart): only allow if out of stock
-        if ($product->stock > 0) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Product is already in stock'
-            ]);
-        }
-
-        // prevent duplicate
-        $exists = StockNotification::where('user_id', Auth::id())
-            ->where('product_id', $request->product_id)
-            ->first();
-
-        if ($exists) {
-            return response()->json([
-                'status' => false,
-                'message' => 'You already requested notification'
-            ]);
-        }
-
-        StockNotification::create([
-            'user_id' => Auth::id(),
-            'product_id' => $request->product_id,
-            'notified' => 0
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'You will be notified when product is back in stock'
-        ]);
-    }
-
+    }    
 
     public function faqs() {
         return view('front.faqs');
     }
-
-
-    public function deals() {
-        $affiliateProducts = AffiliateProduct::latest()->get();
-
-        $affiliateProductIds = [];
-
-        if (Auth::check()) {
-            $affiliateProductIds = AffiliateWishlist::where('user_id', Auth::id())
-                ->pluck('affiliate_product_id')
-                ->toArray();
-        }    
-
-        $notifiedIds = DealStockNotification::where('user_id', Auth::id())
-                    ->pluck('affiliate_product_id')
-                    ->toArray();
-
-        return view('front.affiliateDeals', compact('affiliateProducts', 'affiliateProductIds', 'notifiedIds'));
-    }
-
-
-    public function addToAffiliateNotify(Request $request) {
-        if (!Auth::check()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Please login first'
-            ]);
-        }
-
-        $request->validate([
-            'affiliate_product_id' => 'required|exists:affiliate_products,id'
-        ]);
-
-        $product = AffiliateProduct::find($request->affiliate_product_id);
-
-        if (!$product) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Product not found.'
-            ]);
-        }
-
-        $exists = DealStockNotification::where('user_id', Auth::id())
-            ->where('affiliate_product_id', $request->affiliate_product_id)
-            ->first();
-
-        if ($exists) {
-            return response()->json([
-                'status' => false,
-                'message' => 'You already requested notification'
-            ]);
-        }
-
-        DealStockNotification::create([
-            'user_id' => Auth::id(),
-            'affiliate_product_id' => $request->affiliate_product_id,
-            'notified' => 0
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'You will be notified when deal is available'
-        ]);
-    }
-
 
     public function orderStatus(Request $request) {
         $orderId = $request->message;
