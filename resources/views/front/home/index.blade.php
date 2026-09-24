@@ -97,11 +97,11 @@
         <section class="cmn-home">
             <h2>New and noteworthy</h2>        
             <div class="services-gallery">   
-                @foreach(getSubCategories() as $value)                         
+                @foreach(getSubCategories() as $service)                         
                     <x-services 
                         class="home-gallery"
-                        :item="$value"
-                        :data="$value"
+                        :item="$service"
+                        :data="$service"
                         gallery="homeSubCategory"
                         :hover="false"
                         :price="true"                        
@@ -117,10 +117,28 @@
                 <h2>Most booked services</h2>
             </div>
             <div class="services-gallery">
-                @foreach($services as $value)
+                @foreach($most_booked as $categoryId => $subCategories)
+                    @foreach($subCategories as $subCategory)                        
+                        <x-services
+                            :item="$subCategory"
+                            :data="$subCategory"
+                            :category="$subCategory->category"
+                            :subcategory="$subCategory"
+                            :ratings="$subCategory->services->flatMap->ratings"
+                            show="services_new"
+                            gallery="homeServices"
+                            class="home-gallery"
+                            :reviews="true"
+                            :hover="false"
+                            :price="true"
+                        />
+                    @endforeach
+                @endforeach
+
+                {{-- @foreach($services as $service)
                     <x-services 
-                        :item="$value"
-                        :data="$value"
+                        :item="$service"
+                        :data="$service"
                         :reviews="true"
                         :hover="false"
                         :price="true"
@@ -130,7 +148,7 @@
                         show="services_new"
                         class="home-gallery"
                     />
-                @endforeach
+                @endforeach --}}
             </div> 
         </section>
 
@@ -139,15 +157,15 @@
                 <h2>Span for women</h2>
             </div>
             <div class="services-gallery">
-                @foreach($women_spa as $subCategoryId => $subCategoryServices)                    
-                    @foreach($subCategoryServices as $value)
+                @foreach($women_spa as $categoryId => $subCategories)
+                    @foreach($subCategories as $subCategory)                        
                         <x-services
-                            :item="$value"
-                            :data="$value"
-                            :category="$value->category"
-                            :subcategory="$value->subCategories" 
-                            :ratings="$value->ratings"                            
-                            show="services_new" 
+                            :item="$subCategory"
+                            :data="$subCategory"
+                            :category="$subCategory->category"
+                            :subcategory="$subCategory"
+                            :ratings="$subCategory->services->flatMap->ratings"
+                            show="services_new"
                             gallery="homeServices"
                             class="home-gallery"
                             :reviews="true"
@@ -166,15 +184,15 @@
             </div>
 
             <div class="services-gallery">
-                @foreach($women_spa as $subCategoryId => $subCategoryServices)                    
-                    @foreach($subCategoryServices as $value)
+                @foreach($cleaning as $categoryId => $subCategories)
+                    @foreach($subCategories as $subCategory)                        
                         <x-services
-                            :item="$value"
-                            :data="$value"
-                            :category="$value->category"
-                            :subcategory="$value->subCategories" 
-                            :ratings="$value->ratings"                            
-                            show="services_new" 
+                            :item="$subCategory"
+                            :data="$subCategory"
+                            :category="$subCategory->category"
+                            :subcategory="$subCategory"
+                            :ratings="$subCategory->services->flatMap->ratings"
+                            show="services_new"
                             gallery="homeServices"
                             class="home-gallery"
                             :reviews="true"
@@ -191,15 +209,15 @@
                 <h2>Appliance repair & service</h2>
             </div>
             <div class="services-gallery">
-                @foreach($appliances as $subCategoryId => $subCategoryServices)                    
-                    @foreach($subCategoryServices as $value)
+                @foreach($appliances as $categoryId => $subCategories)
+                    @foreach($subCategories as $subCategory)                        
                         <x-services
-                            :item="$value"
-                            :data="$value"
-                            :category="$value->category"
-                            :subcategory="$value->subCategories" 
-                            :ratings="$value->ratings"                            
-                            show="services_new" 
+                            :item="$subCategory"
+                            :data="$subCategory"
+                            :category="$subCategory->category"
+                            :subcategory="$subCategory"
+                            :ratings="$subCategory->services->flatMap->ratings"
+                            show="services_new"
                             gallery="homeServices"
                             class="home-gallery"
                             :reviews="true"
@@ -207,7 +225,7 @@
                             :price="true"
                         />
                     @endforeach
-                @endforeach
+                @endforeach                
             </div> 
         </section>
 
@@ -215,16 +233,42 @@
             <div class="title-group">
                 <h2>Home repair & installation</h2>
             </div>
-            <div class="services-gallery">                
-                @foreach($installation as $subCategoryId => $subCategoryServices)                    
-                    @foreach($subCategoryServices as $value)
+            <div class="services-gallery">
+                @foreach($installation as $categoryId => $subCategories)
+                    @foreach($subCategories as $subCategory)                        
                         <x-services
-                            :item="$value"
-                            :data="$value"
-                            :category="$value->category"
-                            :subcategory="$value->subCategories" 
-                            :ratings="$value->ratings"                            
-                            show="services_new" 
+                            :item="$subCategory"
+                            :data="$subCategory"
+                            :category="$subCategory->category"
+                            :subcategory="$subCategory"
+                            :ratings="$subCategory->services->flatMap->ratings"
+                            show="services_new"
+                            gallery="homeServices"
+                            class="home-gallery"
+                            :reviews="true"
+                            :hover="false"
+                            :price="true"
+                        />
+                    @endforeach
+                @endforeach                
+            </div> 
+        </section>
+
+        <section class="cmn-home">
+            <div class="title-group">
+                
+                <p>Grooming essentials</p>
+            </div>
+            <div class="services-gallery">
+                @foreach($men_spa as $categoryId => $subCategories)
+                    @foreach($subCategories as $subCategory)                        
+                        <x-services
+                            :item="$subCategory"
+                            :data="$subCategory"
+                            :category="$subCategory->category"
+                            :subcategory="$subCategory"
+                            :ratings="$subCategory->services->flatMap->ratings"
+                            show="services_new"
                             gallery="homeServices"
                             class="home-gallery"
                             :reviews="true"
@@ -233,34 +277,6 @@
                         />
                     @endforeach
                 @endforeach
-            </div> 
-        </section>
-
-        <section class="cmn-home">
-            <div class="title-group">
-                <h3>{{ $men_spa->first()->first()->category->category_name }}</h3>
-                <p>Grooming essentials</p>
-            </div>
-            <div class="services-gallery">
-                @if ($men_spa)                    
-                    @foreach($men_spa as $subCategoryId => $subCategoryServices)                    
-                        @foreach($subCategoryServices as $value)
-                            <x-services
-                                :item="$value"
-                                :data="$value"
-                                :category="$value->category"
-                                :subcategory="$value->subCategory" 
-                                :ratings="$value->ratings"                            
-                                show="services_new" 
-                                gallery="homeServices"
-                                class="home-gallery"
-                                :reviews="true"
-                                :hover="false"
-                                :price="true"
-                            />
-                        @endforeach
-                    @endforeach
-                @endif
             </div> 
         </section>
     </div>      

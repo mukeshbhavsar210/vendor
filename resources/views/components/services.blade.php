@@ -331,46 +331,38 @@
             @endif
             
         @elseif($gallery == 'homeServices')  
-            <a href="{{ route('front.category', [$data->category->category_slug]) }}#{{ $data->subCategory->sub_category_slug }}" class="link">
-                @if ($data->subCategory->image != "")                    
-                    <img src="{{ asset('uploads/subcategory/'.$data->category->category_slug.'/'.$data->subCategory->image) }}" alt="" class="thumb">
+            <a href="{{ route('front.category', [$data->category->category_slug]) }}#{{ $data->sub_category_slug }}" class="link">                
+
+                @if ($data->image != "")                    
+                    <img src="{{ asset('uploads/subcategory/'.$data->image) }}" alt="" class="thumb">
                 @endif                
 
-                <h5>{{ Str::limit($data->subCategory->sub_category_name, 29, '...') }}</h5>
+                <h5>{{ Str::limit($data->sub_category_name, 29, '...') }}</h5>               
 
                 @if($reviews)
                     @php
-                        $averageRating = round($data->ratings->avg('rating') ?? 0);
+                        $ratingCount = $ratings->count();
+                        $averageRating = $ratings->avg('rating');
                     @endphp
-
+                                    
                     <div class="rating">
                         <div class="part">
-                            <p class="icon">
-                                <svg width="100%" height="100%" viewBox="0 0 24 24" fill="#545454" xmlns="http://www.w3.org/2000/svg"><path d="M12.923 2.616a1 1 0 00-1.846 0l-2.41 5.795-6.257.502a1 1 0 00-.571 1.756l4.767 4.084-1.457 6.105a1 1 0 001.494 1.086L12 18.672l5.357 3.272a1 1 0 001.494-1.086l-1.457-6.105 4.767-4.084a1 1 0 00-.57-1.756l-6.257-.502-2.41-5.795z" fill="#545454"></path></svg>
-                            </p>
-                            {{-- @for($i = 1; $i <= 5; $i++)
-                                @if($i <= $averageRating)                            
-                                    <i class="fa fa-star"></i>
-                                @else                            
-                                    <i class="fa fa-star-o"></i>
-                                @endif
-                            @endfor --}}
-                            <p>{{ $data->ratings->count() }}</p>
+                            @if($ratingCount > 0)
+                                <span>{{ number_format($averageRating, 1) }} ★</span>
+                                <span>({{ $ratingCount }})</span>
+                            @endif                                                        
                         </div>
 
-                        @if ($data->category->instant == 'yes')
+                        @if ($data->instant == 'yes')
                             <div class="part">
-                                <p class="icon"><svg width="100%" height="100%" viewBox="0 0 24 24" fill="#545454" xmlns="http://www.w3.org/2000/svg"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" fill="#545454"></path></svg></p>
-                                <p class="icon"><svg width="100%" height="100%" viewBox="0 0 12 12" fill="#07794C" xmlns="http://www.w3.org/2000/svg"><path d="M1.576 7.77a.2.2 0 01-.16-.32L6.609.546a.2.2 0 01.36.11l.19 3.384a.2.2 0 00.2.19h3.067a.2.2 0 01.16.32l-5.192 6.903a.2.2 0 01-.36-.109l-.19-3.385a.2.2 0 00-.199-.189H1.576z" fill="#07794C"></path></svg></p>
-                                <p>Instant</p>
+                                <span class="icon"><svg width="100%" height="100%" viewBox="0 0 24 24" fill="#545454" xmlns="http://www.w3.org/2000/svg"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" fill="#545454"></path></svg></span>
+                                <span class="icon"><svg width="100%" height="100%" viewBox="0 0 12 12" fill="#07794C" xmlns="http://www.w3.org/2000/svg"><path d="M1.576 7.77a.2.2 0 01-.16-.32L6.609.546a.2.2 0 01.36.11l.19 3.384a.2.2 0 00.2.19h3.067a.2.2 0 01.16.32l-5.192 6.903a.2.2 0 01-.36-.109l-.19-3.385a.2.2 0 00-.199-.189H1.576z" fill="#07794C"></path></svg></span>
+                                <span>Instant</span>
                             </div>
                         @endif
                     </div>
                 @endif
-
-                @if($price)
-                    <p>₹{{ $data->subCategory->price }}</p>
-                @endif
+                <p>₹{{ $data->price }}</p>
             </a>
         @endif       
 

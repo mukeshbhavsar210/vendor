@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\File;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller {
@@ -56,20 +57,8 @@ class CategoryController extends Controller {
                                 'data'  => [
                                     'target' => '#slug'
                                 ],
-                                'col' => 'col-md-9 col-12'
+                                'col' => 'col-12'
                             ],    
-                            [
-                                'type' => 'select',
-                                'name' => 'showHome',
-                                'label' => 'Show on Home',
-                                'options' => [
-                                    'yes' => 'Yes',
-                                    'no' => 'No'
-                                ],
-                                'value' => 'yes',
-                                'default' => 'yes',
-                                'col' => 'col-md-3 col-6'
-                            ],      
                             [
                                 'type' => 'select',
                                 'name' => 'category_modal',
@@ -80,8 +69,46 @@ class CategoryController extends Controller {
                                     'Home Repairs' => 'Home Repairs',
                                     'Home Installation' => 'Home Installation',
                                 ],
-                                'col' => 'col-md-9 col-6'
-                            ],                            
+                                'col' => 'col-12'
+                            ], 
+                            [
+                                'type' => 'text',
+                                'name' => 'category_slug',
+                                'label' => 'Category slug',
+                                'placeholder' => 'Enter Category name',
+                                'id'    => 'slug',
+                                'col' => 'col-12 d-none'
+                            ],
+                            [
+                                'type' => 'file',
+                                'name' => 'image',
+                                'label' => 'Category Image',
+                                'col' => 'col-12'
+                            ],
+                            [
+                                'type' => 'select',
+                                'name' => 'status',
+                                'label' => 'Status',
+                                'options' => [
+                                    1 => 'Active',
+                                    0 => 'Block'
+                                ],
+                                'value' => 1,
+                                'default' => 1,
+                                'col' => 'col-12'
+                            ],
+                            [
+                                'type' => 'select',
+                                'name' => 'showHome',
+                                'label' => 'Show on Home',
+                                'options' => [
+                                    'yes' => 'Yes',
+                                    'no' => 'No'
+                                ],
+                                'value' => 'yes',
+                                'default' => 'yes',
+                                'col' => 'col-6'
+                            ],
                             [
                                 'type' => 'select',
                                 'name' => 'menu_order',
@@ -96,34 +123,8 @@ class CategoryController extends Controller {
                                 ],
                                 'value' => 1,
                                 'default' => 1,
-                                'col' => 'col-md-3 col-6'
-                            ],  
-                            [
-                                'type' => 'text',
-                                'name' => 'category_slug',
-                                'label' => 'Category slug',
-                                'placeholder' => 'Enter Category name',                                
-                                'id'    => 'slug',
-                                'col' => 'col-md-12 col-12 d-none'
-                            ],
-                            [
-                                'type' => 'file',
-                                'name' => 'image',
-                                'label' => 'Category Image',
-                                'col' => 'col-md-9 col-6'
-                            ],                            
-                            [
-                                'type' => 'select',
-                                'name' => 'status',
-                                'label' => 'Status',
-                                'options' => [
-                                    1 => 'Active',
-                                    0 => 'Block'
-                                ],
-                                'value' => 1,
-                                'default' => 1,
-                                'col' => 'col-md-3 col-6'
-                            ]                         
+                                'col' => 'col-6'
+                            ]                            
                         ]
                     ]
                 ],                
@@ -140,49 +141,124 @@ class CategoryController extends Controller {
                         'button' => 'Submit',
                         'fields' => [                            
                             [
-                                'type' => 'select',
-                                'name' => 'category_id',
-                                'label' => 'Select Parent Category',
-                                'options' => $categories->pluck('category_name','id')->toArray(),
-                                'col' => 'col-md-12 col-12'
-                            ], 
-                            [
-                                'type' => 'text',
-                                'name' => 'sub_category_name',
-                                'label' => 'Sub Category Name',
-                                'id' => 'sub_category_name',
-                                'placeholder' => 'Enter Category name',
-                                'slug_create' => 'slug-source',
-                                'class' => 'slug-source',                                
-                                'data'  => [
-                                    'target' => '#slug_2'
+                                'type' => 'accordion',
+                                'name' => '',
+                                'label' => '',
+                                'class' => '',
+                                'items' => [
+                                    [
+                                        'title' => 'SubCategory Details',
+                                        'fields' => [
+                                            [
+                                                'type' => 'select',
+                                                'name' => 'category_id',
+                                                'label' => 'Select Parent Category',
+                                                'options' => $categories->pluck('category_name','id')->toArray(),
+                                                'col' => 'col-12'
+                                            ],                             
+                                            [
+                                                'type' => 'text',
+                                                'name' => 'sub_category_name',
+                                                'label' => 'Sub Category Name',
+                                                'id' => 'sub_category_name',
+                                                'placeholder' => 'Enter Category name',
+                                                'slug_create' => 'slug-source',
+                                                'class' => 'slug-source',                                
+                                                'data'  => [
+                                                    'target' => '#slug_2'
+                                                ],
+                                                'col' => 'col-12'
+                                            ],
+                                            [
+                                                'type' => 'text',
+                                                'name' => 'sub_category_slug',
+                                                'label' => 'Category slug',
+                                                'placeholder' => 'Enter Category name',                                
+                                                'id'    => 'slug_2',
+                                                'col' => 'col-12 d-none'
+                                            ],
+                                            [
+                                                'type' => 'file',
+                                                'name' => 'image',
+                                                'label' => 'Sub Category Image',
+                                                'col' => 'col-12'
+                                            ],                            
+                                            [
+                                                'type' => 'select',
+                                                'name' => 'status',
+                                                'label' => 'Status',
+                                                'options' => [
+                                                    1 => 'Active',
+                                                    0 => 'Block'
+                                                ],
+                                                'col' => 'col-12 d-none'
+                                            ],
+                                            [
+                                                'type' => 'text',
+                                                'name' => 'price',
+                                                'label' => 'Price',
+                                                'placeholder' => 'Price',
+                                                'col' => 'col-8'
+                                            ],
+                                            [
+                                                'type' => 'select',
+                                                'name' => 'instant',
+                                                'label' => 'Instant',
+                                                'options' => [
+                                                    'yes' => 'Yes',
+                                                    'no' => 'No'
+                                                ],
+                                                'value' => 'yes',
+                                                'default' => 'yes',
+                                                'col' => 'col-4'
+                                            ], 
+                                        ],
+                                    ],
+                                    [
+                                        'title' => 'Banner Details',
+                                        'fields' => [
+                                            [
+                                                'type' => 'text',
+                                                'name' => 'banner_title',
+                                                'label' => 'Banner Title',
+                                                'placeholder' => 'Banner Title',
+                                                'col' => 'col-9'
+                                            ],   
+                                            [
+                                                'type' => 'select',
+                                                'name' => 'banner',
+                                                'label' => 'Banner',
+                                                'options' => [
+                                                    'yes' => 'Yes',
+                                                    'no' => 'No'
+                                                ],                                
+                                                'default' => 'Yes',
+                                                'col' => 'col-3'
+                                            ],        
+                                            [
+                                                'type' => 'file',
+                                                'name' => 'banner_image',
+                                                'label' => 'Banner Image',
+                                                'col' => 'col-12'
+                                            ],                        
+                                            [
+                                                'type' => 'text',
+                                                'name' => 'banner_label',
+                                                'label' => 'Banner Label',
+                                                'placeholder' => 'Banner Label',
+                                                'col' => 'col-12'
+                                            ],
+                                            [
+                                                'type' => 'textarea',
+                                                'name' => 'banner_details',
+                                                'label' => 'Banner Details',
+                                                'placeholder' => 'Banner Details',
+                                                'col' => 'col-12'
+                                            ] 
+                                        ],
+                                    ],
                                 ],
-                                'col' => 'col-md-12 col-12'
-                            ],                         
-                            [
-                                'type' => 'text',
-                                'name' => 'sub_category_slug',
-                                'label' => 'Category slug',
-                                'placeholder' => 'Enter Category name',                                
-                                'id'    => 'slug_2',
-                                'col' => 'col-md-12 col-12 d-none'
-                            ],
-                            [
-                                'type' => 'file',
-                                'name' => 'image',
-                                'label' => 'Sub Category Image',
-                                'col' => 'col-md-12 col-6'
-                            ],
-                            [
-                                'type' => 'select',
-                                'name' => 'status',
-                                'label' => 'Status',
-                                'options' => [
-                                    1 => 'Active',
-                                    0 => 'Block'
-                                ],
-                                'col' => 'col-md-3 col-6 d-none'
-                            ],
+                            ],                                                                                    
                         ]
                     ]
                 ],
@@ -344,13 +420,13 @@ class CategoryController extends Controller {
         ]);
 
         if ($validator->passes()) {
-           $subCategory = new SubCategory();
-
-            $category = Category::findOrFail($request->category_id);
-
+            $subCategory = new SubCategory();
+            $category = Category::find($request->category_id);
             $subCategory->category_id = $request->category_id;
             $subCategory->sub_category_name = $request->sub_category_name;
             $subCategory->sub_category_slug = $request->sub_category_slug;
+            $subCategory->price = $request->price;
+            $subCategory->instant = $request->instant;
             $subCategory->status = $request->status;
             $subCategory->save();
 
@@ -360,31 +436,21 @@ class CategoryController extends Controller {
             // Init Image Manager
             $manager = new ImageManager(new Driver());
 
+            // Create directory if not exists
+            $path = public_path('uploads/subcategory/');
+            if (!File::exists($path)) {
+                File::makeDirectory($path, 0755, true);
+            }            
+            
             if ($request->hasFile('image')) {
-
                 $image = $request->file('image');
-
-                $imageName = $name . '.' . $image->getClientOriginalExtension();
-
-                // Dynamic folder based on category_slug
-                $categorySlug = $category->category_slug;
-
-                $path = public_path('uploads/subcategory/' . $categorySlug . '/');
-
-                // Create directory if not exists
-                if (!File::exists($path)) {
-                    File::makeDirectory($path, 0755, true);
-                }
-
-                $img = $manager->read($image->getRealPath());
-
+                $imageName = $id . '_' . $name . '.' . $image->getClientOriginalExtension();
+                $img = $manager->read($image->getRealPath());                
                 $img->resize(144, 144);
-
-                $img->save($path . $imageName);
-
+                $img->save($path.$imageName);
                 $subCategory->image = $imageName;
                 $subCategory->save();
-            }         
+            }          
 
             $request->session()->flash('success', 'Sub Category added successfully');
 
@@ -400,6 +466,7 @@ class CategoryController extends Controller {
             ]);
         }
     }
+
 
     public function subCategory_update($subCategoryId, Request $request){
         $subCategory = SubCategory::find($subCategoryId);
@@ -470,20 +537,31 @@ class CategoryController extends Controller {
         return SubCategory::where('category_id', $id)->get();
     }
 
-    public function subCategory_destroy ($id, Request $request){
-        $subCategory = SubCategory::find($id);
 
-        if(empty($subCategory)){
-            $request->session()->flash('error','Record not found');
+    public function subCategory_destroy($id, Request $request) {
+        $subCategory = SubCategory::find($id);
+        if (!$subCategory) {
+            $request->session()->flash('error', 'Record not found');
             return response([
                 'status' => false,
                 'notFound' => true,
             ]);
         }
 
+        if (!empty($subCategory->image)) {
+            $imagePath = public_path('uploads/subcategory/' . $subCategory->image);
+            if (File::exists($imagePath)) {
+                File::delete($imagePath);
+            }
+        }
+
+        // Delete database record
         $subCategory->delete();
 
-        $request->session()->flash('success', 'Sub Category deleted successfully');
+        $request->session()->flash(
+            'success',
+            'Sub Category deleted successfully'
+        );
 
         return response([
             'status' => true,

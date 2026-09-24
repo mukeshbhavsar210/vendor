@@ -14,7 +14,7 @@
     @endif
 </div>
 
-<div class="modal fade" id="{{ $modal_id }}" tabindex="-1" aria-labelledby="{{ $modal_id }}Label" aria-hidden="true" data-bs-keyboard="true">
+<div class="modal right-modal" id="{{ $modal_id }}" tabindex="-1" aria-labelledby="{{ $modal_id }}Label" aria-hidden="true" data-bs-keyboard="true">
     <div class="modal-dialog {{ $formConfig['modal_size'] ?? '' }}">
         <div class="modal-content">            
             <form action="{{ $formConfig['action'] }}" method="POST" class="ajax-form" enctype="multipart/form-data" id="{{ $form_id }}">
@@ -25,14 +25,16 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 
-                <div class="modal-body py-3">
+                <div class="modal-body">
                     <input type="hidden" name="_method" id="{{ $method_id }}" value="POST" class="form-control">
                     
                     <div class="row">
                         @foreach($formConfig['fields'] as $field)                        
                             <div class="{{ $field['col'] ?? 'col-md-12' }}">
-                                <div class="form-group">
-                                    <label for="{{ $field['name'] }}">{{ $field['label'] }}</label>
+                                <div class="{{ $field['type'] !== 'accordion' ? 'form-group' : 'accordion' }}">
+                                    @if($field['type'] !== 'accordion')
+                                        <label for="{{ $field['name'] }}">{{ $field['label'] }}</label>
+                                    @endif
 
                                     @if($field['type'] == 'text')                                                                            
                                         <input type="{{ $field['type'] }}" name="{{ $field['name'] }}" id="{{ $field['id'] ?? '' }}" value="{{ old($field['name']) }}" class="form-control {{ $field['animate_label'] ?? '' }} {{ $field['class'] ?? '' }}" 
@@ -41,7 +43,7 @@
                                                     data-{{ $key }}="{{ $value }}"
                                                 @endforeach
                                             @endif 
-                                        >                                                                            
+                                        >
 
                                     @elseif($field['type'] == 'email')                                                                                    
                                         <input type="{{ $field['type'] }}" id="{{ $field['name'] }}" name="{{ $field['name'] }}" class="form-control" placeholder="{{ $field['placeholder'] ?? '' }}">                                            
@@ -78,15 +80,93 @@
                                     @elseif($field['type'] == 'category')                                                                                
                                         <select name="sub_category_id" id="sub_category" class="form-select" >
                                             <option value="">Sub Category</option>
-                                        </select>    
-
+                                        </select>                                        
+                                    
                                     @elseif($field['type'] == 'dropzone')
                                         <input type="hidden" id="{{ $field['name'] }}_id" name="{{ $field['name'] }}_id" value=" ">                                        
                                         <div id="{{ $field['name'] }}" data-input="{{ $field['name'] }}_id" class="dropzone custom-dropzone dz-clickable">
                                             <div class="dz-message needsclick">
                                                 <br>Drop files here or click to upload.<br><br>
                                             </div>
-                                        </div>                                       
+                                        </div>
+
+                                    @elseif($field['type'] == 'accordion')
+                                        @foreach($field['items'] as $key => $item)
+                                            @php
+                                                $accordionId = $field['name'] . '_' . $key;
+                                            @endphp
+
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header" id="heading{{ $accordionId }}">
+                                                    <button class="accordion-button {{ $key != 0 ? 'collapsed' : '' }}"
+                                                        type="button"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#collapse{{ $accordionId }}"
+                                                        aria-expanded="{{ $key == 0 ? 'true' : 'false' }}"
+                                                        aria-controls="collapse{{ $accordionId }}">
+
+                                                        <b>{{ $item['title'] }}</b>
+                                                    </button>
+                                                </h2>
+
+                                                <div id="collapse{{ $accordionId }}"
+                                                    class="accordion-collapse collapse {{ $key == 0 ? 'show' : '' }}"
+                                                    aria-labelledby="heading{{ $accordionId }}"
+                                                    data-bs-parent="#{{ $field['name'] }}Accordion">
+
+                                                    <div class="accordion-body">
+                                                        <div class="row">
+                                                            @foreach($item['fields'] as $field)                                                                            
+                                                                <div class="{{ $field['col'] ?? 'col-md-6' }}">
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">{{ $field['label'] }}</label>
+                                                                    
+                                                                        @if($field['type'] == 'text') 
+                                                                            <input type="{{ $field['type'] }}" name="{{ $field['name'] }}" id="{{ $field['id'] ?? '' }}" value="{{ old($field['name']) }}" class="form-control {{ $field['animate_label'] ?? '' }} {{ $field['class'] ?? '' }}" 
+                                                                                @if(isset($field['data']))
+                                                                                    @foreach($field['data'] as $key => $value)
+                                                                                        data-{{ $key }}="{{ $value }}"
+                                                                                    @endforeach
+                                                                                @endif 
+                                                                            >
+                                                                        
+                                                                        @elseif($field['type'] == 'textarea')
+                                                                            <textarea name="{{ $field['name'] }}" class="form-control" rows="3" >
+                                                                                {{ old(
+                                                                                    $field['name'],
+                                                                                    $model->{$field['name']} ?? ''
+                                                                                ) }}
+                                                                            </textarea>
+
+                                                                        @elseif($field['type'] == 'file')
+                                                                            <input type="file" name="{{ $field['name'] }}" class="form-control" id="{{ $field['name'] }}"
+                                                                                accept="{{ $field['accept'] ?? '*/*' }}" >
+
+                                                                        @elseif($field['type'] == 'select')
+                                                                            @php
+                                                                                $selectedValue = old(
+                                                                                    $field['name'],
+                                                                                    $model->{$field['name']} ?? ($field['default'] ?? null)
+                                                                                );
+                                                                            @endphp                                                                                        
+
+                                                                            <select name="{{ $field['name'] }}" class="form-select" id="{{ $field['name'] }}">
+                                                                                @foreach($field['options'] as $value => $label)
+                                                                                    <option value="{{ $value }}"
+                                                                                        {{ (string) $selectedValue === (string) $value ? 'selected' : '' }}>
+                                                                                        {{ $label }}
+                                                                                    </option>
+                                                                                @endforeach
+                                                                            </select>                                                                                    
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
                                     @endif
                                 </div>
                             </div>
@@ -244,13 +324,22 @@
         document.getElementById('form_submit_btn').innerText = 'Create Category';
     }
 
-    function createSubCategoryModal() {
+    //Create SubCategory Modal
+    function createSubCategoryModal(button) {
+        let categoryId = $(button).data('category-id');
         let form = document.getElementById('subCategoryForm');
+
+        // Reset form first
         form.reset();
-        form.action = store_subcategory;
-        document.getElementById('form_method').value = 'POST';
-        document.getElementById('form_submit_btn').innerText = 'Create Sub Category';
-    }
+
+        // Set create mode
+        form.action = store_subcategory;        
+
+        // Auto-select category
+        document.getElementById('category_id').value = categoryId;
+
+        $('#category_id').trigger('change');        
+    }   
    
     // function editCategoryModal(button) {
     //     let id = button.dataset.id;
@@ -274,6 +363,8 @@
     //     document.getElementById('status').value = (status == 'Active') ? 1 : 0;        
     //     document.getElementById('form_submit_btn').innerText = 'Update Category';
     // }
+
+
 
     function editCategoryModal(button) {
         let id = button.dataset.id;
@@ -305,9 +396,7 @@
 
     document.getElementById('editCategoryModal').addEventListener('hidden.bs.modal', function () {
         document.getElementById('categoryForm').reset();
-    });
-
-    
+    });    
 
     function editSubCategoryModal(button) {
         let id = button.dataset.id;

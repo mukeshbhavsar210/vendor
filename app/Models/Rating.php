@@ -11,4 +11,18 @@ class Rating extends Model {
     public function product() {
         return $this->belongsTo(Product::class);
     }
+
+    public function service() {
+        return $this->belongsTo(Service::class, 'service_id', 'id');
+    }
+
+    public function vendor()
+    {
+        return $this->belongsTo(User::class, 'vendor_id', 'id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }

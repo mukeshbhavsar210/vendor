@@ -23,7 +23,7 @@
                             @foreach($category->subCategories as $subcategory)
                                 <a href="#{{ $subcategory->sub_category_slug }}" data-id="{{ $subcategory->id }}" class="subcategory-thumb" >
                                     <div class="thumb">
-                                        <img src="{{ asset('uploads/subcategory/'.$category->category_slug.'/'.$subcategory->image) }}" alt="{{ $subcategory->category_name }}" />                                        
+                                        <img src="{{ asset('uploads/subcategory/'.$subcategory->image) }}" alt="{{ $subcategory->category_name }}" />                                        
                                     </div>
                                     <p>{{ $subcategory->sub_category_name }}</p>
                                 </a>

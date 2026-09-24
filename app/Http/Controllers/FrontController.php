@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Page;
 use App\Models\Service;
 use App\Models\StockNotification;
+use App\Models\SubCategory;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,30 +15,31 @@ use Illuminate\Support\Facades\Validator;
 
 class FrontController extends Controller {
     public function index(){        
-        $services = Service::with(['category', 'subCategories', 'ratings'])
-            ->where('status', 'approved')
-            ->whereIn('id', function ($query) {
-                $query->selectRaw('MIN(id)')->from('services')->where('status', 'approved')->groupBy('category_id');
-            })->take(20)->get();
+        // $services = Service::with(['category', 'subCategories', 'ratings'])->where('status', 'approved')
+        //     ->whereIn('id', function ($query) {
+        //         $query->selectRaw('MIN(id)')->from('services')->where('status', 'approved')->groupBy('category_id');
+        //     })->take(20)->get();
 
         function getServicesByCategorySlug($categorySlug) {
-            return Service::with(['category', 'subCategory', 'ratings'])
-                ->whereHas('category', function ($query) use ($categorySlug) {
-                    $query->where('category_slug', $categorySlug);
-                })
-                ->where('status', 'approved')->get()->groupBy('category_id');
+            return SubCategory::with(['category','services.ratings'])
+            ->whereHas('category', function ($query) use ($categorySlug) {
+                $query->where('category_slug', $categorySlug);
+            })->where('status', 1)->get()->groupBy('category_id');
         }
 
+        $most_booked = getServicesByCategorySlug('womens-salon-spa');
         $women_spa = getServicesByCategorySlug('womens-salon-spa');
-        $men_spa = getServicesByCategorySlug('mens-salon-massage');
+        $cleaning = getServicesByCategorySlug('cleaning');
         $appliances = getServicesByCategorySlug('ac-appliance-repair');
         $installation = getServicesByCategorySlug('home-repair-&-installation');
+        $men_spa = getServicesByCategorySlug('mens-salon-massage');
 
-        $data['services'] = $services;
+        $data['most_booked'] = $most_booked;
         $data['women_spa'] = $women_spa;
+        $data['cleaning'] = $cleaning;
         $data['men_spa'] = $men_spa;
         $data['appliances'] = $appliances;
-        $data['installation'] = $installation;
+        $data['installation'] = $installation;        
 
         return view("front.home.index",$data);
     }
