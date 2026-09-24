@@ -13,16 +13,7 @@
             </div>
             <div class="col-sm-9 col-12 float-end">
                 <div class="flexContainer">
-                    <div class="dropdown">
-                        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuBtn">
-                            + ADD
-                        </button>
-
-                        <ul class="dropdown-menu" id="dropdownMenu">
-                            <li><a class="dropdown-item open-modal" href="#" onclick="createCategoryModal()" data-bs-toggle="modal" data-bs-target="#categoryModal" >Create Category</a></li>
-                            <li><a class="dropdown-item open-modal" href="#" onclick="createSubCategoryModal()" data-bs-toggle="modal" data-bs-target="#subCategoryModal">Create Sub Category</a></li>                            
-                        </ul>
-                    </div>                     
+                    <a class="btn btn-primary" href="#" onclick="createCategoryModal()" data-bs-toggle="modal" data-bs-target="#categoryModal" >Create Category</a>                    
 
                     <form action="" method="get" >
                         <div class="d-flex">
@@ -61,39 +52,48 @@
                         <div class="accordion-button collapsed p-2" data-bs-toggle="collapse" data-bs-target="#catCollapse{{ $category->id }}">
                             <div class="category-card">
                                 <div class="icon-head">
-                                    <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}" class="thumb" >
-                                    <h5>{{ $category->category_name }}
-                                        @if ($category->sub_categories_count > 0)
-                                            - {{ $category->sub_categories_count }}    
-                                        @endif                                        
-                                    </h5>
+                                    <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}" class="thumb" >                                    
+                                    <h5>{{ $category->category_name }}</h5>
                                 </div>
-
-                                <div class="flex">
-                                    <a href="javascript:0"                                         
-                                        data-id="{{ $category->id }}"
-                                        data-category-modal="{{ $category->category_modal }}"
-                                        data-category-name="{{ $category->category_name }}"
-                                        data-show-home="{{ $category->showHome }}"
-                                        data-menu-order="{{ $category->menu_order }}"
-                                        data-status="{{ $category->status }}"
-                                        onclick="editCategoryModal(this)"                                                
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#categoryModal" >
-                                        <i class="las la-pen text-secondary fs-18"></i>
-                                    </a>
-                                    <a href="#" onclick="deleteCategory({{ $category->id }})" >
-                                        <i class="las la-trash-alt text-secondary fs-18"></i>
-                                    </a>
-                                </div>                                
+                                
+                                @if ($category->sub_categories_count > 0)
+                                    <span class="counts">{{ $category->sub_categories_count }}</span>
+                                @endif
                             </div>
                         </div>
                     </div>
 
                     <div id="catCollapse{{ $category->id }}" class="accordion-collapse collapse" data-bs-parent="#categoryAccordion">
-                        <div class="accordion-body">                            
+                        <div class="accordion-body"> 
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <a href="#" class="open-modal btn btn-sm btn-outline-primary"
+                                        data-category-id="{{ $category->id }}" data-bs-toggle="modal"
+                                        data-bs-target="#subCategoryModal"
+                                        onclick="createSubCategoryModal(this)">Create Sub-Category</a>
+                                </div>
+                                <div class="col-md-4 ">
+                                    <div class="flex-end">
+                                        <a href="javascript:void"
+                                            data-id="{{ $category->id }}"
+                                            data-category-modal="{{ $category->category_modal }}"
+                                            data-category-name="{{ $category->category_name }}"
+                                            data-show-home="{{ $category->showHome }}"
+                                            data-menu-order="{{ $category->menu_order }}"
+                                            data-status="{{ $category->status }}"
+                                            onclick="editCategoryModal(this)"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#categoryModal"
+                                            class="btn btn-sm btn-outline-secondary">
+                                            Edit Category
+                                        </a>
+                                        <a href="#" onclick="deleteCategory({{ $category->id }})" class="btn btn-sm btn-outline-danger">Delete Category</a>
+                                    </div>
+                                </div>
+                            </div>
+
                             @if ($category->sub_categories_count > 0)                                                          
-                                <div class="category-card-flex">
+                                <div class="category-card-flex mt-2">
                                     @foreach ($category->subCategories as $sub)                                    
                                         <div class="sub-category-card">
                                             <div class="hover-card">
@@ -102,15 +102,20 @@
                                                         <i class="las la-trash-alt text-secondary fs-18"></i>
                                                     </a>
                                                 </div>
-                                                <img src="{{ asset('uploads/subcategory/'.$sub->category->category_slug.'/'.$sub->image) }}" alt="{{ $sub->name }}" class="thumb">                                                
+                                                <img src="{{ asset('uploads/subcategory/'.$sub->image) }}" alt="{{ $sub->name }}" class="thumb" />
                                             </div>
-                                            <p class="mb-0">{{ Str::limit($sub->sub_category_name, 22) }}</p>
+                                            <p class="mb-0">
+                                                {{ Str::limit($sub->sub_category_name, 22) }}<br />
+                                                ₹{{ $sub->price }}
+                                            </p>
                                         </div>                                    
                                     @endforeach
                                 </div>
                             @else
                                 <p>No Sub-Category</p>
                             @endif                            
+                            
+                            
                         </div>
                     </div>
                 </div>                                                    
@@ -122,13 +127,14 @@
 </div>   
 
 @foreach($modals as $key => $modal)
-    @include('admin.layouts.common', [
-        'modal_id' => $modal['modal_id'],
-        'form_id' => $modal['form_id'],
-        'method_id' => $modal['method_id'],        
-        'formConfig' => $modal['formConfig'],
-        'title' => $modal['title'] ?? 'Modal'
-    ])
+    @include('admin.layouts.common', 
+        [
+            'modal_id' => $modal['modal_id'],
+            'form_id' => $modal['form_id'],
+            'method_id' => $modal['method_id'],
+            'formConfig' => $modal['formConfig'],
+            'title' => $modal['title'] ?? 'Modal'
+        ])
 @endforeach
 
 @endsection

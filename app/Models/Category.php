@@ -12,15 +12,19 @@ class Category extends Model {
 
     public function sub_category(){
         return $this->hasMany(SubCategory::class);
-    }  
+    }      
 
     public function subCategories() {
-        return $this->hasMany(SubCategory::class, 'category_id')->orderBy('sort_order', 'ASC');
+        return $this->hasMany(SubCategory::class, 'category_id', 'id')->orderBy('sort_order', 'ASC');
     }
 
     public function services() {
-        return $this->hasMany(Service::class, 'sub_category_id');
+        return $this->hasMany(Service::class, 'category_id', 'id');
     }
+
+    // public function services() {
+    //     return $this->hasMany(Service::class, 'sub_category_id');
+    // }
 
     public function ratings(){
         return $this->hasMany(Rating::class, 'category_id');

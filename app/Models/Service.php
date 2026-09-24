@@ -16,25 +16,29 @@ class Service extends Model {
         'approved_at' => 'datetime',
     ];
 
+    public function category() {
+        return $this->belongsTo(Category::class, 'category_id', 'id');
+    }
+
+    public function subCategory(){
+        return $this->belongsTo(SubCategory::class, 'sub_category_id', 'id');
+    }
+
+    public function ratings() {
+        return $this->hasMany(Rating::class, 'service_id', 'id'); 
+    }
+
     public function service_images(){
         return $this->hasMany(ServiceImage::class);
     }        
 
     public function discounts() {
         return $this->hasMany(Discount::class, 'service_id');
-    }
-
-    public function subCategory(){
-        return $this->belongsTo(SubCategory::class, 'sub_category_id');
-    }
+    }    
 
     public function subCategories(){
         return $this->hasMany(SubCategory::class, 'category_id');
-    }  
-
-    public function ratings() {
-        return $this->hasMany(Rating::class, 'category_id', 'category_id');
-    }
+    }      
 
     public function brand() {
         return $this->belongsTo(Brand::class, 'brand_id');
@@ -68,9 +72,7 @@ class Service extends Model {
     //     return $this->belongsTo(Category::class, 'category_id');
     // }
 
-    public function category() {
-        return $this->belongsTo(Category::class);
-    }
+    
 
     // public function subCategory() {
     //     return $this->belongsTo(SubCategory::class);
