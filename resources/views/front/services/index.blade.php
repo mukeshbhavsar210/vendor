@@ -85,7 +85,7 @@
                                     </div>
                                 @endif
                                                         
-                                <div class="services-list">                                
+                                <div class="services-list"> 
                                     @foreach($subCategoryServices as $value)
                                         <x-services
                                             class="service-card"
@@ -94,17 +94,12 @@
                                             :category="$category"
                                             :subcategory="$subCategory"
                                             :ratings="$value->ratings"
-                                            :brand="$value->brand"
-                                            :process="$value->process"
-                                            :waranty="$value->waranty"
-                                            :include="$value->include"
-                                            :need="$value->need"
-                                            :faqs="$value->faqs"
+                                            :process="$subCategory->process"                                            
                                             :hover="false"
                                             :price="true"
-                                            :title_limit="25"
-                                            :short_limit="7"
-                                        />
+                                            :title_limit="35"
+                                            :short_limit="15"
+                                        />                                        
                                     @endforeach
                                 </div>
                             </div>

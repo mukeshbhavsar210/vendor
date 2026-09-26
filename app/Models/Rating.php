@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Rating extends Model {
     use HasFactory;
 
+    protected $fillable = [ 'service_id','vendor_id','user_id','ratings','review'];
+
     public function product() {
         return $this->belongsTo(Product::class);
     }
@@ -16,13 +18,11 @@ class Rating extends Model {
         return $this->belongsTo(Service::class, 'service_id', 'id');
     }
 
-    public function vendor()
-    {
+    public function vendor() {
         return $this->belongsTo(User::class, 'vendor_id', 'id');
     }
 
-    public function user()
-    {
+    public function user() {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

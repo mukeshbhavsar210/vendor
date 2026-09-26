@@ -14,32 +14,30 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class FrontController extends Controller {
-    public function index(){        
-        // $services = Service::with(['category', 'subCategories', 'ratings'])->where('status', 'approved')
-        //     ->whereIn('id', function ($query) {
-        //         $query->selectRaw('MIN(id)')->from('services')->where('status', 'approved')->groupBy('category_id');
-        //     })->take(20)->get();
+    public function index(){
 
-        function getServicesByCategorySlug($categorySlug) {
-            return SubCategory::with(['category','services.ratings'])
+        function getServices($categorySlug) {
+            return SubCategory::with(['category','ratings'])
             ->whereHas('category', function ($query) use ($categorySlug) {
                 $query->where('category_slug', $categorySlug);
             })->where('status', 1)->get()->groupBy('category_id');
         }
 
-        $most_booked = getServicesByCategorySlug('womens-salon-spa');
-        $women_spa = getServicesByCategorySlug('womens-salon-spa');
-        $cleaning = getServicesByCategorySlug('cleaning');
-        $appliances = getServicesByCategorySlug('ac-appliance-repair');
-        $installation = getServicesByCategorySlug('home-repair-&-installation');
-        $men_spa = getServicesByCategorySlug('mens-salon-massage');
+        $most_booked = getServices('womens-salon-spa');
+        $new_and_noteworthy = getServices('new_and_noteworthy');
+        $women_spa = getServices('womens-salon-spa');
+        $cleaning = getServices('cleaning');
+        $appliances = getServices('ac-appliance-repair');
+        $installation = getServices('home-repair-&-installation');
+        $men_spa = getServices('mens-salon-massage');
 
         $data['most_booked'] = $most_booked;
+        $data['new_and_noteworthy'] = $new_and_noteworthy;
         $data['women_spa'] = $women_spa;
         $data['cleaning'] = $cleaning;
         $data['men_spa'] = $men_spa;
         $data['appliances'] = $appliances;
-        $data['installation'] = $installation;        
+        $data['installation'] = $installation;                   
 
         return view("front.home.index",$data);
     }

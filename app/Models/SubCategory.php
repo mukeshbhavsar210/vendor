@@ -8,7 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class SubCategory extends Model {
     use HasFactory;
 
-    protected $fillable = [ 'category_id','sub_category_name','sub_category_slug','image','price','instant','banner','banner_title','banner_label','banner_details','banner_image','sort_order','status',  ];
+    protected $fillable = [ 'category_id','sub_category_name','sub_category_slug','process_id','image','price','instant','banner','banner_title','banner_label','banner_details','banner_image','sort_order','status',  ];
+
+    protected $casts = [
+        'process_id' => 'array',
+    ];
 
     public function subCategories() {
         return $this->hasMany(SubCategory::class, 'category_id');  
@@ -23,10 +27,14 @@ class SubCategory extends Model {
     }
 
     public function ratings() {
-        return $this->hasMany(Rating::class, 'category_id', 'category_id');
+        return $this->hasMany(Rating::class, 'service_id', 'id'); 
     }
 
     public function subSubCategories() {
         return $this->hasMany(SubSubCategory::class);
+    }
+
+    public function process() {
+        return $this->belongsTo(Process::class, 'process_id');
     }
 }

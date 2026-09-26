@@ -329,50 +329,24 @@ class ShopController extends Controller {
             'subCategories' => function ($query) {
                 $query->orderBy('sort_order', 'asc');
             },
-            'ratings'
+            // 'ratings'
         ])
         ->where('category_slug', $selected_category)
         ->firstOrFail();
 
         // All approved services belonging to this category
-        $services = Service::with([
-            'category',
-            'subCategory',
-            'ratings',
-            'process',
-            'brand',
-            'discounts.discountPercentage',
-            'waranty',
-            'include',
-            'need',
-            'faqs',
-        ])
-        ->where('status', 'approved')
-        ->where('category_id', $category->id)
-        ->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Group services by sub-category
-        |--------------------------------------------------------------------------
-        */
+        $services = Service::with(['category','subCategory','subCategory.process','ratings','ratings.user','brand','discounts.discountPercentage','waranty','include','need','faqs'])
+            ->where('status', 'approved')->where('category_id', $category->id)->get();
+               
         $services = $services
             ->sortBy(function ($service) {
                 return $service->subCategory?->sort_order ?? 999999;
             })
             ->groupBy('sub_category_id');
-
-        /*
-        |--------------------------------------------------------------------------
-        | Category
-        |--------------------------------------------------------------------------
-        */
-        $categories = Category::with([
-            'subCategories',
-            'ratings',
-        ])
-        ->where('id', $category->id)
-        ->get();
+       
+        $categories = Category::with(['subCategories',
+            // 'ratings',
+        ])->where('id', $category->id)->get();
 
         /*
         |--------------------------------------------------------------------------
@@ -397,18 +371,10 @@ class ShopController extends Controller {
         $coupon_code = session()->get(
             'coupon_discount.code',
             0
-        );
+        );        
 
         return view('front.services.index', compact(
-            'services',
-            'selected_category',
-            'category',
-            'categories',
-            'discount_price',
-            'store_discount',
-            'coupon_code',
-            'coupon_discount',
-            'cartContent'
+            'services','selected_category','category','categories','discount_price','store_discount','coupon_code','coupon_discount','cartContent'
         ));
     }
    
