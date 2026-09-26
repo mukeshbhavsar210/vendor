@@ -42,11 +42,7 @@ class Service extends Model {
 
     public function brand() {
         return $this->belongsTo(Brand::class, 'brand_id');
-    }
-
-    public function process() {
-        return $this->belongsTo(Process::class, 'process_id');
-    }
+    }    
 
     public function waranty() {
         return $this->belongsTo(Warantees::class, 'waranty_id');

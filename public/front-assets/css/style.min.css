@@ -2365,7 +2365,7 @@ figure,pre,table{max-width:100%;height:auto}
 img{width:100%}
 h1,h2,h3,h4,h5,h6{margin:0}
 h1 span,h2 span,h3 span,h4 span,h5 span,h6 span{font-size:inherit;font-family:inherit;display:inline-block}
-.navbar-toggler{margin-top:5px;padding-bottom:0}
+.navbar-toggler{padding-bottom:0}
 .navbar-toggler .navbar-toggler-icon{color:#FFF}
 .navbar-toggler:focus{box-shadow:none}
 ul{margin:0;padding:0}

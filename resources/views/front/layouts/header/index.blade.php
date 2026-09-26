@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row row-hide">
             <nav class="navbar navbar-expand-lg">							
-                <div class="col-md-8 col-7">
+                <div class="col-md-8 col-6">
                     <div class="logo-controls">                
                         @if(request()->routeIs(['front.home']))
                             <div class="d-block d-md-none">
@@ -111,7 +111,7 @@
                         </div>
                     </div>
                 </div>        
-                <div class="col-md-4 col-5">
+                <div class="col-md-4 col-6">
                     <div class="search-controls">
                         <form class="search-form desktop-form d-none d-md-block" action="{{ route('front.shop') }}">
                             <div class="search-control">

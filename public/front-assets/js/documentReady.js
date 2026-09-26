@@ -168,6 +168,7 @@ $(document).ready(function(){
         centerPadding: '20px',
         prevArrow:'<div class="arrow-left"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="#0F0F0F" viewBox="0 0 16 16"><path fill="#0F0F0F" fill-rule="evenodd" d="M6.47 2.97l-4.5 4.5a.75.75 0 000 1.06l4.5 4.5 1.06-1.06-3.22-3.22h9.19v-1.5H4.31l3.22-3.22-1.06-1.06z" clip-rule="evenodd"></path></svg></div>',
         nextArrow:'<div class="arrow-right"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="#0F0F0F" viewBox="0 0 16 16"><path fill="#0F0F0F" fill-rule="evenodd" d="M11.69 8.75H2.5v-1.5h9.19L8.47 4.03l1.06-1.06 4.5 4.5a.75.75 0 010 1.06l-4.5 4.5-1.06-1.06 3.22-3.22z" clip-rule="evenodd"></path></svg></div>',
+       
         responsive: [{
             breakpoint: 1200,
             settings: {
@@ -210,7 +211,7 @@ $(document).ready(function(){
             settings: {
                 centerMode: false,
                 slidesToShow: 1,
-                slidesToScroll: 1,      
+                slidesToScroll: 1,                 
             }
         }]     
     });
@@ -313,4 +314,17 @@ $('.subcategory-thumb').on('click', function () {
     $('.subcategory-right').removeClass('anchor-active');    
     $('.subcategory-right').removeClass('anchor-active');
     $('.subcategory-right[data-id="' + id + '"]').addClass('anchor-active');
+});
+
+
+
+$('#showMoreReviews').on('click', function () {
+    let hiddenReviews = $('.review-item:hidden');
+
+    hiddenReviews.slice(0, 10).slideDown();
+
+    // Hide button when no more reviews
+    if ($('.review-item:hidden').length === 0) {
+        $(this).hide();
+    }
 });
