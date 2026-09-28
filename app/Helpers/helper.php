@@ -44,12 +44,9 @@ use Illuminate\Support\Facades\Mail;
         return SubCategory::where('status', 1)->take(20)->get();
     }
 
-    function getModalCategories() {
-        return Category::where('showHome', 'no')->where('status', 1)
-            ->orderBy('menu_order', 'ASC')
-            ->take(6)
-            ->get();
-    }
+    // function getModalCategories() {
+    //     return Category::where('showHome', 'yes')->where('status', 1)->orderBy('menu_order', 'ASC')->get();
+    // }
    
 
     function getProductImage($productId){

@@ -9,22 +9,28 @@
         <div class="col-md-5 col-12">
             <h1>Home services at your<br /> doorstep</h1>
             <div class="card mt-3">
-                <div class="card-body">                    
-                    @if (getCategories()->isNotEmpty())
+                <div class="card-body">
+                    @if ($getCategories->isNotEmpty())
                         <div class="category-card">
-                            @foreach (getCategories() as $category)                                
-
-                                @if ($category->open_to == 'link')                                    
+                            @foreach ($getCategories as $category)
+                                @if ($category->open_to == 'link')
                                     <a href="{{ route('front.category', [$category->category_slug]) }}" class="repeate">
                                         <div class="thumb">
                                             <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}">                                        
                                         </div>
                                         <p>{{ $category->category_name }}</p>
                                     </a>
-                                @else
+                                @elseif($category->open_to == 'modal')
                                     <div class="repeate" data-bs-toggle="modal" data-bs-target="#modal_{{ $category->category_slug }}">
                                         <div class="thumb">                                        
-                                            <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}">                                        
+                                            <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}">
+                                        </div>
+                                        <p>{{ $category->category_name }}</p>
+                                    </div>                            
+                                @elseif($category->open_to == 'all')
+                                    <div class="repeate" data-bs-toggle="modal" data-bs-target="#modal_{{ $category->category_slug }}">
+                                        <div class="thumb">                                        
+                                            <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}">
                                         </div>
                                         <p>{{ $category->category_name }}</p>
                                     </div>
@@ -39,35 +45,115 @@
                                                 <h2 id="categoryModalLabel{{ $category->category_modal }}">{{ $category->category_name }}</h2>
                                             </div>
 
-                                            <div class="modal-body">                                                
+                                            <div class="modal-body">
                                                 @php
-                                                    $modalCategories = getModalCategories()->where('menu_order', $category->menu_order)->groupBy('category_modal');
-                                                @endphp
-
-                                                @foreach ($modalCategories as $modalType => $categories)
-                                                    @if ($modalType)
-                                                        <h5 class="mb-2">{{ ucfirst($modalType) }}</h5>
-                                                    @endif
-
-                                                    <div class="modal-card">
-                                                        @foreach ($categories as $category)
-                                                            <div class="repeate">
-                                                                @if ($category->image)
-                                                                    <div class="thumb">
-                                                                        <a href="{{ route('front.category', [$category->category_slug]) }}">
-                                                                            <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}">
-                                                                        </a>
+                                                    $modalType = $category->category_modal;
+                                                    $categories = $modalCategories->get($modalType, collect());                                                    
+                                                @endphp 
+                                                                                        
+                                                @if ($categories->isNotEmpty())
+                                                    @if ($modalType === 'ac-appliance-repair' || $modalType === 'electrician-plumber-carpenter')
+                                                        @foreach ($categories->groupBy('appliance_types') as $applianceType => $items)
+                                                            <h5 class="mb-2">{{ $applianceType }}</h5>
+                                                            <div class="modal-card">
+                                                                @foreach ($items as $category)
+                                                                    <div class="repeate">
+                                                                        <div class="thumb">
+                                                                            <a href="{{ route('front.category', $category->category_slug) }}">
+                                                                                <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}" />
+                                                                            </a>
+                                                                        </div>
+                                                                        <p>{{ $category->category_name }}</p>
                                                                     </div>
-                                                                @endif
-                                                                <p>{{ $category->category_name }}</p>
+                                                                @endforeach
                                                             </div>
                                                         @endforeach
-                                                    </div>
-                                                @endforeach
+                                                    @else
+                                                        <div class="modal-card">
+                                                            @foreach ($categories as $category)
+                                                                <div class="repeate">
+                                                                    @if ($category->image)
+                                                                        <div class="thumb">
+                                                                            <a href="{{ route('front.category', $category->category_slug) }}">
+                                                                                <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}" />
+                                                                            </a>
+                                                                        </div>
+                                                                    @endif
+                                                                    <p>{{ $category->category_name }}</p>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    @endif
+                                                @elseif($allServices)
+                                                    @foreach ($allServices->groupBy(['appliance_types', 'category_modal']) as $applianceType => $modalGroups)
+                                                        @foreach ($modalGroups as $categoryModal => $items)
+                                                            @php
+                                                                $section = $items->firstWhere('showHome', 'outside');
+                                                                $insideItems = $items->where('showHome', 'inside');
+                                                            @endphp
+                                                            
+                                                            @if ($section)
+                                                                <h4 class="mb-3">{{ $section->category_name }}</h4>
+                                                            @endif
+                                                            
+                                                            @if ($insideItems->isNotEmpty())
+                                                                <h5 class="mb-2">{{ $applianceType }}</h5>
+                                                                <div class="modal-card">
+                                                                    @foreach ($insideItems as $category)
+                                                                        <div class="repeate">
+                                                                            @if ($category->image)
+                                                                                <div class="thumb">
+                                                                                    <a href="{{ route('front.category', $category->category_slug) }}">
+                                                                                        <img src="{{ asset('uploads/category/' . $category->image) }}"
+                                                                                            alt="{{ $category->category_name }}">
+                                                                                    </a>
+                                                                                </div>
+                                                                            @endif
+                                                                            <p>{{ $category->category_name }}</p>
+                                                                        </div>
+                                                                    @endforeach
+                                                                </div>
+                                                            @endif
+                                                            <hr>
+                                                        @endforeach
+                                                    @endforeach
+
+                                                    {{-- @foreach ($allServices->groupBy(['appliance_types','category_modal']) as $applianceType => $items)                                                    
+                                                        @php
+                                                            $section = $items->firstWhere('showHome', 'outside');
+                                                            $insideItems = $items->where('showHome', 'inside');
+                                                        @endphp                                                                             
+                                                                                                                    
+                                                        @if ($section)
+                                                            <h4 class="mb-3">{{ $section->category_name }}</h4>
+                                                        @endif
+
+                                                          @if ($insideItems->isNotEmpty())
+                                                            <h5 class="mb-2">{{ $applianceType }}</h5>
+
+                                                            <div class="modal-card">
+                                                                @foreach ($insideItems as $category)
+                                                                    <div class="repeate">
+                                                                        @if ($category->image)
+                                                                            <div class="thumb">
+                                                                                <a href="{{ route('front.category', $category->category_slug) }}">
+                                                                                    <img src="{{ asset('uploads/category/' . $category->image) }}"
+                                                                                        alt="{{ $category->category_name }}">
+                                                                                </a>
+                                                                            </div>
+                                                                        @endif
+                                                                        <p>{{ $category->category_name }}</p>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+                                                        @endif                                                        
+                                                        <hr />
+                                                    @endforeach --}}
+                                                @endif                                                
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div>                               
                             @endforeach
                         </div>
                     @endif                                      
@@ -79,8 +165,8 @@
         </div>
     </div>
 
-    @if (getCategories()->isNotEmpty())
-        @foreach (getCategories() as $category)
+    @if ($getCategories->isNotEmpty())
+        @foreach ($getCategories as $category)
             @if ($category->subCategories->isNotEmpty())														                       
                 @foreach ($category->subCategories->whereNotNull('image')->where('image','!=','') as $subcategory)
                     @if ($subcategory->subSubCategories->isNotEmpty())
