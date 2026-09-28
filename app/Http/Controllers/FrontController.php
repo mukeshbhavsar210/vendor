@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Page;
 use App\Models\Service;
 use App\Models\StockNotification;
+use App\Models\Category;
 use App\Models\SubCategory;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
@@ -15,6 +16,11 @@ use Illuminate\Support\Facades\Validator;
 
 class FrontController extends Controller {
     public function index(){
+        
+        $getCategories = Category::with(['subCategories'])->where('showHome', 'outside')->orderBy('menu_order', 'ASC')->take(20)->get();
+        $modalCategories = Category::where('showHome', 'inside')->where('status', 1)->orderBy('menu_order', 'ASC')->get()->groupBy('category_modal');
+        $modalCategories2 = Category::where('status', 1)->orderBy('menu_order', 'ASC')->get();
+        $allServices = Category::where('status', 1)->get();
 
         function getServices($categorySlug) {
             return SubCategory::with(['category','ratings'])
@@ -31,13 +37,18 @@ class FrontController extends Controller {
         $installation = getServices('home-repair-&-installation');
         $men_spa = getServices('mens-salon-massage');
 
+        $data['getCategories'] = $getCategories;
+        $data['modalCategories'] = $modalCategories;
+        $data['modalCategories2'] = $modalCategories2;
+        $data['allServices'] = $allServices;
+
         $data['most_booked'] = $most_booked;
         $data['new_and_noteworthy'] = $new_and_noteworthy;
         $data['women_spa'] = $women_spa;
         $data['cleaning'] = $cleaning;
         $data['men_spa'] = $men_spa;
         $data['appliances'] = $appliances;
-        $data['installation'] = $installation;                   
+        $data['installation'] = $installation;              
 
         return view("front.home.index",$data);
     }
