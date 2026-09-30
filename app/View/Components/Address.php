@@ -4,7 +4,7 @@ namespace App\View\Components;
 
 use Illuminate\View\Component;
 
-class CustomerAddressForm extends Component {
+class Address extends Component {
     public $address;
     public $states;
     public $action;
@@ -26,6 +26,6 @@ class CustomerAddressForm extends Component {
     }
 
     public function render() {
-        return view('components.customer-address-form');
+        return view('components.address');
     }
 }

@@ -880,6 +880,21 @@ class AuthController extends Controller {
     
 
     public function address_update(Request $request, $id) {
+        $address = CustomerAddress::findOrFail($id);
+
+        $address->update([
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'state_id' => $request->state_id,
+            'city' => $request->city,
+            'pincode' => $request->pincode,
+        ]);
+
+        return back()->with('success', 'Address updated successfully.');
+    }
+
+    public function address_update_old(Request $request, $id) {
         //$address = CustomerAddress::findOrFail($id);
         $address = CustomerAddress::where('user_id', auth()->id())->first();
 

@@ -936,7 +936,7 @@ body.active .menu-overlay{
 .form-group { margin-bottom: 10px;}
 
 
-.modal-footer { border: none; width: 100%; padding-top: 0; margin: 0; justify-content: space-between;}
+.modal-footer { width: 100%; margin: 0; justify-content: space-between; border-top:1px #ccc solid; border-bottom: none; padding: 10px 15px 15px 15px;}
 
 .card .card-header h3 { font-size: 20px; margin-bottom: 7px;}
 
@@ -1151,12 +1151,14 @@ body.active .menu-overlay{
 .review-out .details { width: 80%; }
 
 .login-form { }
-.left-summary { padding:10px 10px 0 0;}
-.left-summary .saved-order { padding: 30px 0; margin: 10px 0; display: flex; column-gap: 15px;}
-.left-summary .saved-order svg { width: 25px;}
+.left-summary { }
+.left-summary .saved-order { padding: 30px; margin: 10px 0; display: flex; column-gap: 10px; font-size: 12px;}
+.left-summary .saved-order svg { width: 20px;}
+.left-summary .full { padding: 20px; border-radius: 8px; border: 1px solid #EAEAEC; margin: 10px 0; }
 .left-summary .delivery-time { border-radius: 8px; border: 1px solid #EAEAEC; margin: 10px 0; }
 .left-summary .delivery-time .repeate { padding: 20px; border-bottom: 1px solid #EAEAEC; display: flex; justify-content:space-between; }
 .left-summary .delivery-time .repeate .left { display: flex; column-gap: 20px; }
+.left-summary .delivery-time .repeate .cmn-wrapper { }
 .left-summary .delivery-time .repeate .icon { background-color: var(--gray-light); border-radius: 5px; height: 40px; width: 40px; }
 .left-summary .delivery-time .repeate .details { }
 .left-summary .delivery-time .repeate .details .title { font-weight: bold; font-size: 14px; margin-bottom: 3px;}
@@ -1172,7 +1174,7 @@ body.active .menu-overlay{
 .slot-booking .card-details .radio-label .label .green { background-color: var(--green-dark); color: var(--white); padding: 5px 8px; border-radius: 5px; font-size: 12px; display: flex; column-gap: 3px; margin-bottom: 4px; }
 .slot-booking .card-details .radio-label .label .green svg { width: 13px; margin-top: 3px;}
 
-.card-radio { appearance: none; -webkit-appearance: none; width: 20px; height: 20px; border: 1px solid #999; border-radius: 50%; background: #fff; cursor: pointer; position: relative; vertical-align: middle; }
+.card-radio { appearance: none; -webkit-appearance: none; width: 22px; height: 22px; border: 1px solid #999; border-radius: 50%; background: #fff; cursor: pointer; position: relative; vertical-align: middle; }
 .card-radio:checked { border-color:  var(--primary); }
 .card-radio:checked::after { content: ""; position: absolute; width: 12px; height: 12px; background: var(--primary); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%);}
 
@@ -1235,15 +1237,17 @@ body.active .menu-overlay{
 .shpping-address .default.active { border-color: var(--primary);}
 
 .cart-summery {  margin: 20px 0 25px 10px; font-size: 14px; color: var(--gray);}
-.cart-summery .part { margin-bottom: 15px; border-bottom: 1px solid #EAEAEC; padding: 0 0 5px 0;}
-.cart-summery .part h5 { margin-bottom: 5px; font-weight: bold; font-size: 13px;}
-.cart-summery .part h5 span { text-transform: capitalize; font-weight: normal;}
+.cart-summery .part { }
+.cart-summery .part h5 { margin-bottom: 10px; font-weight: bold; font-size: 14px; display: flex; column-gap: 5px; }
+.cart-summery .part h5 .small-text { font-size: 12px; font-weight: normal; position: relative; top:3px;}
 .cart-summery .part h6 { margin-bottom: 0; text-transform: uppercase; font-weight: bold; font-size: 11px;}
 .cart-summery .part h6 span { text-transform: capitalize; font-weight: normal;}
 .cart-summery .part .repeate-row { display: flex; justify-content:space-between;  }
 .cart-summery .part .repeate-row .left { }
 .cart-summery .part .repeate-row .right { text-align: right;}
 .cart-summery .part .repeate-row .compare-discount { color: var(--green);}
+
+.cart-summery .scroll-items { height: 265px; overflow-y: auto;}
 
 .tiny-font { font-size: 12px;}
 .font-13 { font-size: 13px;}
@@ -1260,7 +1264,7 @@ body.active .menu-overlay{
 .saved-address-grey { display: flex; column-gap: 20px; background-color: color-mix(in srgb, var(--gray-light) 80%, white); margin: 20px 0 0 0; padding: 15px 20px; justify-content: space-between; }
 .saved-address-grey h5 { font-size: 13px; text-transform: uppercase;}
 
-.delivery-address-card { font-size: 14px;}
+.delivery-address-card { }
 .delivery-address-card .address-content { font-size: 13px; width: 100%; display: flex; justify-content: space-between;}
 .delivery-address-card .address-content .left h6 span { font-size: 12px; }
 .delivery-address-card .address-content .badge-right { font-size: 11px; font-weight: 700; border:1px solid var(--green); color: var(--green); padding: 3px 10px; border-radius: 100px; height: 26px;}

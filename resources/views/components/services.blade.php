@@ -40,7 +40,7 @@
     $ratingCounts = $ratings->groupBy('ratings')->map->count();
     $ratingTotal = $ratings->count(); 
 
-    $discount = $discounts->first();
+    // $discount = $discounts->first();
     $discount_percent = $discount?->discountPercentage?->percentage ?? 0;
     $discount_price = $price - ($price * $discount_percent / 100);         
     $price = $subcategory->price ?? 0;
