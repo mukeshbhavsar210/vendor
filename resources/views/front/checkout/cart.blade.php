@@ -3,8 +3,8 @@
 @section('title', 'Shopping Bag' . (Cart::count() > 0 ? ' (' . Cart::count() . ')' : ''))
 
 @section('content')    
-    <div class="container">                
-        <x-customer-address-form 
+    <div class="container-small">                
+        <x-address 
             :states="$states"
             :homeExists="$homeExists"
             :action="route('customer.address.store')" 
@@ -16,7 +16,7 @@
 
         <div class="row">
             @if (Cart::count() > 0)
-                <div class="col-md-8 col-12 left-border"> 
+                <div class="col-md-7 col-12"> 
                     <div class="left-summary">                  
                         @php
                             $defaultAddressId = old(
@@ -25,31 +25,36 @@
                             );
                         @endphp
 
-                        @if (Auth::check())
-                            <div class="saved-order">
-                                <svg width="100%" height="100%" viewBox="0 0 16 16" fill="#07794C" xmlns="http://www.w3.org/2000/svg"><path d="M15 7.929L8.472 1.4a.997.997 0 00-.904-.274l-5.04 1.008a.5.5 0 00-.393.393l-1.008 5.04a.998.998 0 00.274.904L7.928 15a.999.999 0 001.414 0L15 9.343a.999.999 0 000-1.414zM5.25 6a.75.75 0 110-1.5.75.75 0 010 1.5z" fill="#07794C"></path></svg>
-                                <p>Saving ₹100 on this order</p>
-                            </div>
-                            <div class="delivery-time">                                                    
-                                @foreach($address as $value)
-                                    @if($value->default_address == 1)
-                                        <div class="repeate">
-                                            <div class="left">
-                                                <div class="icon"><img src="{{ asset('front-assets/images/location.jpeg') }}" alt="location" /></div>
-                                                <div class="details">
-                                                    <h5 class="title">Send booking details to</b></h5>
-                                                    <p>+91-{{ $value->mobile }}</p>                                                                                    
-                                                </div>
-                                            </div>
-                                        </div>
+                        <div class="saved-order">
+                            <svg width="100%" height="100%" viewBox="0 0 16 16" fill="#07794C" xmlns="http://www.w3.org/2000/svg"><path d="M15 7.929L8.472 1.4a.997.997 0 00-.904-.274l-5.04 1.008a.5.5 0 00-.393.393l-1.008 5.04a.998.998 0 00.274.904L7.928 15a.999.999 0 001.414 0L15 9.343a.999.999 0 000-1.414zM5.25 6a.75.75 0 110-1.5.75.75 0 010 1.5z" fill="#07794C"></path></svg>
+                            <p><b>Saving ₹<span class="price_discount">0.00</span> on this order</b></p>
+                        </div>
 
-                                        <div class="repeate">
-                                            <div class="left">
-                                                <div class="icon"><img src="{{ asset('front-assets/images/location.jpeg') }}" alt="location" /></div>
-                                                <div class="details">                                                                                        
-                                                    <h5 class="title">Address on service</h5>
-                                                    <b>{{ $value->address_type }}</b>
-                                                    <p class="mb-2">
+                        @if (Auth::check())
+                            <div class="delivery-time">
+                                <div class="repeate">
+                                    <div class="left">
+                                        <div class="icon"><img src="{{ asset('front-assets/images/location.jpeg') }}" alt="location" /></div>
+                                        <div class="details">
+                                            <h5 class="title">Send booking details to</b></h5>
+                                            @foreach($address as $value)
+                                                @if($value->default_address == 1)
+                                                    <p>+91-{{ $value->mobile }}</p>                                                                                    
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="repeate">
+                                    <div class="left">
+                                        <div class="icon"><img src="{{ asset('front-assets/images/slot.jpeg') }}" alt="location" /></div>
+                                        <div class="details">
+                                            <h5 class="title">Select Address</h5>
+                                            @foreach($address as $value)
+                                                @if($value->default_address == 1)
+                                                    <p class="mb-3">
+                                                        <b>{{ $value->address_type }}:</b>
                                                         @php
                                                             $fullAddress = $value->address . ', ' .
                                                                         $value->locality . ', ' .
@@ -57,128 +62,75 @@
                                                                         $value->zip . ', ' .
                                                                         $value->state->name;
                                                         @endphp
-                                                        {{ \Illuminate\Support\Str::limit($fullAddress, 100) }}                                                    
-                                                    </p> 
+                                                        {{ \Illuminate\Support\Str::limit($fullAddress, 100) }}
+                                                    </p>                                                                 
+                                                @endif
+                                            @endforeach
 
-                                                    @if($address->count() > 0)
-                                                        <a href="#" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#deliveryAddress">
-                                                            Edit Address
-                                                        </a>
-                                                    @else
-                                                        <a href="#" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#deliveryAddress">
-                                                            Add Address
-                                                        </a>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>                                    
-                                    @endif
-                                @endforeach
+                                            @if($address->count() > 0)
+                                                <x-address
+                                                    :states="$states"
+                                                    :action="url('/customer/address/__ID__')"
+                                                    method="PUT"
+                                                    title="Edit Address"
+                                                    buttonText="Update Address"
+                                                    modalId="editAddressModal"
+                                                />
+
+                                                @php
+                                                    $types = $delivery_address->pluck('address_type')->toArray();
+                                                    $delivery_address->pluck('address_type')->toArray();
+                                                    $defaultAddressId = old(
+                                                        'address_id',
+                                                        optional($address->firstWhere('default_address', 1))->id
+                                                    );
+                                                @endphp
+
+                                                <x-common-modal 
+                                                    modalId="selectAddress"                                                    
+                                                    modalName="select-address-modal" 
+                                                    title="Saved addresses"
+                                                    button="Proceed"
+                                                    :types="$types"  
+                                                    :defaultAddressId="$defaultAddressId"
+                                                    :addresses="$delivery_address"
+                                                >
+                                                </x-common-modal>
+
+                                                <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#selectAddress">
+                                                    Select Address
+                                                </a>                                                
+                                            @else
+                                                <x-common-modal 
+                                                    modalId="createAddress"
+                                                    modalName="create-address-modal" 
+                                                    title="Create address"
+                                                    button="Proceed"
+                                                >
+                                                </x-common-modal>
+
+                                                <a href="#" class="btn btn-primary float-end mt-2" data-bs-toggle="modal" data-bs-target="#createAddress">
+                                                    Add Address
+                                                </a>
+                                            @endif                                            
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <div class="repeate">
                                     <div class="left">
                                         <div class="icon"><img src="{{ asset('front-assets/images/slot.jpeg') }}" alt="location" /></div>
                                         <div class="details">
                                             <h5 class="title">Slot for Service</h5>
+
+                                            <x-common-modal modalId="slot" 
+                                                modalName="slot-modal" 
+                                                title="When should the professional arrive?"
+                                                button="Process to Checkout"
+                                            >
+
+                                            </x-common-modal>
                                             <a href="#" class="btn btn-outline-primary w-100 mt-2" data-bs-toggle="modal" data-bs-target="#slot">Select Time & Date</a>
-
-                                            <div class="modal fade" id="slot" tabindex="-1" aria-labelledby="slotLabel" aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered modal-custom">
-                                                    <div class="modal-content">
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-
-                                                        <div class="modal-header">
-                                                            <h4>When should the professional arrive?</h4>
-                                                        </div>
-
-                                                        <div class="slot-booking">                                                                                                        
-                                                            <div class="card-details" data-target="#collapseOne">                                                            
-                                                                <label class="radio-label">
-                                                                    <div class="label">
-                                                                        <div class="green">
-                                                                            <svg width="100%" height="100%" viewBox="0 0 24 24" fill="#FFFFFF" xmlns="http://www.w3.org/2000/svg"><path d="M15.29 2.096a.5.5 0 00-.859-.433l-9.8 10.714a.5.5 0 00.19.804l5.207 1.993-1.319 6.73a.5.5 0 00.86.433l9.8-10.714a.5.5 0 00-.19-.804l-5.207-1.993 1.319-6.73z" fill="#FFFFFF"></path></svg>
-                                                                            <p>Instant</p>
-                                                                        </div>
-                                                                        <p><b>In 44 mins</b></p>
-                                                                    </div>
-                                                                    <input type="radio" name="service" class="card-radio" value="1" checked>
-                                                                </label>
-                                                            </div>
-
-                                                            <div class="card-details" data-target="#collapseTwo">                                                            
-                                                                <label class="radio-label">
-                                                                    <div class="label">
-                                                                        <h6>Schedule for later</h6>
-                                                                        <small>Select your preferred day & time</small>
-                                                                    </div>
-                                                                    <input type="radio" name="service" class="card-radio" value="1">
-                                                                </label>                                                            
-
-                                                                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#serviceAccordion">
-                                                                    <div class="details">
-                                                                        @php
-                                                                            $dates = collect();
-                                                                            for ($i = 0; $i < 4; $i++) {
-                                                                                $date = now()->addDays($i);
-                                                                                $dates->push([
-                                                                                    'value' => $date->format('Y-m-d'),
-                                                                                    'day'   => $i == 0 ? 'Today' : $date->format('D'),
-                                                                                    'date'  => $date->format('d'),
-                                                                                ]);
-                                                                            }
-
-                                                                            $startTime = now()->copy()->startOfHour()->addHour();
-                                                                            $timeSlots = [];
-
-                                                                            for ($i = 0; $i < 12; $i++) {
-                                                                                $time = $startTime->copy()->addHours($i);
-                                                                                $timeSlots[$time->format('H:i')] = $time->format('g:i A');
-                                                                            }
-                                                                        @endphp
-
-                                                                        <div class="wrapper">
-                                                                            <div class="details">
-                                                                                @foreach($dates as $date)
-                                                                                    <label class="date common">
-                                                                                        <input type="radio" name="date" value="{{ $date['value'] }}"
-                                                                                            {{ $loop->first ? 'checked' : '' }}>
-                                                                                        <span>
-                                                                                            <small>{{ $date['day'] }}</small>
-                                                                                            <p><b>{{ $date['date'] }}</b></p>
-                                                                                        </span>
-                                                                                    </label>
-                                                                                @endforeach
-
-                                                                                <div id="online-payment-message" class="payment-message" style="display:none;">
-                                                                                    <svg width="100%" height="100%" viewBox="0 0 24 24" fill="#545454" xmlns="http://www.w3.org/2000/svg"><path d="M15 16h4v-2h-4v2zM13 16h-2v-2h2v2z" fill="#545454"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M2.77 4C1.781 4 1 4.806 1 5.778v12.444C1 19.194 1.782 20 2.77 20h18.46c.988 0 1.77-.806 1.77-1.778V5.778C23 4.806 22.218 4 21.23 4H2.77zM3 8V6h18v2H3zm0 2v8h18v-8H3z" fill="#545454"></path></svg>
-                                                                                    <p>Online payment only for selected date</p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="wrapper">
-                                                                            <h5>Select start time of service</h5>
-                                                                            <div class="details">
-                                                                                @foreach($timeSlots as $value => $label)
-                                                                                    <label class="time common">
-                                                                                        <input type="radio" name="time" value="{{ $value }}" 
-                                                                                        {{ $loop->first ? 'checked' : '' }}>
-                                                                                        <span>{{ $label }}</span>
-                                                                                    </label>
-                                                                                @endforeach
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="checkout-btn">
-                                                            <a href="#" class="btn btn-big btn-primary">Process to Checkout</a>                                                        
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -193,78 +145,25 @@
                                 </div>
                             </div>
                         @else
-                            <div class="delivery-time">
-                                <div class="repeate">
-                                    <p class="mt-2">Login to get delivery at your place.</p>
-                                    {{-- <a href="{{ route('account.login') }}?redirect={{ url()->current() }}" class="btn btn-outline-primary retirectBack">Login</a> --}}
-                                    <a href="" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a>
-                                    
-                                    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered modal-custom">
-                                            <div class="modal-content">
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>                             
+                            <div class="full">                                
+                                <h5>Account</h5>
+                                <p class="mb-2">To book the service, please login or sign up</p>                                        
 
-                                                <div class="modal-header">
-                                                    <h4 class="modal-title">Login / Signup</h4>
-                                                </div>
+                                <x-common-modal 
+                                    modalId="loginModal"
+                                    modalName="login-modal" 
+                                    title="Login / Signup"
+                                    button="Login"
+                                >
+                                </x-common-modal>                                
 
-                                                <div class="modal-body">
-                                                    <div class="login-form p-0">                                                    
-                                                        <p class="tiny-font">Join us now to be a part of {{ config('app.name') }} family.</p>
-
-                                                        <form action="{{ route('account.authenticate') }}" method="post" class="mt-4" >
-                                                            @csrf                        
-                                                            <div class="form-group">
-                                                                <input type="text" class="form-control floating-input @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}">
-                                                                <label class="floating-label">Email</label>
-                                                                @error('email')
-                                                                    <p class="invalid-feedback">{{ $message }}</p>
-                                                                @enderror
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <input type="password" class="form-control floating-input @error('password') is-invalid @enderror" name="password" >
-                                                                <label class="floating-label">Password</label>
-                                                                @error('password')
-                                                                    <p class="invalid-feedback">{{ $message }}</p>
-                                                                @enderror
-                                                            </div>
-                                                            
-                                                            <div class="flex-end">
-                                                                {{-- <a href="#" class="forgot-link mt-3">Forgot Password?</a> --}}
-                                                                <p class="mt-2">Don't have an account? <a href="{{ route('account.register') }}" ><b>Sign up</b></a></p>
-                                                                <button type="submit" class="btn btn-primary">Login</button>
-                                                            </div>
-                                                        </form>
-                                                        
-                                                        <div class="social-btns">
-                                                            <p class="or">OR</p>
-                                                            <div class="flex">                            
-                                                                <a href="{{ url('auth/google') }}" class="btn btn-outline-dark w-50">
-                                                                    {{-- <span class="sprites"></span> --}}
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 16 16" style="height: 16px; width: 16px;" class=" " stroke="none"><g clip-path="url(#login-google_svg__a)"><path fill="#4285F4" d="M15.844 8.184c0-.544-.044-1.09-.138-1.625H8.16v3.08h4.321a3.703 3.703 0 0 1-1.6 2.431v2h2.579c1.514-1.394 2.384-3.452 2.384-5.886Z"></path><path fill="#34A853" d="M8.16 16c2.158 0 3.977-.708 5.303-1.93l-2.578-2c-.717.488-1.643.765-2.722.765-2.087 0-3.857-1.409-4.492-3.302h-2.66v2.061A8.001 8.001 0 0 0 8.16 16Z"></path><path fill="#FBBC04" d="M3.668 9.534a4.792 4.792 0 0 1 0-3.063V4.41H1.011a8.007 8.007 0 0 0 0 7.184l2.657-2.06Z"></path><path fill="#EA4335" d="M8.16 3.166a4.347 4.347 0 0 1 3.069 1.2l2.284-2.284A7.689 7.689 0 0 0 8.16 0 7.998 7.998 0 0 0 1.011 4.41l2.657 2.06C4.3 4.575 6.073 3.167 8.16 3.167Z"></path></g><defs><clipPath id="login-google_svg__a"><path fill="#fff" d="M0 0h16v16H0z"></path></clipPath></defs></svg>
-                                                                    Google
-                                                                </a>                        
-                                                                <a href="{{ url('auth/facebook') }}" class="btn btn-outline-dark w-50">
-                                                                    {{-- <span class="sprites"></span> --}}
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 16 16" style="height: 16px; width: 16px;" class=" " stroke="none"><g clip-path="url(#login-facebook_svg__a)"><path fill="#1877F2" d="M16 8a8 8 0 1 0-9.25 7.903v-5.59H4.719V8H6.75V6.237c0-2.005 1.194-3.112 3.022-3.112.875 0 1.79.156 1.79.156V5.25h-1.008c-.994 0-1.304.617-1.304 1.25V8h2.219l-.355 2.313H9.25v5.59A8.002 8.002 0 0 0 16 8Z"></path><path fill="#fff" d="M11.114 10.313 11.47 8H9.25V6.5c0-.633.31-1.25 1.304-1.25h1.008V3.281s-.915-.156-1.79-.156c-1.828 0-3.022 1.107-3.022 3.112V8H4.719v2.313H6.75v5.59c.828.13 1.672.13 2.5 0v-5.59h1.864Z"></path></g><defs><clipPath id="login-facebook_svg__a"><path fill="#fff" d="M0 0h16v16H0z"></path></clipPath></defs></svg>
-                                                                    Facebook
-                                                                </a>                                             
-                                                            </div>          
-                                                        </div>
-
-                                                        <p class="mt-3 tiny-font">By creating an account or logging in, you agree with {{ config('app.name') }} T&C and Privacy Policy</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>                                
-                                </div>
+                                <a href="" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a>
                             </div>
                         @endif
                     </div>
                 </div>
 
-                <div class="col-md-4 col-12">
+                <div class="col-md-5 col-12">
                     <div class="cart-summery">
                         <div class="product-title-cart">                            
                             <div class="title">
@@ -286,101 +185,103 @@
                                 @endauth --}}
                             </div>                            
                         </div>
-                    
-                        @foreach($cartContent as $item)
-                            <div class="product-repeate active-card" id="cart-item-{{ $item->rowId }}"> 
-                                <div class="checkbox">
-                                    <label class="custom-checkbox">                                    
-                                        <input type="checkbox" name="cart_ids[]" value="{{ $item->rowId }}" class="item-checkbox" checked
-                                            data-rowid="{{ $item->rowId }}"                                                
-                                            data-price="{{ $item->options->original_price }}"
-                                            data-discount-price="{{ $item->options->discount_price }}"                                            
-                                            data-qty="{{ $item->qty }}"
-                                            data-discount_percentage="{{ $item->options->discount_percent }}" >
-                                        <span class="checkmark"></span>
-                                    </label>
-                                </div>                                                                                             
-                                <div class="photo">   
-                                    @if ($item->options->image)                                    
-                                        <img src="{{ asset('uploads/subcategory/'.$item->options->image) }}" >
-                                    @else
-                                        <img src="{{ asset('admin-assets/img/default-150x150.png') }}" alt="" />
-                                    @endif
-                                </div>
-                                <div class="details">                                
-                                    <h3>{{ $item->name }}</h3>
-                                    <p class="short-desc">{{ $item->options->short_description ?? '' }}</p>
-
-                                    <div class="manuplate">
-                                        <div class="select">   
-                                            <a href="javascript:void(0);" class="update-cart-modal" data-type="qty" data-rowid="{{ $item->rowId }}" data-selected="{{ $item->qty }}">
-                                                Qty: <b>{{ $item->qty }}</b> <span class="caret"></span>
-                                            </a>                                                                    
-                                        </div>
+                        
+                        <div class="{{ $cartContent->count() > 1 ? 'scroll-items' : '' }}">
+                            @foreach($cartContent as $item)
+                                <div class="product-repeate active-card" id="cart-item-{{ $item->rowId }}"> 
+                                    <div class="checkbox">
+                                        <label class="custom-checkbox">                                    
+                                            <input type="checkbox" name="cart_ids[]" value="{{ $item->rowId }}" class="item-checkbox" checked
+                                                data-rowid="{{ $item->rowId }}"                                                
+                                                data-price="{{ $item->options->original_price }}"
+                                                data-discount-price="{{ $item->options->discount_price }}"                                            
+                                                data-qty="{{ $item->qty }}"
+                                                data-discount_percentage="{{ $item->options->discount_percent }}" >
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </div>                                                                                             
+                                    <div class="photo">   
+                                        @if ($item->options->image)                                    
+                                            <img src="{{ asset('uploads/subcategory/'.$item->options->image) }}" >
+                                        @else
+                                            <img src="{{ asset('admin-assets/img/default-150x150.png') }}" alt="" />
+                                        @endif
                                     </div>
-                                    
-                                    <div class="price">
-                                        <span class="dark">₹{{ round($item->options->discount_price) }}</span>
-                                        @if($item->options->discount_percent)
-                                            <span class="mrp"><del>₹{{ $item->options->original_price }}</del></span>    
-                                            <span class="discount">({{ $item->options->discount_percent }}% OFF)</span>
-                                        @endif
-                                        @if ($item->options->time)                                                                                    
-                                            <svg style="top:6px; position:relative;" width="12px" height="12px" viewBox="0 0 24 24" fill="#545454" xmlns="http://www.w3.org/2000/svg"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" fill="#545454"></path></svg>
-                                            <p class="small-text">{{ $item->options->time }}</p>
-                                        @endif
-                                    </div>                                    
-                                </div>
+                                    <div class="details">                                
+                                        <h3>{{ $item->name }}</h3>
+                                        <p class="short-desc">{{ $item->options->short_description ?? '' }}</p>
 
-                                <div class="remove">                                
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#removeItemModal_{{ $item->id }}" class="delete-icon">
-                                        <span class="sprites"></span>                                    
-                                    </a>
-                                </div>
-
-                                <div class="modal fade" id="removeItemModal_{{ $item->id }}" tabindex="-1" aria-labelledby="removeItemModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered item-remove-modal">
-                                        <div class="modal-content">  
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>                                            
-
-                                            <div class="modal-header">
-                                                <h5>Move from cart</h5>  
+                                        <div class="manuplate">
+                                            <div class="select">   
+                                                <a href="javascript:void(0);" class="update-cart-modal" data-type="qty" data-rowid="{{ $item->rowId }}" data-selected="{{ $item->qty }}">
+                                                    Qty: <b>{{ $item->qty }}</b> <span class="caret"></span>
+                                                </a>                                                                    
                                             </div>
+                                        </div>
+                                        
+                                        <div class="price">
+                                            <span class="dark">₹{{ round($item->options->discount_price) }}</span>
+                                            @if($item->options->discount_percent)
+                                                <span class="mrp"><del>₹{{ $item->options->original_price }}</del></span>    
+                                                <span class="discount">({{ $item->options->discount_percent }}% OFF)</span>
+                                            @endif
+                                            @if ($item->options->time)                                                                                    
+                                                <svg style="top:6px; position:relative;" width="12px" height="12px" viewBox="0 0 24 24" fill="#545454" xmlns="http://www.w3.org/2000/svg"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" fill="#545454"></path></svg>
+                                                <p class="small-text">{{ $item->options->time }}</p>
+                                            @endif
+                                        </div>                                    
+                                    </div>
 
-                                            <div class="modal-body">
-                                                <div class="item-remove-cart">
-                                                    <div class="image">                                                                                                    
-                                                        @if ($item->options->image)
-                                                            <img src="{{ asset('uploads/subcategory/'.$item->options->image) }}" class="photo" >
-                                                        @else
-                                                            <img src="{{ asset('admin-assets/img/default-150x150.png') }}" alt="" />
-                                                        @endif
-                                                    </div>
-                                                    <div class="text">
-                                                        <h5>{{ $item->name }}</h5>
-                                                        <p>Are you sure you want to move this item from cart?</p>
-                                                    </div>                                                    
+                                    <div class="remove">                                
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#removeItemModal_{{ $item->id }}" class="delete-icon">
+                                            <span class="sprites"></span>                                    
+                                        </a>
+                                    </div>
+
+                                    <div class="modal fade" id="removeItemModal_{{ $item->id }}" tabindex="-1" aria-labelledby="removeItemModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered item-remove-modal">
+                                            <div class="modal-content">  
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>                                            
+
+                                                <div class="modal-header">
+                                                    <h5>Move from cart</h5>  
                                                 </div>
+
+                                                <div class="modal-body">
+                                                    <div class="item-remove-cart">
+                                                        <div class="image">                                                                                                    
+                                                            @if ($item->options->image)
+                                                                <img src="{{ asset('uploads/subcategory/'.$item->options->image) }}" class="photo" >
+                                                            @else
+                                                                <img src="{{ asset('admin-assets/img/default-150x150.png') }}" alt="" />
+                                                            @endif
+                                                        </div>
+                                                        <div class="text">
+                                                            <h5>{{ $item->name }}</h5>
+                                                            <p>Are you sure you want to move this item from cart?</p>
+                                                        </div>                                                    
+                                                    </div>
+                                                </div>
+                                                <div class="btn-group-details">                                                
+                                                    <a href="#" class="btn btn-link text-danger w-50" onclick="deleteItem('{{ $item->rowId}}' );" data-bs-dismiss="modal">
+                                                        Remove
+                                                    </a>
+                                                    @auth
+                                                        <a href="#" class="btn btn-link text-secondary w-50" onclick="moveToWishlist('{{ $item->rowId }}')" data-bs-dismiss="modal">
+                                                            Move to Wishlist
+                                                        </a>
+                                                    @else
+                                                        <a href="#" class="btn btn-link text-secondary" data-bs-toggle="modal" data-bs-target="#login" >
+                                                            Login to Move Wishlist
+                                                        </a>
+                                                    @endauth
+                                                </div>                                        
                                             </div>
-                                            <div class="btn-group-details">                                                
-                                                <a href="#" class="btn btn-link text-danger w-50" onclick="deleteItem('{{ $item->rowId}}' );" data-bs-dismiss="modal">
-                                                    Remove
-                                                </a>
-                                                @auth
-                                                    <a href="#" class="btn btn-link text-secondary w-50" onclick="moveToWishlist('{{ $item->rowId }}')" data-bs-dismiss="modal">
-                                                        Move to Wishlist
-                                                    </a>
-                                                @else
-                                                    <a href="#" class="btn btn-link text-secondary" data-bs-toggle="modal" data-bs-target="#login" >
-                                                        Login to Move Wishlist
-                                                    </a>
-                                                @endauth
-                                            </div>                                        
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        @endforeach  
+                            @endforeach
+                        </div>
 
                         <form name="orderForm" id="orderForm" method="POST">                        
                             @csrf
@@ -400,21 +301,21 @@
                                                 <div>
                                                     <svg height="40px" width="40px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
                                                         viewBox="0 0 505 505" xml:space="preserve">
-                                                    <circle style="fill:#FD8469;" cx="252.5" cy="252.5" r="252.5"/>
-                                                    <path style="fill:#FFFFFF;" d="M382.3,296.1l26.3-26.3c9.6-9.6,9.6-25,0-34.6l-26.3-26.3c-4.6-4.6-7.2-10.8-7.2-17.3v-37.2
-                                                        c0-13.5-11-24.5-24.5-24.5h-37.2c-6.5,0-12.7-2.6-17.3-7.2l-26.3-26.3c-9.6-9.6-25-9.6-34.6,0l-26.3,26.3
-                                                        c-4.6,4.6-10.8,7.2-17.3,7.2h-37.2c-13.5,0-24.5,11-24.5,24.5v37.2c0,6.5-2.6,12.7-7.2,17.3l-26.3,26.3c-9.6,9.6-9.6,25,0,34.6
-                                                        l26.3,26.3c4.6,4.6,7.2,10.8,7.2,17.3v37.2c0,13.5,11,24.5,24.5,24.5h37.2c6.5,0,12.7,2.6,17.3,7.2l26.3,26.3c9.6,9.6,25,9.6,34.6,0
-                                                        l26.3-26.3c4.6-4.6,10.8-7.2,17.3-7.2h37.2c13.5,0,24.5-11,24.5-24.5v-37.2C375.1,306.9,377.7,300.7,382.3,296.1z"/>
-                                                    <path style="fill:#4CDBC4;" d="M241.2,207.7c0,9-3.2,16.6-9.6,22.8c-6.4,6.2-14.5,9.3-24.2,9.3s-17.8-3.1-24.2-9.4
-                                                        c-6.4-6.3-9.6-13.9-9.6-22.8c0-8.9,3.2-16.5,9.6-22.8c6.4-6.2,14.5-9.4,24.2-9.4s17.7,3.1,24.2,9.4
-                                                        C238,191.1,241.2,198.7,241.2,207.7z M329.1,171.5L214.3,331.7h-39.4l115-160.1h39.2V171.5z M200.5,215.8c1.8,2.1,4,3.1,6.8,3.1
-                                                        c2.7,0,5-1,6.9-3.1c1.8-2.1,2.7-4.8,2.7-8.1s-0.9-6.1-2.7-8.4c-1.8-2.2-4.1-3.3-6.8-3.3s-4.9,1.1-6.8,3.3c-1.8,2.2-2.7,5-2.7,8.4
-                                                        S198.7,213.8,200.5,215.8z M331.4,301.4c0,9-3.2,16.6-9.6,22.8c-6.4,6.2-14.5,9.3-24.2,9.3s-17.8-3.1-24.2-9.4
-                                                        c-6.4-6.2-9.6-13.9-9.6-22.8s3.2-16.5,9.6-22.8s14.5-9.4,24.2-9.4s17.7,3.1,24.2,9.4C328.2,284.8,331.4,292.4,331.4,301.4z
-                                                        M290.8,309.5c1.8,2.1,4,3.1,6.8,3.1s5-1,6.9-3.1c1.8-2.1,2.8-4.8,2.8-8.1c0-3.4-0.9-6.2-2.8-8.4c-1.8-2.2-4.1-3.3-6.8-3.3
-                                                        c-2.7,0-4.9,1.1-6.8,3.3c-1.8,2.2-2.8,5-2.8,8.4S289,307.5,290.8,309.5z"/>
-                                                    </svg>
+                                                        <circle style="fill:#FD8469;" cx="252.5" cy="252.5" r="252.5"/>
+                                                        <path style="fill:#FFFFFF;" d="M382.3,296.1l26.3-26.3c9.6-9.6,9.6-25,0-34.6l-26.3-26.3c-4.6-4.6-7.2-10.8-7.2-17.3v-37.2
+                                                            c0-13.5-11-24.5-24.5-24.5h-37.2c-6.5,0-12.7-2.6-17.3-7.2l-26.3-26.3c-9.6-9.6-25-9.6-34.6,0l-26.3,26.3
+                                                            c-4.6,4.6-10.8,7.2-17.3,7.2h-37.2c-13.5,0-24.5,11-24.5,24.5v37.2c0,6.5-2.6,12.7-7.2,17.3l-26.3,26.3c-9.6,9.6-9.6,25,0,34.6
+                                                            l26.3,26.3c4.6,4.6,7.2,10.8,7.2,17.3v37.2c0,13.5,11,24.5,24.5,24.5h37.2c6.5,0,12.7,2.6,17.3,7.2l26.3,26.3c9.6,9.6,25,9.6,34.6,0
+                                                            l26.3-26.3c4.6-4.6,10.8-7.2,17.3-7.2h37.2c13.5,0,24.5-11,24.5-24.5v-37.2C375.1,306.9,377.7,300.7,382.3,296.1z"/>
+                                                        <path style="fill:#4CDBC4;" d="M241.2,207.7c0,9-3.2,16.6-9.6,22.8c-6.4,6.2-14.5,9.3-24.2,9.3s-17.8-3.1-24.2-9.4
+                                                            c-6.4-6.3-9.6-13.9-9.6-22.8c0-8.9,3.2-16.5,9.6-22.8c6.4-6.2,14.5-9.4,24.2-9.4s17.7,3.1,24.2,9.4
+                                                            C238,191.1,241.2,198.7,241.2,207.7z M329.1,171.5L214.3,331.7h-39.4l115-160.1h39.2V171.5z M200.5,215.8c1.8,2.1,4,3.1,6.8,3.1
+                                                            c2.7,0,5-1,6.9-3.1c1.8-2.1,2.7-4.8,2.7-8.1s-0.9-6.1-2.7-8.4c-1.8-2.2-4.1-3.3-6.8-3.3s-4.9,1.1-6.8,3.3c-1.8,2.2-2.7,5-2.7,8.4
+                                                            S198.7,213.8,200.5,215.8z M331.4,301.4c0,9-3.2,16.6-9.6,22.8c-6.4,6.2-14.5,9.3-24.2,9.3s-17.8-3.1-24.2-9.4
+                                                            c-6.4-6.2-9.6-13.9-9.6-22.8s3.2-16.5,9.6-22.8s14.5-9.4,24.2-9.4s17.7,3.1,24.2,9.4C328.2,284.8,331.4,292.4,331.4,301.4z
+                                                            M290.8,309.5c1.8,2.1,4,3.1,6.8,3.1s5-1,6.9-3.1c1.8-2.1,2.8-4.8,2.8-8.1c0-3.4-0.9-6.2-2.8-8.4c-1.8-2.2-4.1-3.3-6.8-3.3
+                                                            c-2.7,0-4.9,1.1-6.8,3.3c-1.8,2.2-2.8,5-2.8,8.4S289,307.5,290.8,309.5z"/>
+                                                        </svg>
                                                 </div>
                                                 <div>
                                                     <b>1 Coupon applied <span class="tiny-font">({{ $coupon_code }})</span></b>
@@ -429,70 +330,65 @@
                                 </div>
                             @endif
 
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="part">
+                                        <h5>Payment summary <p class="small-text">(<span class="selected-items">0</span> <span>items</span>)</p></h5>
 
-                            <div class="part">                            
-                                <h5 class="mb-2">Price Details (<span class="selected-items">0</span> <span>items</span>)</h5>
-
-                                @if (Cart::count() > 0)                                                                    
-                                    <div class="repeate-row mb-1">
-                                        <div class="left">Total MRP</div>
-                                        <div class="right">₹<span class="mrp_total">0.00</span></div>
-                                    </div>
-
-                                    <div class="repeate-row mb-1 priceDetailsBox">
-                                        <div class="left">Discount on MRP</div>
-                                        <div class="right">
-                                            <span class="compare-discount">- ₹<span class="price_discount">0.00</span></span>                                            
-                                        </div>
-                                    </div>
-
-                                    @if($coupon_discount)
-                                        <div class="repeate-row mb-2 priceDetailsBox">
-                                            <div class="left">
-                                                <div class="flex">
-                                                    Coupon Discount
-                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#discount" class="show-discount">
-                                                        <span class="sprites"></span>
-                                                    </a>
-                                                    <a href="javascript:0" class="remove_coupon delete-icon-new" onclick="removeCoupon()">
-                                                        <span class="sprites"></span>
-                                                    </a>
-                                                </div>
-                                            </div>                                             
-
-                                            <div class="right">
-                                                <input type="hidden" id="coupon_discount" value="{{ $coupon_discount }}">
-                                                <span class="compare-discount">- ₹<span class="coupon_discount">{{ $coupon_discount }}</span></span>
-                                            </div>
-                                        </div>
-                                    @else
-                                        @if($hasValidCoupon)
+                                        @if (Cart::count() > 0)                                                                    
                                             <div class="repeate-row mb-1">
-                                                <div class="left">Coupon Discount</div>
+                                                <div class="left">Total MRP</div>
+                                                <div class="right">₹<span class="mrp_total">0.00</span></div>
+                                            </div>
+
+                                            <div class="repeate-row priceDetailsBox">
+                                                <div class="left">Discount on MRP</div>
                                                 <div class="right">
-                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#discount">Apply Discount</a>
+                                                    <span class="compare-discount">- ₹<span class="price_discount">0.00</span></span>                                            
                                                 </div>
+                                            </div>
+
+                                            @if($coupon_discount)
+                                                <div class="repeate-row priceDetailsBox">
+                                                    <div class="left">
+                                                        <div class="flex">
+                                                            Coupon Discount
+                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#discount" class="show-discount">
+                                                                <span class="sprites"></span>
+                                                            </a>
+                                                            <a href="javascript:0" class="remove_coupon delete-icon-new" onclick="removeCoupon()">
+                                                                <span class="sprites"></span>
+                                                            </a>
+                                                        </div>
+                                                    </div>                                             
+
+                                                    <div class="right">
+                                                        <input type="hidden" id="coupon_discount" value="{{ $coupon_discount }}">
+                                                        <span class="compare-discount">- ₹<span class="coupon_discount">{{ $coupon_discount }}</span></span>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                @if($hasValidCoupon)
+                                                    <div class="repeate-row mb-1">
+                                                        <div class="left">Coupon Discount</div>
+                                                        <div class="right">
+                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#discount">Apply Discount</a>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            @endif                                   
+
+                                            <div class="repeate-row total-amount">
+                                                <div class="left">Total amount</div>
+                                                <div class="right">₹<span class="grand_total">0.00</span></div>
                                             </div>
                                         @endif
-                                    @endif
-
-                                    @auth
-                                        <div class="repeate-row priceDetailsBox">
-                                            <div class="left">Platform Fee</div>
-                                            <input type="hidden" id="shipping_charge" value="{{ $shipping_charge }}">
-                                            <div class="right">₹{{ number_format($shipping_charge,2) }}</div>
-                                        </div>
-                                    @endauth
-
-                                    <div class="repeate-row total-amount">
-                                        <div class="left">Total Amount</div>
-                                        <div class="right">₹<span class="grand_total">0.00</span></div>
                                     </div>
-                                @endif
+                                </div>
                             </div>
-
                            
                             <input type="hidden" name="grand_total" id="grand_total_input">
+                            
                             @if($item->options->cod == 1)
                                 <div class="order-btn mt-3">                                            
                                     <div class="btn-group w-100 mb-3" role="group">
@@ -512,7 +408,7 @@
                                     @endif
                                 </div>  
                             @else                                    
-                                <button id="razorpay-form" class="btn-primary btn btn-block w-100  {{ Auth::check() ? 'placeOrderBtn' : 'retirectBack' }}" type="submit">Pay <span class="grand_total_button"></span></button>
+                                <button id="razorpay-form" class="btn-primary btn btn-block w-100  {{ Auth::check() ? 'placeOrderBtn' : 'retirectBack' }}" type="submit">Amount to Pay <span class="grand_total_button"></span></button>
                             @endif                                                       
                         </form>                  
                     </div>
@@ -537,9 +433,9 @@
                     @endif
                 </div>
             </div>
-        @endif
-        
-        @include('front.layouts.address_modal') 
+        @endif                          
+
+        @include('front.layouts.modal') 
 @endsection
 
 @section('customJs')

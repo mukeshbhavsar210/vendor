@@ -156,7 +156,8 @@ Route::group(['prefix' => 'account'], function(){
             Route::post('/change-password','changePassword')->name('account.processChangePassword');
 
             Route::post('/address/store', 'address_store')->name('customer.address.store');
-            Route::put('/address/{id}', 'address_update')->name('customer.address.update');
+            Route::put('/customer/address/{address}', 'address_update')->name('customer.address.update');
+            //Route::put('/address/{id}', 'address_update')->name('customer.address.update');
             Route::get('/address','address')->name('account.address');
             Route::get('/cards','cards')->name('account.cards');
             Route::get('/coupons','coupons')->name('account.coupons');
