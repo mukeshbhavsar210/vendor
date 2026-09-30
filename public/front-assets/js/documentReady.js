@@ -1,4 +1,19 @@
 $(document).ready(function(){
+    //Search on click   
+    $('#headerSearch').on('focus click', function () {            
+        $('#searchDropdown').addClass('show');
+        loadCategories();
+    });    
+
+    $(document).on('click', function (e) {
+        if (
+            !$(e.target).closest('#headerSearch').length &&
+            !$(e.target).closest('#searchDropdown').length
+        ) {
+            $('#searchDropdown').removeClass('show');
+        }
+    });
+
     $('#faq-nav a').click(function(e){
         e.preventDefault();
 
@@ -316,8 +331,6 @@ $('.subcategory-thumb').on('click', function () {
     $('.subcategory-right[data-id="' + id + '"]').addClass('anchor-active');
 });
 
-
-
 $('#showMoreReviews').on('click', function () {
     let hiddenReviews = $('.review-item:hidden');
 
@@ -327,4 +340,55 @@ $('#showMoreReviews').on('click', function () {
     if ($('.review-item:hidden').length === 0) {
         $(this).hide();
     }
+});
+
+
+
+$(document).on('click', '.search-category', function () {
+    let categoryId = $(this).data('id');
+    let url = window.searchSubcategoriesUrl + '/' + categoryId;        
+
+    $.get(url, function (response) {
+        $('#headerSearch').val(response.category.name);
+        $('#clearSearch').show();
+
+        let html = '';
+
+        response.items.forEach(function (item) {
+            let itemUrl = item.url;
+
+            if (item.type === 'subcategory') {
+                itemUrl += '#' + item.slug;
+            }
+
+            html += `<a href="${itemUrl}" class="subcategory ${item.type === 'category' ? 'child-category' : ''}">
+                    ${
+                        item.image
+                        ? `<div class="thumb"><img src="${item.image}" alt="${item.name}" /></div>`
+                        : ''
+                    }
+
+                    <div class="content">
+                        <h6>${item.name}</h6>
+                        ${
+                            item.type === 'subcategory'
+                            ? `<p>★ ${item.rating}<span>(${item.rating_count})</span> • ₹${item.price}</p>`
+                            : ''
+                        }
+                        <p>• ${item.parent}</p>
+                    </div>
+                </a>                
+            `;
+        });
+
+        $('#searchContent').html(html);
+    }).fail(function (xhr) {
+        console.log(xhr.responseText);
+    });
+});
+    
+$(document).on('click', '#clearSearch', function () {
+    $('#headerSearch').val('').focus();
+    $('#clearSearch').hide();
+    loadCategories();
 });

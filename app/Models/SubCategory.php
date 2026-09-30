@@ -37,4 +37,12 @@ class SubCategory extends Model {
     public function process() {
         return $this->belongsTo(Process::class, 'process_id');
     }
+
+    public function discountPercentage() {
+        return $this->belongsTo(DiscountPercentage::class, 'discount_percentage_id');
+    }
+
+    public function discounts() {
+        return $this->hasMany(Discount::class, 'sub_category_id');
+    }  
 }

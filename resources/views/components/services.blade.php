@@ -21,7 +21,7 @@
     'reviews' => null,
     'description' => null, 
     'gallery' => null,   
-    'discount' => null,
+    'discounts' => null,
 ])
 
 @php
@@ -29,18 +29,25 @@
     $title = $service->title ?? '';
     $short = $service->short_description ?? '';    
     $single = $service->image;
-    $qty = $service->qty ?? '';    
+    $qty = $service->qty ?? '';        
     $galleryRepeate = $service->product_images ? $service->product_images->first() : null;
     $url = $service->url ?? null;   
-    //$discount = $service->discounts->first();
-    $discount_percent = $discount?->discountPercentage?->percentage ?? 0;
-    $discount_price = $price - ($price * $discount_percent / 100);         
+    
     $cartItems = Cart::content();
     $cartServiceIds = $cartItems->pluck('id')->toArray();   
     $ratingCount = $ratings->count();
     $averageRating = $ratings->avg('ratings') ?? 0;            
     $ratingCounts = $ratings->groupBy('ratings')->map->count();
     $ratingTotal = $ratings->count(); 
+
+    $discount = $discounts->first();
+    $discount_percent = $discount?->discountPercentage?->percentage ?? 0;
+    $discount_price = $price - ($price * $discount_percent / 100);         
+    $price = $subcategory->price ?? 0;
+    $discount_price = $price;
+    if ($discount_percent > 0) {
+        $discount_price = $price - ($price * $discount_percent / 100);
+    }
 @endphp
 
 <div class="{{ $class }}">
@@ -60,20 +67,15 @@
                     
             <div class="price tiny-font">
                 @if($discount_percent > 0)
-                    @php
-                        $total_price = $item->qty * round($discount_price);
-                    @endphp
-
-                    <span>₹{{ round($total_price ) }}</span>                    
-                    <span><del>₹{{ $price }}</del></span>  
-                    {{-- <span class="discount">({{ $discount_percent }}% OFF)</span> --}}
+                    <span>₹{{ round($discount_price) }}</span>
+                    <span><del>₹{{ round($price) }}</del></span>
+                    <span class="discount">({{ $discount_percent }}% OFF)</span>
                 @else
-                    <span>₹{{ $item->subcategory->price }}</span>
-                @endif
+                    <span>₹{{ round($price) }}</span>
+                @endif                
                 <svg style="top:2px; position:relative;" width="12px" height="12px" viewBox="0 0 24 24" fill="#545454" xmlns="http://www.w3.org/2000/svg"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" fill="#545454"></path></svg>
                 <span>{{ $item->subcategory->time }}</span>
-            </div>
-            {{-- <p><b>₹{{ $item->price }}</b></p> --}}
+            </div>            
 
             <div class="text-details">
                 <p>{{ isset($short_limit) ? Str::limit($short, $short_limit, '...') : $short }}</p>            

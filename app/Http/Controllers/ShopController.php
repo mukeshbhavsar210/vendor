@@ -31,23 +31,23 @@ class ShopController extends Controller {
         $brandsArray = [];        
         $discountArray = [];            
         
-        $products = Service::with(['category','subCategory','ratings',])->where('status',1);
+        $services = Service::with(['category','subCategory','ratings',])->where('status',1);
         $categories = Category::orderBy("category_name","ASC")->with(['sub_category'])->where('status',1)->get();                       
         $productCount = Service::where('status', 1)->count();
-        $totalProducts = $products->count();             
+        $totalProducts = $services->count();             
         
-        function applySlugFilter($slug, $model, $slugColumn, $productColumn, &$selectedItem, &$products){
+        function applySlugFilter($slug, $model, $slugColumn, $productColumn, &$selectedItem, &$services){
             if (!empty($slug)) {
                 $selectedItem = $model::where($slugColumn, $slug)->first();
                 if ($selectedItem) {
-                    $products->where($productColumn, $selectedItem->id);
+                    $services->where($productColumn, $selectedItem->id);
                 }
             }
         }
 
-        applySlugFilter($item1, Category::class, 'category_slug', 'category_id', $selected_item1, $products);
-        applySlugFilter($item2, SubCategory::class, 'sub_category_slug', 'sub_category_id', $selected_item2, $products);
-        applySlugFilter($item3, SubSubCategory::class, 'sub_sub_category_slug', 'sub_sub_category_id', $selected_item3, $products);
+        applySlugFilter($item1, Category::class, 'category_slug', 'category_id', $selected_item1, $services);
+        applySlugFilter($item2, SubCategory::class, 'sub_category_slug', 'sub_category_id', $selected_item2, $services);
+        applySlugFilter($item3, SubSubCategory::class, 'sub_sub_category_slug', 'sub_sub_category_id', $selected_item3, $services);
 
         $item3 = collect();
 
@@ -63,7 +63,7 @@ class ShopController extends Controller {
             $values = explode(',', $request->get('category'));
             $ids = SubSubCategory::whereIn('sub_sub_category_slug', $values)->pluck('id')->toArray();
             $categoryArray = $values;
-            $products->whereIn('sub_sub_category_id', $ids);
+            $services->whereIn('sub_sub_category_id', $ids);
         }
 
         $filterProducts = function ($query) use ($selected_item1, $selected_item2) {
@@ -77,7 +77,7 @@ class ShopController extends Controller {
         //         ->orderBy('percentage', 'ASC')->get();                         
 
         //Filter logic
-        function applyFilter($request, $param, $model, $column, &$selectedArray, &$products, $options = []) {
+        function applyFilter($request, $param, $model, $column, &$selectedArray, &$services, $options = []) {
             if (!empty($request->get($param))) {
                 $values = explode(',', $request->get($param));
                 // Get matching IDs from lookup table
@@ -87,7 +87,7 @@ class ShopController extends Controller {
                 // 🔥 Case 1: Pivot relation (colors, sizes, discounts)
                 if (!empty($options['relation'])) {
                     $relation = $options['relation'];
-                    $products->whereHas($relation, function ($q) use ($ids) {
+                    $services->whereHas($relation, function ($q) use ($ids) {
                         $table = $q->getModel()->getTable();
                         $q->whereIn($table . '.id', $ids);
                     });
@@ -95,62 +95,62 @@ class ShopController extends Controller {
                 } 
                 // 🔥 Case 2: Direct column (brand_id, category_id)
                 elseif (!empty($options['column'])) {
-                    $products->whereIn($options['column'], $ids);
+                    $services->whereIn($options['column'], $ids);
                 }
             }
         }
                 
-        applyFilter($request,'discount',DiscountPercentage::class,'percentage',$discountArray,$products,['column' => 'discount_percentage_id']);
+        applyFilter($request,'discount',DiscountPercentage::class,'percentage',$discountArray,$services,['column' => 'discount_percentage_id']);
 
         // Price slider
         if ($request->filled('price_min') && $request->filled('price_max')) {
             $min = intval($request->price_min);
             $max = intval($request->price_max);
-            $products = $products->whereBetween('price', [$min, $max]);
+            $services = $services->whereBetween('price', [$min, $max]);
         }        
 
         //Search main header
         if (!empty($request->get('search'))){
-            $products = $products->where('title','like','%'.$request->get('search').'%');
+            $services = $services->where('title','like','%'.$request->get('search').'%');
         }
 
         //Sort filters
         if ($request->get('sort') != '') {
             switch ($request->get('sort')) {
                 case 'latest':
-                    $products = $products->orderBy('id', 'DESC');
+                    $services = $services->orderBy('id', 'DESC');
                     break;
 
                 case 'price_asc':
-                    $products = $products->orderBy('price', 'ASC');
+                    $services = $services->orderBy('price', 'ASC');
                     break;
 
                 case 'price_desc':
-                    $products = $products->orderBy('price', 'DESC');
+                    $services = $services->orderBy('price', 'DESC');
                     break;
 
                 case 'recommended':
-                    $products = $products->orderBy('recommended', 'DESC');
+                    $services = $services->orderBy('recommended', 'DESC');
                     break;
 
                 case 'popularity':
-                    $products = $products->orderBy('views', 'DESC');
+                    $services = $services->orderBy('views', 'DESC');
                     break;
 
                 case 'discount':
-                    $products = $products->orderBy('discount_percentage', 'DESC');
+                    $services = $services->orderBy('discount_percentage', 'DESC');
                     break;
 
                 case 'rating':
-                    $products = $products->orderBy('average_rating', 'DESC');
+                    $services = $services->orderBy('average_rating', 'DESC');
                     break;
 
                 default:
-                    $products = $products->orderBy('id', 'DESC');
+                    $services = $services->orderBy('id', 'DESC');
             }
 
         } else {
-            $products = $products->orderBy('id', 'DESC');
+            $services = $services->orderBy('id', 'DESC');
         }
 
         $filtersApplied = false;
@@ -168,22 +168,22 @@ class ShopController extends Controller {
 
         // Coupon filter
         if ($request->coupon) {
-            $products->whereHas('coupons', function ($q) use ($request) {
+            $services->whereHas('coupons', function ($q) use ($request) {
                 $q->where('code', $request->coupon);
             });
         }
         // if ($request->coupon) {
         //     $coupon = DiscountCoupon::where('code', $request->coupon)->first();
         //     if ($coupon) {
-        //         $products->whereHas('coupons', function ($q) use ($coupon) {
+        //         $services->whereHas('coupons', function ($q) use ($coupon) {
         //             $q->where('discount_coupons.id', $coupon->id);
         //         });
         //     } else {
-        //         $products->whereRaw('0=1'); 
+        //         $services->whereRaw('0=1'); 
         //     }
         // }
 
-        $products = $products->paginate(10); 
+        $services = $services->paginate(10); 
         
         $wishlistProductIds = [];
 
@@ -194,7 +194,7 @@ class ShopController extends Controller {
         }     
 
         $data = compact(
-            'products', 'wishlistProductIds','productCount','categories','categoryArray', 'discountArray', 'selected_item1', 'selected_item2', 'selected_item3', 'item1','item2','item3','filtersApplied','totalProducts'
+            'services', 'wishlistProductIds','productCount','categories','categoryArray', 'discountArray', 'selected_item1', 'selected_item2', 'selected_item3', 'item1','item2','item3','filtersApplied','totalProducts'
         );
 
         $data = array_merge($data, [
@@ -323,8 +323,7 @@ class ShopController extends Controller {
 
     public function category(Request $request, $item1 = null) {
         $selected_category = $item1;
-
-        // Category from URL
+        
         $category = Category::with([
             'subCategories' => function ($query) {
                 $query->orderBy('sort_order', 'asc');
@@ -335,7 +334,7 @@ class ShopController extends Controller {
         ->firstOrFail();
 
         // All approved services belonging to this category
-        $services = Service::with(['category','subCategory','subCategory.process','ratings','ratings.user','brand','discounts.discountPercentage','waranty','include','need','faqs'])
+        $services = Service::with(['category','subCategory','subCategory.process','subCategory.discounts.discountPercentage','discounts.discountPercentage','ratings','ratings.user','brand','waranty','include','need','faqs'])
             ->where('status', 'approved')->where('category_id', $category->id)->get();
                
         $services = $services
@@ -356,13 +355,10 @@ class ShopController extends Controller {
         $cartContent = Cart::content();
 
         $selectedIds = $request->cart_ids ?? [];
-
         $discount_price = $cartContent->sum(function ($item) {
             return ($item->options->discount_price ?? 0) * $item->qty;
         });
-
         $store_discount = session()->get('coupon_discount');
-
         $coupon_discount = session()->get(
             'coupon_discount.discount',
             0
@@ -374,11 +370,11 @@ class ShopController extends Controller {
         );        
 
         return view('front.services.index', compact(
-            'services','selected_category','category','categories','discount_price','store_discount','coupon_code','coupon_discount','cartContent'
+            'services','selected_category','category','categories','coupon_code','cartContent'
+            // 'services','selected_category','category','categories','discount_price','store_discount','coupon_code','coupon_discount','cartContent'
         ));
     }
    
-
     public function category_old(Request $request, $item1=null) {    
         $services = Service::with('ratings')->where('status',1);
         $selected_category = $item1;
