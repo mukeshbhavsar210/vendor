@@ -20,7 +20,7 @@ class FrontController extends Controller {
         $getCategories = Category::with(['subCategories'])->where('showHome', 'outside')->orderBy('menu_order', 'ASC')->take(20)->get();
         $modalCategories = Category::where('showHome', 'inside')->where('status', 1)->orderBy('menu_order', 'ASC')->get()->groupBy('category_modal');
         $modalCategories2 = Category::where('status', 1)->orderBy('menu_order', 'ASC')->get();
-        $allServices = Category::where('status', 1)->get();
+        $allServices = Category::where('category_modal', '!=', 'services')->orderBy('menu_order', 'ASC')->where('status', 1)->get();
 
         function getServices($categorySlug) {
             return SubCategory::with(['category','ratings'])
@@ -145,6 +145,91 @@ class FrontController extends Controller {
         // return response()->json([
         //     'reply' => "📦 Order #{$order->id} is currently: {$order->status}"
         // ]);
+    }
+
+
+
+    public function searchCategories() {
+        $categories = Category::where('status', 1)->orderBy('menu_order')->where('showHome', 'outside')->orderBy('id', 'DESC')->get();
+        return response()->json([
+            'categories' => $categories
+        ]);
+    }
+
+    public function searchSubCategories(Category $category) {
+        $parentCategory = Category::where('id', $category->id)->where('status', 1)->where('showHome', 'outside')->firstOrFail();
+        
+        $childCategory = Category::where('status', 1)
+            ->where('showHome', 'inside')->where('category_modal', $parentCategory->category_modal)
+            ->first();
+
+        // SubCategories belonging to this category
+        $subCategories = SubCategory::where('category_id', $parentCategory->id)->where('status', 1)
+            ->with([
+                'services' => function ($query) {
+                    $query->where('status', 'approved')
+                        ->with('ratings');
+                }
+            ])->orderBy('sort_order')->get();
+
+        $data = collect();        
+
+        if ($childCategory) {
+            $data->push([
+                'type' => 'category',
+                'id' => $childCategory->id,
+                'name' => $childCategory->category_name,
+                'slug' => $childCategory->category_slug,
+                'image' => $childCategory->image ? asset('uploads/category/' . $childCategory->image) : null,
+                'rating' => null,
+                'rating_count' => 0,                
+                'parent' => $parentCategory->category_name,
+                'url' => url('/category/' . $childCategory->category_slug),                
+            ]);
+        }
+
+        $subCategories->each(function ($subcategory) use ($data, $parentCategory) {
+
+        $services = $subcategory->services;
+
+        $ratings = $services
+            ->flatMap(fn ($service) => $service->ratings);
+                $data->push([
+                    'type' => 'subcategory',
+                    'id' => $subcategory->id,
+                    'name' => $subcategory->sub_category_name,
+                    'slug' => $subcategory->sub_category_slug,
+                    'price' => $subcategory->price,
+                    'image' => $subcategory->image ? asset('uploads/subcategory/' . $subcategory->image) : null,
+                    'rating' => round($ratings->avg('ratings') ?? 0, 1),
+                    'rating_count' => $ratings->count(),                    
+                    'parent' => $parentCategory->category_name,                       
+                    'url' => route('search.services',$subcategory->id),
+                ]);
+            });
+
+        return response()->json([
+            'category' => [
+                'id' => $parentCategory->id,
+                'name' => $parentCategory->category_name,
+            ],
+
+            'items' => $data->values(),
+        ]);
+    }
+
+
+    public function searchServices(SubCategory $subcategory) {
+        $service = $subcategory->services()->where('status', 'approved')->first();
+
+        if (!$service) {
+            abort(404);
+        }
+
+        return redirect()->route(
+            'front.category',
+            $service->category->category_slug
+        );
     }
 
 }

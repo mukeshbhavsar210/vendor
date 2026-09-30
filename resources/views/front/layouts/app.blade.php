@@ -135,7 +135,7 @@
     $('input[name="time"]:checked').closest('.time').addClass('selected_time');
 
 
-    $(document).ready(function(){                
+    $(document).ready(function(){ 
         $('.track-order-btn').click(function(){
             let orderId = $(this).data('order-id');
             let url = "{{ route('account.order.tracking', ':id') }}";
@@ -360,7 +360,6 @@
         $("#chatInput").val('');
     }
 
-
     $("#registrationForm").submit(function(event){
         event.preventDefault();
         $("button[type='submit']").prop('disabled', true);
@@ -414,6 +413,28 @@
             }
         })
     });
+    
+
+    function loadCategories() {
+        $.get('{{ route("search.categories") }}', function (response) {
+            let html = ``;
+
+            response.categories.forEach(function (category) {
+                html += `<li>
+                            <a href="#" class="search-category" data-id="${category.id}">
+                                <svg width="15px" height="15px" viewBox="0 0 24 24" fill="#B0B0B0" xmlns="http://www.w3.org/2000/svg"><path d="M21.75 4.25h-6v2h3.586l-6.586 6.586-3.043-3.043a1 1 0 00-1.414 0l-6.75 6.75 1.414 1.414L9 11.914l3.043 3.043a1 1 0 001.414 0l7.293-7.293v3.586h2v-6a1 1 0 00-1-1z" fill="#B0B0B0"></path></svg>
+                                ${category.category_name}
+                            </a>
+                        </li>`;
+            });
+
+            $('#searchContent').html(html);
+        });
+    }
+</script>
+
+<script>
+    window.searchSubcategoriesUrl = "{{ url('/search/category') }}";
 </script>
 
 @yield('customJs')

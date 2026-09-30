@@ -33,7 +33,7 @@ class Service extends Model {
     }        
 
     public function discounts() {
-        return $this->hasMany(Discount::class, 'service_id');
+        return $this->hasMany(Discount::class, 'sub_category_id');
     }    
 
     public function subCategories(){
@@ -64,21 +64,6 @@ class Service extends Model {
         return $this->belongsTo(Vendor::class);
     }
 
-    // public function category(){
-    //     return $this->belongsTo(Category::class, 'category_id');
-    // }
-
-    
-
-    // public function subCategory() {
-    //     return $this->belongsTo(SubCategory::class);
-    // }
-
-    // public function images(){
-    //     return $this->hasMany(ServiceImage::class)
-    //         ->orderBy('sort_order');
-    // }
-
     public function images(){
         return $this->hasMany(ServiceImage::class, 'service_id');
     }
@@ -86,4 +71,6 @@ class Service extends Model {
     public function reviews(){
         return $this->hasMany(Review::class);
     }    
+
+    
 }

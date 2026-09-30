@@ -18,7 +18,7 @@
         </div>
         <p class="tiny-font">                                                
             {{ $selected_item1->category_name ?? '' }} / {{ $selected_item2->sub_category_name ?? '' }} / {{ $selected_item3->sub_sub_category_name ?? '' }}
-            <span class="text-muted">- {{ $products->total() }} items</span>
+            <span class="text-muted">- {{ $services->total() }} items</span>
         </p> 
     
         <div class="row mt-3 col-12">
@@ -90,14 +90,27 @@
         <div class="col-md-10 col-12">
             <div class="listing-products">
                 <div class="row">
-                    @foreach($products as $product) 
+                    @foreach($services as $service) 
                         <div class="col-md-3 col-6">
-                            <x-products :item="$product" :wishlistProductIds="$wishlistProductIds" section="show_products" gallery="yes" variable="product" class="product" :producttitle="true" :hover="true" :description="true" :amount="true" :title_limit="27" :short_limit="30" />
+                            <x-services 
+                                :item="$service" 
+                                :wishlistProductIds="$wishlistProductIds" 
+                                section="show_products" 
+                                gallery="yes" 
+                                variable="product" 
+                                class="product" 
+                                :producttitle="true" 
+                                :hover="true" 
+                                :description="true" 
+                                :amount="true" 
+                                :title_limit="27" 
+                                :short_limit="30" 
+                            />
                         </div>
                     @endforeach
                 </div>
                 <div class="col-md-12 pt-5">
-                    {{ $products->withQueryString()->links() }}
+                    {{ $services->withQueryString()->links() }}
                 </div>
             </div>
         </div>

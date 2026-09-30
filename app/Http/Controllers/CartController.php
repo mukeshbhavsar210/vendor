@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\OrderItem;
 use App\Models\Service;
+use App\Models\Category;
 use App\Models\Order;
 use App\Models\CustomerAddress;
 use App\Models\DiscountCoupon;
@@ -22,91 +23,114 @@ use Razorpay\Api\Api;
 use Illuminate\Support\Facades\Mail;
 
 class CartController extends Controller {
-    public function addToCart(Request $request){
-        $service = Service::with(['discounts.discountPercentage'])->findOrFail($request->service_id);
-        $alreadyExists = false;
+    public function addToCart(Request $request)
+{
+    $service = Service::with([
+        'category',
+        'subCategory.discounts.discountPercentage',
+    ])->findOrFail($request->service_id);
 
-        // Check if service already exists in cart
-        foreach (Cart::content() as $cartItem) {
-            if ($cartItem->id == $service->id) {
-                $alreadyExists = true;
-                break;
-            }
+    $alreadyExists = false;
+
+    // Check if service already exists in cart
+    foreach (Cart::content() as $cartItem) {
+        if ($cartItem->id == $service->id) {
+            $alreadyExists = true;
+            break;
         }
-
-        if (!$alreadyExists) {
-            $discountPercent = 0;
-            $discount = $service->discounts->first();
-
-            if ($discount && $discount->discountPercentage) {
-                $discountPercent = (float) $discount->discountPercentage->percentage;
-            }
-
-            $originalPrice = (float) $service->price;
-            $discountPrice = $originalPrice;
-
-            if ($discountPercent > 0) {
-                $discountPrice = $originalPrice -
-                    ($originalPrice * $discountPercent / 100);
-            }
-
-            Cart::add([
-                'id'    => $service->id,
-                'name'  => $service->title,
-                'qty'   => 1,
-                'price' => round($discountPrice, 2),
-                'options' => [
-                    'image'            => $service->image,
-                    'original_price'   => round($originalPrice, 2),
-                    'discount_price'   => round($discountPrice, 2),
-                    'discount_percent' => $discountPercent,
-                ],
-            ]);
-
-            $status  = true;
-            $message = $service->title . ' added to Cart';
-            session()->flash('success', $message);
-        } else {
-            $status  = false;
-            $message = $service->title . ' already added in cart';
-        }
-
-        return response()->json([
-            'status'    => $status,
-            'message'   => $message,
-            'cartCount' => Cart::count(),
-        ]);
     }
 
-    public function updateQty(Request $request) {
-        $rowId = $request->rowId;
-        $qty   = (int) $request->qty;
+    if (!$alreadyExists) {
 
-        if ($qty < 1) {
-            $qty = 1;
+        /*
+        |--------------------------------------------------------------------------
+        | Subcategory
+        |--------------------------------------------------------------------------
+        */
+        $subCategory = $service->subCategory;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Get discount from subcategory
+        |--------------------------------------------------------------------------
+        */
+        $discountPercent = 0;
+
+        $discount = $subCategory?->discounts?->first();
+
+        if ($discount?->discountPercentage) {
+            $discountPercent = (float) $discount->discountPercentage->percentage;
         }
 
-        $item = Cart::get($rowId);
 
-        if (!$item) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Cart item not found.',
-            ], 404);
+        /*
+        |--------------------------------------------------------------------------
+        | Price from subcategory
+        |--------------------------------------------------------------------------
+        */
+        $originalPrice = (float) ($subCategory?->price ?? 0);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Calculate discounted price
+        |--------------------------------------------------------------------------
+        */
+        $discountPrice = $originalPrice;
+
+        if ($discountPercent > 0) {
+            $discountPrice = $originalPrice -
+                ($originalPrice * $discountPercent / 100);
         }
 
-        Cart::update($rowId, $qty);
 
-        return response()->json([
-            'status'    => true,
-            'qty'       => Cart::get($rowId)->qty,
-            'cartCount' => Cart::count(),
-            'total'     => round(Cart::total()),
+        /*
+        |--------------------------------------------------------------------------
+        | Add to cart
+        |--------------------------------------------------------------------------
+        */
+        Cart::add([
+            'id'    => $service->id,
+            'name'  => $service->title,
+            'qty'   => 1,
+            'price' => round($discountPrice, 2),
+
+            'options' => [
+                'image' => $subCategory?->image,
+                'time' => $subCategory?->time,
+
+                'original_price' => round($originalPrice, 2),
+                'discount_price' => round($discountPrice, 2),
+                'discount_percent' => $discountPercent,
+
+                'category_id' => $service->category?->id,
+                'category_name' => $service->category?->category_name,
+
+                'subcategory_id' => $subCategory?->id,
+                'subcategory_name' => $subCategory?->sub_category_name,
+            ],
         ]);
+
+        $status = true;
+        $message = $service->title . ' added to Cart';
+
+        session()->flash('success', $message);
+
+    } else {
+
+        $status = false;
+        $message = $service->title . ' already added in cart';
     }
 
+    return response()->json([
+        'status' => $status,
+        'message' => $message,
+        'cartCount' => Cart::count(),
+    ]);
+}
 
-     public function cart() {
+    public function cart() {
         $cartContent = Cart::content();
         $appliedCouponId = session('coupon_discount.id'); 
 
@@ -185,6 +209,33 @@ class CartController extends Controller {
             'hasValidCoupon'        => $hasValidCoupon
         ]);
     } 
+
+    public function updateQty(Request $request) {
+        $rowId = $request->rowId;
+        $qty   = (int) $request->qty;
+
+        if ($qty < 1) {
+            $qty = 1;
+        }
+
+        $item = Cart::get($rowId);
+
+        if (!$item) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Cart item not found.',
+            ], 404);
+        }
+
+        Cart::update($rowId, $qty);
+
+        return response()->json([
+            'status'    => true,
+            'qty'       => Cart::get($rowId)->qty,
+            'cartCount' => Cart::count(),
+            'total'     => round(Cart::total()),
+        ]);
+    }
 
     public function wishlistToCart(Request $request) { 
         $service = Service::with(['product_images','discount'])->find($request->product_id);

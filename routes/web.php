@@ -40,6 +40,11 @@ Route::controller(FrontController::class)->group(function() {
 
     //Chat support
     Route::post('/chat-order-status', 'orderStatus')->name('chat.order.status');
+
+    //Search from home
+    Route::get('/search/categories', 'searchCategories')->name('search.categories');
+    Route::get('/search/category/{category}', 'searchSubCategories')->name('search.subcategories');
+    Route::get('/search/subcategory/{subcategory}', 'searchServices')->name('search.services');
 });
 
 Route::get('/go/{id}', function($id){
@@ -52,7 +57,7 @@ Route::post('/set-intended-url', function (Request $request) {session(['url.inte
 
 Route::controller(ShopController::class)->group(function() {
     Route::get('/services/{item1?}/{item2?}/{item3?}','listing')->name('front.shop');
-    Route::get('/details/{item2?}-{item3?}/{slug}', 'product')->name('front.product');
+    //Route::get('/details/{item2?}-{item3?}/{slug}', 'product')->name('front.product');
 
     //Category
     Route::get('/category/{item1?}','category')->name('front.category');

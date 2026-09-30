@@ -41,9 +41,11 @@
                                         <div class="modal-content">
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
-                                            <div class="modal-header">
-                                                <h2 id="categoryModalLabel{{ $category->category_modal }}">{{ $category->category_name }}</h2>
-                                            </div>
+                                            @if($category->open_to !== 'all')
+                                                <div class="modal-header">
+                                                    <h2 id="categoryModalLabel{{ $category->category_modal }}">{{ $category->category_name }}</h2>
+                                                </div>
+                                            @endif                                            
 
                                             <div class="modal-body">
                                                 @php
@@ -67,7 +69,7 @@
                                                                     </div>
                                                                 @endforeach
                                                             </div>
-                                                        @endforeach
+                                                        @endforeach                                                    
                                                     @else
                                                         <div class="modal-card">
                                                             @foreach ($categories as $category)
@@ -84,20 +86,23 @@
                                                             @endforeach
                                                         </div>
                                                     @endif
-                                                @elseif($allServices)
-                                                    @foreach ($allServices->groupBy(['appliance_types', 'category_modal']) as $applianceType => $modalGroups)
-                                                        @foreach ($modalGroups as $categoryModal => $items)
+                                                @elseif($allServices)                                                
+                                                    @foreach ($allServices->groupBy(['category_modal', 'appliance_types']) as $categoryModal => $applianceGroups)
+                                                        @foreach ($applianceGroups as $applianceType => $items)
                                                             @php
                                                                 $section = $items->firstWhere('showHome', 'outside');
                                                                 $insideItems = $items->where('showHome', 'inside');
                                                             @endphp
-                                                            
+
                                                             @if ($section)
                                                                 <h4 class="mb-3">{{ $section->category_name }}</h4>
                                                             @endif
-                                                            
+
                                                             @if ($insideItems->isNotEmpty())
-                                                                <h5 class="mb-2">{{ $applianceType }}</h5>
+                                                                @if ($applianceType)
+                                                                    <h6 class="mb-2">{{ $applianceType }}</h6>
+                                                                @endif
+
                                                                 <div class="modal-card">
                                                                     @foreach ($insideItems as $category)
                                                                         <div class="repeate">
@@ -113,42 +118,10 @@
                                                                         </div>
                                                                     @endforeach
                                                                 </div>
-                                                            @endif
-                                                            <hr>
+                                                            @endif                                                            
                                                         @endforeach
-                                                    @endforeach
-
-                                                    {{-- @foreach ($allServices->groupBy(['appliance_types','category_modal']) as $applianceType => $items)                                                    
-                                                        @php
-                                                            $section = $items->firstWhere('showHome', 'outside');
-                                                            $insideItems = $items->where('showHome', 'inside');
-                                                        @endphp                                                                             
-                                                                                                                    
-                                                        @if ($section)
-                                                            <h4 class="mb-3">{{ $section->category_name }}</h4>
-                                                        @endif
-
-                                                          @if ($insideItems->isNotEmpty())
-                                                            <h5 class="mb-2">{{ $applianceType }}</h5>
-
-                                                            <div class="modal-card">
-                                                                @foreach ($insideItems as $category)
-                                                                    <div class="repeate">
-                                                                        @if ($category->image)
-                                                                            <div class="thumb">
-                                                                                <a href="{{ route('front.category', $category->category_slug) }}">
-                                                                                    <img src="{{ asset('uploads/category/' . $category->image) }}"
-                                                                                        alt="{{ $category->category_name }}">
-                                                                                </a>
-                                                                            </div>
-                                                                        @endif
-                                                                        <p>{{ $category->category_name }}</p>
-                                                                    </div>
-                                                                @endforeach
-                                                            </div>
-                                                        @endif                                                        
-                                                        <hr />
-                                                    @endforeach --}}
+                                                        <hr>
+                                                    @endforeach                                                  
                                                 @endif                                                
                                             </div>
                                         </div>
@@ -164,28 +137,6 @@
             <img src="{{ asset('front-assets/images/home_banner.jpeg') }}" alt="Urban Clap">
         </div>
     </div>
-
-    @if ($getCategories->isNotEmpty())
-        @foreach ($getCategories as $category)
-            @if ($category->subCategories->isNotEmpty())														                       
-                @foreach ($category->subCategories->whereNotNull('image')->where('image','!=','') as $subcategory)
-                    @if ($subcategory->subSubCategories->isNotEmpty())
-                        <div class="col-md-2 col-6">
-                            <x-services 
-                                :item="$category"
-                                :category="$category"
-                                :subcategory="$subcategory"
-                                section="show_subcategory"
-                                :amount="false" 
-                                :title_limit="20" 
-                                :short_limit="7" 
-                            />
-                        </div>                                  
-                    @endif
-                @endforeach
-            @endif
-        @endforeach
-    @endif
     
     @php
         $homeServiceSections = [

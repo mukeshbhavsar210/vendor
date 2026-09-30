@@ -94,6 +94,7 @@
                                             :category="$category"
                                             :subcategory="$subCategory"
                                             :ratings="$value->ratings"
+                                            :discounts="$subCategory->discounts"
                                             :process="$subCategory->process"                                            
                                             :hover="false"
                                             :price="true"
