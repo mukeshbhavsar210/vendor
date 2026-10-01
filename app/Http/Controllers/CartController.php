@@ -23,112 +23,81 @@ use Razorpay\Api\Api;
 use Illuminate\Support\Facades\Mail;
 
 class CartController extends Controller {
-    public function addToCart(Request $request)
-{
-    $service = Service::with([
-        'category',
-        'subCategory.discounts.discountPercentage',
-    ])->findOrFail($request->service_id);
+    public function addToCart(Request $request) {
+        $service = Service::with([
+            'category',
+            'subCategory.discounts.discountPercentage',
+        ])->findOrFail($request->service_id);
 
-    $alreadyExists = false;
+        $alreadyExists = false;
 
-    // Check if service already exists in cart
-    foreach (Cart::content() as $cartItem) {
-        if ($cartItem->id == $service->id) {
-            $alreadyExists = true;
-            break;
-        }
-    }
-
-    if (!$alreadyExists) {
-
-        /*
-        |--------------------------------------------------------------------------
-        | Subcategory
-        |--------------------------------------------------------------------------
-        */
-        $subCategory = $service->subCategory;
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Get discount from subcategory
-        |--------------------------------------------------------------------------
-        */
-        $discountPercent = 0;
-
-        $discount = $subCategory?->discounts?->first();
-
-        if ($discount?->discountPercentage) {
-            $discountPercent = (float) $discount->discountPercentage->percentage;
+        // Check if service already exists in cart
+        foreach (Cart::content() as $cartItem) {
+            if ($cartItem->id == $service->id) {
+                $alreadyExists = true;
+                break;
+            }
         }
 
+        if (!$alreadyExists) {
+            $subCategory = $service->subCategory;
 
-        /*
-        |--------------------------------------------------------------------------
-        | Price from subcategory
-        |--------------------------------------------------------------------------
-        */
-        $originalPrice = (float) ($subCategory?->price ?? 0);
+            $discountPercent = 0;
+            $discount = $subCategory?->discounts?->first();
 
+            if ($discount?->discountPercentage) {
+                $discountPercent = (float) $discount->discountPercentage->percentage;
+            }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Calculate discounted price
-        |--------------------------------------------------------------------------
-        */
-        $discountPrice = $originalPrice;
+            $originalPrice = (float) ($subCategory?->price ?? 0);
 
-        if ($discountPercent > 0) {
-            $discountPrice = $originalPrice -
-                ($originalPrice * $discountPercent / 100);
+            $discountPrice = $originalPrice;
+
+            if ($discountPercent > 0) {
+                $discountPrice = $originalPrice -
+                    ($originalPrice * $discountPercent / 100);
+            }
+
+            Cart::add([
+                'id'    => $service->id,
+                'name'  => $service->title,
+                'qty'   => 1,
+                'price' => round($discountPrice, 2),
+
+                'options' => [
+                    'image' => $subCategory?->image,
+                    'time' => $subCategory?->time,
+
+                    'original_price' => round($originalPrice, 2),
+                    'discount_price' => round($discountPrice, 2),
+                    'discount_percent' => $discountPercent,
+
+                    'category_id' => $service->category?->id,
+                    'category_name' => $service->category?->category_name,
+
+                    'subcategory_id' => $subCategory?->id,
+                    'subcategory_name' => $subCategory?->sub_category_name,
+
+                    'booking_type' => null,
+                    'booking_date' => null,
+                    'booking_time' => null,
+                ],
+            ]);
+            $status = true;
+            $message = $service->title . ' added to Cart';
+            session()->flash('success', $message);
+        } else {
+            $status = false;
+            $message = $service->title . ' already added in cart';
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Add to cart
-        |--------------------------------------------------------------------------
-        */
-        Cart::add([
-            'id'    => $service->id,
-            'name'  => $service->title,
-            'qty'   => 1,
-            'price' => round($discountPrice, 2),
-
-            'options' => [
-                'image' => $subCategory?->image,
-                'time' => $subCategory?->time,
-
-                'original_price' => round($originalPrice, 2),
-                'discount_price' => round($discountPrice, 2),
-                'discount_percent' => $discountPercent,
-
-                'category_id' => $service->category?->id,
-                'category_name' => $service->category?->category_name,
-
-                'subcategory_id' => $subCategory?->id,
-                'subcategory_name' => $subCategory?->sub_category_name,
-            ],
+        return response()->json([
+            'status' => $status,
+            'message' => $message,
+            'cartCount' => Cart::count(),
         ]);
-
-        $status = true;
-        $message = $service->title . ' added to Cart';
-
-        session()->flash('success', $message);
-
-    } else {
-
-        $status = false;
-        $message = $service->title . ' already added in cart';
     }
 
-    return response()->json([
-        'status' => $status,
-        'message' => $message,
-        'cartCount' => Cart::count(),
-    ]);
-}
 
     public function cart() {
         $cartContent = Cart::content();
@@ -209,6 +178,52 @@ class CartController extends Controller {
             'hasValidCoupon'        => $hasValidCoupon
         ]);
     } 
+
+
+    public function updateBooking(Request $request) {
+        $request->validate([
+            'booking_type' => 'required|in:instant,scheduled',
+        ]);
+
+        if ($request->booking_type === 'instant') {
+            $bookingDate = now()->addMinutes(44)->format('Y-m-d');
+            $bookingTime = now()->addMinutes(44)->format('H:i');
+            $message = 'Instant booking selected';
+
+        } else {
+            $request->validate([
+                'date' => 'required',
+                'time' => 'required',
+            ]);
+
+            $bookingDate = $request->date;
+            $bookingTime = $request->time;
+            $message = 'Booking date and time updated';
+        }
+
+        foreach (Cart::content() as $item) {
+            Cart::update($item->rowId, [
+                'options' => array_merge(
+                    $item->options->toArray(),
+                    [
+                        'booking_type' => $request->booking_type,
+                        'booking_date' => $bookingDate,
+                        'booking_time' => $bookingTime,
+                    ]
+                )
+            ]);
+        }
+
+        // Flash session message
+        session()->flash('success', $message);
+
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+        ]);
+    }
+
+    
 
     public function updateQty(Request $request) {
         $rowId = $request->rowId;

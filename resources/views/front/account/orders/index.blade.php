@@ -29,7 +29,7 @@
                             </div>
                             
                             <div class="modal fade" id="filterOrdersModal" tabindex="-1" aria-labelledby="filterOrdersModalLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-dialog modal-dialog-centered modal-custom">
                                     <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="filterOrdersModalLabel">Filter Orders</h5>
@@ -195,7 +195,7 @@
                                     </div>
 
                                     <div class="modal fade" id="cancelOrder_{{ $order->id }}" data-bs-backdrop="static" data-bs-keyboard="true" tabindex="-1" aria-labelledby="cancelOrderLabel" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-dialog modal-dialog-centered modal-custom">
                                             <div class="modal-content">
                                                 <div class="modal-header">
                                                     <h5 class="modal-title" id="cancelOrderLabel">Cancel Order</h5>

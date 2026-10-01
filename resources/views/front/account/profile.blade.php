@@ -7,66 +7,63 @@
 <div class="container">    
     @include('front.account.common.sidebar')
 
-                <div class="col-md-9 col-12 px-md-0">
-                    <div class="details-accounts">
-                        @include('front.account.common.message')
+    <div class="col-md-9 col-12 px-md-0">
+        <div class="details-accounts">
+            @include('front.account.common.message')
 
-                        @include('front.account.common.modal', [
-                            'form' => $profileFormConfig,
-                            'model' => $user
-                        ])
+            @include('front.account.common.modal', [
+                'form' => $profileFormConfig,
+                'model' => $user
+            ])
 
-                        @include('front.account.common.modal', [
-                            'form' => $passwordFormConfig,
-                            'model' => null
-                        ])
+            @include('front.account.common.modal', [
+                'form' => $passwordFormConfig,
+                'model' => null
+            ])
 
-                        <h3>Profile Details</h3> 
+            <h3>Profile Details</h3> 
 
-                        <div class="order-history">
-                            <div class="individual">
-                                <div class="row mb-2">
-                                    <div class="col-md-3 col-12 text-muted">Name</div>
-                                    <div class="col-md-9 col-12">{{ $user->name }}</div>
-                                </div>                                
-                                <div class="row mb-2">
-                                    <div class="col-md-3 col-12 text-muted">Email ID</div>
-                                    <div class="col-md-9 col-12">{{ $user->email }}</div>
-                                </div>
-                                <div class="row mb-2">
-                                    <div class="col-md-3 col-12 text-muted">Mobile Number</div>
-                                    <div class="col-md-9 col-12">{{ $user->mobile }}</div>
-                                </div>
-                                <div class="row mb-2">
-                                    <div class="col-md-3 col-12 text-muted">Alternate Mobile</div>
-                                    <div class="col-md-9 col-12">{{ $user->alternate_mobile }}</div>
-                                </div>
-                                <div class="row mb-2">
-                                    <div class="col-md-3 col-12 text-muted">Gender</div>
-                                    <div class="col-md-9 col-12">{{ $user->gender == 'male' ? 'Male' : 'Female' }}</div>
-                                </div>   
-                                <div class="row mb-2">
-                                    <div class="col-md-3 col-12 text-muted">Date of Birth</div>
-                                    <div class="col-md-9 col-12">
-                                        {{ \Carbon\Carbon::parse($user->birthdate)->format('d M, Y') }}
-                                    </div>
-                                </div>           
-                                <div class="row mt-4">
-                                    <div class="col-md-3 col-12"></div>
-                                    <div class="col-md-9 col-12">
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-                                            Edit Profile
-                                        </button>
-
-                                        <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editPasswordModal">
-                                            Edit Password
-                                        </button>
-                                    </div>
-                                </div>                                                 
-                            </div>
+            <div class="order-history">
+                <div class="individual">
+                    <div class="row mb-2">
+                        <div class="col-md-3 col-12 text-muted">Name</div>
+                        <div class="col-md-9 col-12">{{ $user->name }}</div>
+                    </div>                                
+                    <div class="row mb-2">
+                        <div class="col-md-3 col-12 text-muted">Email ID</div>
+                        <div class="col-md-9 col-12">{{ $user->email }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-3 col-12 text-muted">Mobile Number</div>
+                        <div class="col-md-9 col-12">{{ $user->mobile }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-3 col-12 text-muted">Alternate Mobile</div>
+                        <div class="col-md-9 col-12">{{ $user->alternate_mobile }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-3 col-12 text-muted">Gender</div>
+                        <div class="col-md-9 col-12">{{ $user->gender == 'male' ? 'Male' : 'Female' }}</div>
+                    </div>   
+                    <div class="row mb-2">
+                        <div class="col-md-3 col-12 text-muted">Date of Birth</div>
+                        <div class="col-md-9 col-12">
+                            {{ \Carbon\Carbon::parse($user->birthdate)->format('d M, Y') }}
                         </div>
-                    </div>                  
-                </div>  
+                    </div>           
+                    <div class="row mt-4">
+                        <div class="col-md-3 col-12"></div>
+                        <div class="col-md-9 col-12">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                                Edit Profile
+                            </button>
+
+                            <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editPasswordModal">
+                                Edit Password
+                            </button>
+                        </div>
+                    </div>                                                 
+                </div>
             </div>
         </div>
     </div>

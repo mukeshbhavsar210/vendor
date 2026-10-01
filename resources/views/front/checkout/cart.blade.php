@@ -122,15 +122,28 @@
                                         <div class="icon"><img src="{{ asset('front-assets/images/slot.jpeg') }}" alt="location" /></div>
                                         <div class="details">
                                             <h5 class="title">Slot for Service</h5>
+                                            @foreach($cartContent as $item)
+                                                @if ($item->options->booking_type == 'instant')
+                                                    <p class="tiny-font">Executive will arrive within 2 hours of booking on:
+                                                        <b>{{ \Carbon\Carbon::parse($item->options->booking_date . ' ' . $item->options->booking_time)->format('d M Y, h:i A') }}</b>
+                                                    </p>
+                                                @elseif ($item->options->booking_type == 'scheduled')
+                                                    <p class="tiny-font">Executive will arrive as scheduled on:
+                                                        <b>{{ \Carbon\Carbon::parse($item->options->booking_date . ' ' . $item->options->booking_time)->format('d M Y, h:i A') }}</b>
+                                                    </p>                                                    
+                                                @endif                                                
+                                            @endforeach
+
+                                            <div id="bookingMessage" class="alert d-none"></div>
 
                                             <x-common-modal modalId="slot" 
                                                 modalName="slot-modal" 
                                                 title="When should the professional arrive?"
                                                 button="Process to Checkout"
                                             >
-
                                             </x-common-modal>
-                                            <a href="#" class="btn btn-outline-primary w-100 mt-2" data-bs-toggle="modal" data-bs-target="#slot">Select Time & Date</a>
+
+                                            <a href="#" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#slot">Select Time & Date</a>
                                         </div>
                                     </div>
                                 </div>
@@ -155,9 +168,9 @@
                                     title="Login / Signup"
                                     button="Login"
                                 >
-                                </x-common-modal>                                
+                                </x-common-modal>
 
-                                <a href="" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a>
+                                <a href="" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a>
                             </div>
                         @endif
                     </div>
@@ -239,7 +252,7 @@
                                     </div>
 
                                     <div class="modal fade" id="removeItemModal_{{ $item->id }}" tabindex="-1" aria-labelledby="removeItemModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered item-remove-modal">
+                                        <div class="modal-dialog modal-dialog-centered modal-custom item-remove-modal">
                                             <div class="modal-content">  
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>                                            
 
@@ -1029,6 +1042,78 @@
                         location.reload(); 
                         showAlert(response.message, 'success');
                     }
+                }
+            });
+        });
+
+
+        $('#updateBooking').on('click', function () {
+            let bookingType = $('input[name="booking_type"]:checked').val();
+            let data = {
+                _token: "{{ csrf_token() }}",
+                booking_type: bookingType
+            };
+
+            if (bookingType === 'scheduled') {
+                let date = $('input[name="date"]:checked').val();
+                let time = $('input[name="time"]:checked').val();
+
+                if (!date || !time) {
+                    alert('Please select date and time.');
+                    return;
+                }
+                data.date = date;
+                data.time = time;
+            }
+
+            $.ajax({
+                url: "{{ route('cart.updateBooking') }}",
+                type: "POST",
+                data: data,
+
+                success: function (response) {
+                    if (response.status) {
+                        $('#bookingMessage')
+                            .removeClass('d-none alert-danger')
+                            .addClass('alert-success-inline')
+                            .html(response.message)
+                            .fadeIn();
+
+                        setTimeout(function () {
+                            $('#bookingMessage').fadeOut();
+                        }, 2000);
+
+                        setTimeout(function () {
+                            location.reload();
+                        }, 200);
+                    }
+                    if (response.status) {
+                        console.log(response);
+                        // Example
+                        // $('#bookingModal').modal('hide');
+                    }
+                },
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                }
+            });
+        });
+
+
+        $('#bookingForm').on('change', 'input[name="date"], input[name="time"]', function () {
+            let date = $('input[name="date"]:checked').val();
+            let time = $('input[name="time"]:checked').val();
+
+            $.ajax({
+                url: "{{ route('cart.updateBooking') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    date: date,
+                    time: time
+                },
+                success: function (response) {
+                    console.log(response);
                 }
             });
         });

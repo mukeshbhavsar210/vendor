@@ -1,5 +1,5 @@
 <div class="modal fade" id="{{ $form['modal_id'] }}" tabindex="-1" aria-labelledby="{{ $form['modal_id'] }}Label" aria-hidden="true" data-bs-keyboard="true">
-    <div class="modal-dialog modal-dialog-centered {{ $form['modal_size'] ?? '' }}" >
+    <div class="modal-dialog modal-dialog-centered modal-custom {{ $form['modal_size'] ?? '' }}" >
         <div class="modal-content">            
             <form action="{{ $form['action'] }}" method="POST" class="ajax-form" enctype="multipart/form-data">
                 @csrf
@@ -11,8 +11,9 @@
 
                 <div class="modal-body {{ $form['modal_body'] ?? '' }} py-3">
                     @if($form['modal_body'])
-                        <h4 class="mb-2">Contact Details</h4>    
+                        <h4 class="mb-2">Contact Details</h4>
                     @endif
+                    
                     <div class="row">
                         @foreach($form['fields'] as $field)                        
                             <div class="{{ $field['col'] ?? 'col-md-12' }}">                                

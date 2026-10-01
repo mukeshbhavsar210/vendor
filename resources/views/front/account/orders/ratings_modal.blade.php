@@ -1,5 +1,5 @@
 <div class="modal fade" id="ratingsModal_{{ $item->product->id }}" tabindex="-1" aria-labelledby="ratingsModal_{{ $item->product->id }}Label" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-custom">
         <div class="modal-content">
             <form action="{{ route('reviews.store') }}" method="POST">
                 @csrf

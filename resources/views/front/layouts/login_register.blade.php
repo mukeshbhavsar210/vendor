@@ -2,7 +2,7 @@
 
 
 <div class="modal fade" id="login" tabindex="-1" aria-labelledby="loginLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-custom">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="loginLabel">Login to your Account</h5>
@@ -43,7 +43,7 @@
 </div>
 
 <div class="modal fade" id="register" tabindex="-1" aria-labelledby="registerLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-custom">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="registerLabel">Register Account</h5>
@@ -100,7 +100,7 @@
 </div>
 
 <div class="modal fade" id="forgot" tabindex="-1" aria-labelledby="forgotLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-custom">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="forgotLabel">Forgot Password</h5>

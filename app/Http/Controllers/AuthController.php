@@ -34,41 +34,60 @@ class AuthController extends Controller {
         return view('front.account.register');
     }
 
-    public function processRegister(Request $request){
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|min:3',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:5|confirmed',
+
+    public function processRegister(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|min:3',
+        'email' => 'required|email|unique:users',
+        'password' => 'required|min:5|confirmed',
+    ]);
+
+    if ($validator->passes()) {
+
+        $user = new User;
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->mobile = $request->mobile;
+        $user->password = Hash::make($request->password);
+
+        $colors = [
+            '#FF5733',
+            '#33B5E5',
+            '#2ECC71',
+            '#9B59B6',
+            '#F39C12',
+            '#E74C3C',
+            '#1ABC9C',
+            '#34495E'
+        ];
+
+        $user->avatar_color = $colors[array_rand($colors)];
+        $user->save();
+
+        // Automatically login
+        Auth::login($user);
+
+        // Flash message for next request
+        session()->flash(
+            'success',
+            'You have registered successfully.'
+        );
+
+        return response()->json([
+            'status' => true,
+            'message' => 'You have registered successfully.',
+            'redirect' => url('/'),
+            'errors' => []
         ]);
-
-        if($validator->passes()) {
-            $plainPassword = $request->password;
-
-            $user = new User;
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->mobile = $request->mobile;
-            $user->password = Hash::make($plainPassword);            
-            $colors = ['#FF5733', '#33B5E5', '#2ECC71', '#9B59B6', '#F39C12', '#E74C3C', '#1ABC9C', '#34495E'];
-            $user->avatar_color = $colors[array_rand($colors)];
-            $user->save();
-
-            // ✅ Send confirmation email
-            //Mail::to($user->email)->send(new UserRegisteredMail($user, $plainPassword));
-
-            session()->flash('success', 'You have registered successfully. Check your email for login details.');
-
-            return response()->json([
-                'status' => true,
-                'errors' => []
-            ]);
-        } else {
-            return response()->json([
-                'status' => false,
-                'errors' => $validator->errors()
-            ]);
-        }
     }
+
+    return response()->json([
+        'status' => false,
+        'message' => 'Please fix the errors below.',
+        'errors' => $validator->errors()
+    ]);
+}
     
 
     public function authenticate(Request $request) {
