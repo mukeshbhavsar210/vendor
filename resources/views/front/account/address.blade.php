@@ -9,12 +9,48 @@
 
     <div class="col-md-9 col-12 px-md-0">
         <div class="orders-details">
-            @include('front.account.common.message')
-            @include('front.layouts.address_modal')
+            @include('front.account.common.message')            
 
             <div class="flex-end">
                 <h5 class="h5">Saved Address</h5>
-                {{-- <a href="#" class=" btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deliveryAddress">Change Default Address</a> --}}
+                @if($address->count() > 0)
+                    @php
+                        $types = $delivery_address->pluck('address_type')->toArray();
+                        $delivery_address->pluck('address_type')->toArray();
+                        $defaultAddressId = old(
+                            'address_id',
+                            optional($address->firstWhere('default_address', 1))->id
+                        );
+                    @endphp
+
+                    <x-common-modal 
+                        modalId="selectAddress"                                                    
+                        modalName="select-address-modal" 
+                        title="Saved addresses"
+                        button="Proceed"
+                        :types="$types"  
+                        :defaultAddressId="$defaultAddressId"
+                        :addresses="$delivery_address"
+                    >
+                    </x-common-modal>
+
+                    <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#selectAddress">
+                        Select Address
+                    </a> 
+                @else
+                    <x-common-modal 
+                        modalId="createAddress"
+                        modalName="create-address-modal" 
+                        title="Create address"
+                        button="Proceed"
+                    >
+                    </x-common-modal>
+
+                    <a href="#" class="btn btn-primary float-end mt-2" data-bs-toggle="modal" data-bs-target="#createAddress">
+                        + Add New Address
+                    </a>
+                @endif
+
                 {{-- @if(!in_array('Home', $addressTypes) || !in_array('Office', $addressTypes))
                     <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#createAddressModal">
                         + Add New Address

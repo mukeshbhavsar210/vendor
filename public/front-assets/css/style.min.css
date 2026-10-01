@@ -6,6 +6,20 @@
 hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}
 hr:not([size]){height:1px}
 
+:root{
+    --primary:#6e42e5; --primary-light:#f5f2fd; --primary-dark:#572ac8;
+    --secondary:#6c757d;--white:#fff;--black:#212529;--gray:#6c757d; 
+    --green:rgb(3, 166, 133); --green-dark:#137c51; --orange:orangered; 
+    --gray-light:#efeeee; --gray-dark:#e5e5e5; --success:#198754;--info:#0dcaf0;--warning:#ffc107;--danger:#dc3545;--light:#f8f9fa;
+    --body-font:"Manrope", sans-serif;
+    --title-h1:"Manrope", sans-serif;
+    --bs-gradient:linear-gradient(180deg,#ffffff26,#fff0);    
+    --body-font-size:.88rem;
+    --body-font-weight:400;
+    --bs-body-line-height:1.55;
+    --bs-body-color:#212529;
+    --body-bg:#fff
+}
 
 ::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-text,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-year-field{padding:0}
 ::-webkit-inner-spin-button{height:auto}
@@ -245,8 +259,8 @@ textarea.form-control-lg{min-height:calc(1.5em + 1rem + 2px)}
 .form-check-inline .form-check-input~.invalid-feedback{margin-left:.5em}
 .was-validated .input-group .form-control:invalid,.input-group .form-control.is-invalid,.was-validated .input-group .form-select:invalid,.input-group .form-select.is-invalid{z-index:2}
 .was-validated .input-group .form-control:invalid:focus,.input-group .form-control.is-invalid:focus,.was-validated .input-group .form-select:invalid:focus,.input-group .form-select.is-invalid:focus{z-index:3}
-.btn{display:inline-block;font-weight:400;line-height:1.5;color:#212529;text-align:center;text-decoration:none;vertical-align:middle;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;user-select:none;background-color:transparent;border:1px solid transparent;padding:.375rem .75rem;font-size:1rem;border-radius:.25rem;transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out}
-.btn:hover{color:#212529}
+.btn{ font-weight:bold; background-color: var(--white); font-size: 13px; font-family: var(--body-font); border-radius: 5px; display:inline-block;line-height:1.5;color:#212529;text-align:center;text-decoration:none;vertical-align:middle;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;user-select:none;border:1px solid transparent;padding:.375rem .75rem;border-radius:.25rem;transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out}
+.btn:hover{color:var(--white); background-color:var(--primary);border-color:var(--primary)} 
 .btn-check:focus+.btn,.btn:focus{outline:0;box-shadow:0 0 0 .25rem #0d6efd40}
 .btn:disabled,.btn.disabled,fieldset:disabled .btn{pointer-events:none;opacity:.65}
 .btn-primary{color:#fff;background-color:#0d6efd;border-color:#0d6efd}
@@ -297,8 +311,8 @@ textarea.form-control-lg{min-height:calc(1.5em + 1rem + 2px)}
 .btn-check:checked+.btn-dark,.btn-check:active+.btn-dark,.btn-dark:active,.btn-dark.active,.show>.btn-dark.dropdown-toggle{color:#fff;background-color:#1a1e21;border-color:#191c1f}
 .btn-check:checked+.btn-dark:focus,.btn-check:active+.btn-dark:focus,.btn-dark:active:focus,.btn-dark.active:focus,.show>.btn-dark.dropdown-toggle:focus{box-shadow:0 0 0 .25rem #42464980}
 .btn-dark:disabled,.btn-dark.disabled{color:#fff;background-color:#212529;border-color:#212529}
-.btn-outline-primary{color:#0d6efd;border-color:#0d6efd}
-.btn-outline-primary:hover{color:#fff;background-color:#0d6efd;border-color:#0d6efd}
+.btn-outline-primary { color: var(--primary); border-color: var(--primary); }
+.btn-outline-primary:hover { background-color: var(--primary); color: var(--white); border-color: var(--primary); }
 .btn-check:focus+.btn-outline-primary,.btn-outline-primary:focus{box-shadow:0 0 0 .25rem #0d6efd80}
 .btn-check:checked+.btn-outline-primary,.btn-check:active+.btn-outline-primary,.btn-outline-primary:active,.btn-outline-primary.active,.btn-outline-primary.dropdown-toggle.show{color:#fff;background-color:#0d6efd;border-color:#0d6efd}
 .btn-check:checked+.btn-outline-primary:focus,.btn-check:active+.btn-outline-primary:focus,.btn-outline-primary:active:focus,.btn-outline-primary.active:focus,.btn-outline-primary.dropdown-toggle.show:focus{box-shadow:0 0 0 .25rem #0d6efd80}

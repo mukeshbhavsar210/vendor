@@ -88,8 +88,6 @@ class FrontController extends Controller {
         ]);
     }
 
-
-
     public function page($slug){
         $page = Page::where('slug', $slug)->first();
 
@@ -101,8 +99,6 @@ class FrontController extends Controller {
             'page' => $page
         ]);
     }
-
-
     
     public function sendContactEmail(Request $request){
         $validator = Validator::make($request->all(), [
@@ -146,7 +142,6 @@ class FrontController extends Controller {
         //     'reply' => "📦 Order #{$order->id} is currently: {$order->status}"
         // ]);
     }
-
 
 
     public function searchCategories() {
@@ -218,7 +213,6 @@ class FrontController extends Controller {
         ]);
     }
 
-
     public function searchServices(SubCategory $subcategory) {
         $service = $subcategory->services()->where('status', 'approved')->first();
 
@@ -231,5 +225,4 @@ class FrontController extends Controller {
             $service->category->category_slug
         );
     }
-
 }

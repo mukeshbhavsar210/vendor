@@ -52,6 +52,10 @@
             
             <div class="services">                        
                 <div class="service-listings">
+                    @if($category)                                                        
+                        <h2>{{ $category->category_name }}</h2>
+                    @endif
+
                     @if($services->isNotEmpty())
                         @foreach($services as $subCategoryId => $subCategoryServices)                            
                             @php
@@ -59,12 +63,6 @@
                             @endphp
 
                             <div class="subcategory-right" id="{{ $subCategory->sub_category_slug }}" data-id="{{ $subCategory->id }}" >
-                                @if($subCategory)                                
-                                    <div class="subcategory-heading" >
-                                        <h4 class="mb-2">{{ $subCategory->sub_category_name }}</h4>
-                                    </div>
-                                @endif
-
                                 @if($subCategory->banner == 'yes')
                                     <div class="category-banner">
                                         <div class="details">
@@ -98,7 +96,7 @@
                                             :process="$subCategory->process"                                            
                                             :hover="false"
                                             :price="true"
-                                            :title_limit="35"
+                                            :title_limit="50"
                                             :short_limit="15"
                                         />                                        
                                     @endforeach
@@ -129,7 +127,12 @@
                                 <h4>Cart</h4>
                                 @foreach($cartContent as $item)
                                     <div class="cart-repeate" id="cart-item-{{ $item->rowId }}">
-                                        <div class="item">{{ $item->name }}</div>
+                                        <div class="item">
+                                            <p>{{ Str::limit($item->name, 50) }}</p>
+                                            @if ($item->options->discount_percent > 0)                                                                                            
+                                                <p class="tiny-font-orange">{{ $item->options->discount_percent }}% OFF</p>
+                                            @endif
+                                        </div>
                                         <div class="right">                                    
                                             <div class="qty-control">
                                                 <button type="button" class="qty-btn qty-minus" data-rowid="{{ $item->rowId }}">−</button>
@@ -138,9 +141,9 @@
                                             </div>
                                             
                                             <div class="amount">
-                                                <p>₹{{ round($item->options->discount_price) }}</p>
+                                                <p><b>₹{{ round($item->options->discount_price) }}</b></p>
                                                 @if($item->options->discount_percent)
-                                                    <del>₹{{ $item->options->original_price }}</del>
+                                                    <del class="tiny-font">₹{{ $item->options->original_price }}</del>
                                                 @endif
                                             </div>
                                         </div>

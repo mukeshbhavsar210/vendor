@@ -40,7 +40,7 @@
     $ratingCounts = $ratings->groupBy('ratings')->map->count();
     $ratingTotal = $ratings->count(); 
 
-    // $discount = $discounts->first();
+    $discount = isset($discounts) ? $discounts->first() : null;
     $discount_percent = $discount?->discountPercentage?->percentage ?? 0;
     $discount_price = $price - ($price * $discount_percent / 100);         
     $price = $subcategory->price ?? 0;
@@ -52,9 +52,9 @@
 
 <div class="{{ $class }}">
     @if($show == "services")    
-        <div class="left">
-            <h2>{{ isset($title_limit) ? Str::limit($title, $title_limit, '...') : $title }}</h2>            
-                            
+        <div class="left">                        
+            <h3>{{ isset($title_limit) ? Str::limit($subcategory->sub_category_name, $title_limit, '...') : $subcategory->sub_category_name }}</h3>
+
             @if($ratings->count())
                 <div class="ratings">
                     <svg class="svg" width="100%" height="100%" viewBox="0 0 20 20" fill="#572AC8" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.333 10a8.333 8.333 0 11-16.667 0 8.333 8.333 0 0116.667 0zm-7.894-4.694A.476.476 0 009.999 5a.476.476 0 00-.438.306L8.414 8.191l-2.977.25a.48.48 0 00-.414.342.513.513 0 00.143.532l2.268 2.033-.693 3.039a.51.51 0 00.183.518.458.458 0 00.528.022L10 13.298l2.548 1.629a.458.458 0 00.527-.022.51.51 0 00.184-.518l-.693-3.04 2.268-2.032a.513.513 0 00.143-.532.48.48 0 00-.415-.342l-2.976-.25-1.147-2.885z" fill="#572AC8"></path></svg>
@@ -67,14 +67,17 @@
                     
             <div class="price tiny-font">
                 @if($discount_percent > 0)
-                    <span>₹{{ round($discount_price) }}</span>
+                    <span><b>₹{{ round($discount_price) }}</b></span>
                     <span><del>₹{{ round($price) }}</del></span>
                     <span class="discount">({{ $discount_percent }}% OFF)</span>
                 @else
-                    <span>₹{{ round($price) }}</span>
-                @endif                
-                <svg style="top:2px; position:relative;" width="12px" height="12px" viewBox="0 0 24 24" fill="#545454" xmlns="http://www.w3.org/2000/svg"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" fill="#545454"></path></svg>
-                <span>{{ $item->subcategory->time }}</span>
+                    <span><b>₹{{ round($price) }}</b></span>
+                @endif
+                
+                @if ($item->subcategory->time)
+                    <svg style="top:2px; position:relative;" width="12px" height="12px" viewBox="0 0 24 24" fill="#545454" xmlns="http://www.w3.org/2000/svg"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" fill="#545454"></path></svg>
+                    <span>{{ $item->subcategory->time }}</span>
+                @endif
             </div>            
 
             <div class="text-details">
@@ -83,7 +86,7 @@
                                 
             <a href="javascript:0" class="view" data-bs-toggle="modal" data-bs-target="#service_{{ $item->id }}">View Details</a>
 
-            <div class="modal fade " id="service_{{ $item->id }}" tabindex="-1" aria-labelledby="serviceLabel_{{ $item->id }}" aria-hidden="true">
+            <div class="modal fade" id="service_{{ $item->id }}" tabindex="-1" aria-labelledby="serviceLabel_{{ $item->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-custom">
                     <div class="modal-content">
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -108,7 +111,7 @@
                                                     
                             <div class="modal-body-wrapper">
                                 <div class="left">
-                                    <h2>{{ isset($title_limit) ? Str::limit($title, $title_limit, '...') : $title }}</h2>
+                                    <h3>{{ isset($title_limit) ? Str::limit($title, $title_limit, '...') : $title }}</h3>
 
                                     @if($ratings->count())
                                         <div class="ratings">
@@ -118,23 +121,22 @@
                                                 <span>({{ $ratingCount }} reviews)</span>
                                             @endif
                                         </div>
-                                    @endif                      
-                                            
+                                    @endif        
+                                    
                                     <div class="price tiny-font">
                                         @if($discount_percent > 0)
-                                            @php
-                                                $total_price = $item->qty * round($discount_price);
-                                            @endphp
-
-                                            <b>₹ {{ round($total_price ) }}</b>
-                                            <span><del>₹{{ $price }}</del></span>  
-                                            {{-- <span class="discount">({{ $discount_percent }}% OFF)</span> --}}
+                                            <span><b>₹{{ round($discount_price) }}</b></span>
+                                            <span><del>₹{{ round($price) }}</del></span>
+                                            <span class="discount">({{ $discount_percent }}% OFF)</span>
                                         @else
-                                            <b>₹{{ $item->subcategory->price }}</b>
+                                            <span><b>₹{{ round($price) }}</b></span>
                                         @endif
-                                        <svg style="top:2px; position:relative;" width="12px" height="12px" viewBox="0 0 24 24" fill="#545454" xmlns="http://www.w3.org/2000/svg"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" fill="#545454"></path></svg>
-                                        {{ $item->subcategory->time }}
-                                    </div>                                    
+                                        
+                                        @if ($item->subcategory->time)
+                                            <svg style="top:2px; position:relative;" width="12px" height="12px" viewBox="0 0 24 24" fill="#545454" xmlns="http://www.w3.org/2000/svg"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" fill="#545454"></path></svg>
+                                            <span>{{ $item->subcategory->time }}</span>
+                                        @endif
+                                    </div>
                                 </div>
 
                                 <div class="right">

@@ -1,5 +1,5 @@
  <div class="modal fade" id="selectAddress" tabindex="-1" aria-labelledby="selectAddressLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-custom">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="selectAddressLabel">Saved addresses</h5>

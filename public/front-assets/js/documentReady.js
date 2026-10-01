@@ -1,4 +1,21 @@
 $(document).ready(function(){
+
+    $(document).on('click', '.open-signup', function (e) {
+        e.preventDefault();
+
+        $('.modal-body')
+            .removeClass('active-login')
+            .addClass('active-signup');
+    });
+
+    $(document).on('click', '.open-login', function (e) {
+        e.preventDefault();
+
+        $('.modal-body')
+            .removeClass('active-signup')
+            .addClass('active-login');
+    });
+
     //Search on click   
     $('#headerSearch').on('focus click', function () {            
         $('#searchDropdown').addClass('show');

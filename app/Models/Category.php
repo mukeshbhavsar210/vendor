@@ -22,6 +22,14 @@ class Category extends Model {
         return $this->hasMany(Service::class, 'category_id', 'id');
     }
 
+    public function discounts() {
+        return $this->hasMany(Discount::class, 'sub_category_id');
+    }  
+
+    public function discountPercentage() {
+        return $this->belongsTo(DiscountPercentage::class, 'discount_percentage_id');
+    }
+
     // public function services() {
     //     return $this->hasMany(Service::class, 'sub_category_id');
     // }
