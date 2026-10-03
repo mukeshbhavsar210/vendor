@@ -122,6 +122,7 @@
                                         <div class="icon"><img src="{{ asset('front-assets/images/slot.jpeg') }}" alt="location" /></div>
                                         <div class="details">
                                             <h5 class="title">Slot for Service</h5>
+
                                             @foreach($cartContent as $item)
                                                 @if ($item->options->booking_type == 'instant')
                                                     <p class="tiny-font">Executive will arrive within 2 hours of booking on:
@@ -132,9 +133,7 @@
                                                         <b>{{ \Carbon\Carbon::parse($item->options->booking_date . ' ' . $item->options->booking_time)->format('d M Y, h:i A') }}</b>
                                                     </p>                                                    
                                                 @endif                                                
-                                            @endforeach
-
-                                            <div id="bookingMessage" class="alert d-none"></div>
+                                            @endforeach                                            
 
                                             <x-common-modal modalId="slot" 
                                                 modalName="slot-modal" 
@@ -222,13 +221,13 @@
                                     </div>
                                     <div class="details">                                
                                         <h3>{{ $item->name }}</h3>
-                                        <p class="short-desc">{{ $item->options->short_description ?? '' }}</p>
+                                        <p class="short-desc">{{ $item->options->short_description ?? '' }}</p>                                       
 
-                                        <div class="manuplate">
+                                        <div class="manuplate">                                           
                                             <div class="select">   
                                                 <a href="javascript:void(0);" class="update-cart-modal" data-type="qty" data-rowid="{{ $item->rowId }}" data-selected="{{ $item->qty }}">
                                                     Qty: <b>{{ $item->qty }}</b> <span class="caret"></span>
-                                                </a>                                                                    
+                                                </a>                                                                                               
                                             </div>
                                         </div>
                                         
@@ -242,7 +241,7 @@
                                                 <svg style="top:6px; position:relative;" width="12px" height="12px" viewBox="0 0 24 24" fill="#545454" xmlns="http://www.w3.org/2000/svg"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" fill="#545454"></path></svg>
                                                 <p class="small-text">{{ $item->options->time }}</p>
                                             @endif
-                                        </div>                                    
+                                        </div>
                                     </div>
 
                                     <div class="remove">                                
@@ -446,111 +445,14 @@
                     @endif
                 </div>
             </div>
-        @endif                          
+        @endif                                  
 
         @include('front.layouts.modal') 
 @endsection
 
 @section('customJs')
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script>
-        let currentRowId = '';
-        let currentType = '';       
-
-        $(document).on('click', '.update-cart-modal', function(){            
-            currentRowId = $(this).data('rowid');
-            currentType = $(this).data('type');
-            let selected = $(this).data('selected');
-
-            let title = '';
-            let options = [];
-
-            if(currentType === 'size_id'){
-                title = 'Select Size';                
-                let productId = $(this).data('productid');
-
-                $.get('/get-product-sizes/' + productId, function(res){
-                    let options = res.sizes; 
-
-                    let html = '';
-                    options.forEach(function(option){
-                        let active = (option.id == selected) ? 'selected' : '';
-                        html += `<li><a href="#" class="select-option show-tooltip ${active}" data-value="${option.id}">
-                                        ${option.code}
-                                    <span class="tooltip" style="bottom:48px;">${option.name}</span>
-                                </a></li>`;
-                    });
-
-                    $('#modalList').html(html);
-                    $('#cartModalTitle').text(title);
-
-                    let modal = new bootstrap.Modal(document.getElementById('commonCartUpdateModal'));
-                    modal.show();
-                });
-
-                return; // ❗ stop further execution
-            }
-
-            if(currentType === 'color_id'){
-                title = 'Select Color';
-                let productId = $(this).data('productid');
-
-                $.get('/get-product-colors/' + productId, function(res){
-                    let options = res.colors;
-                    let html = '';
-                    options.forEach(function(option){
-                        let active = (option.id == selected) ? 'selected' : '';
-                        html += `<li><a href="#" class="select-option ${active} show-tooltip" data-value="${option.id}">
-                                        <span class="color" style="background-color:${option.code}"></span>
-                                        <span class="tooltip" style="bottom:48px;">${option.name}</span>
-                                </a></li>`;
-                    });
-
-                    $('#modalList').html(html);
-                    $('#cartModalTitle').text(title);
-
-                    let modal = new bootstrap.Modal(document.getElementById('commonCartUpdateModal'));
-                    modal.show();
-                });
-                return; // ❗ stop further execution
-            }
-
-            if(currentType === 'qty'){
-                title = 'Select Quantity';
-                options = [1,2,3,4,5,6,7,8,9,10];
-
-                let html = '';
-                options.forEach(function(option){
-                    let active = (option == selected) ? 'selected' : '';
-                    html += `<li><a href="#" class="select-option ${active}" data-value="${option}">${option}</a></li>`;
-                });
-
-                $('#modalList').html(html);
-                new bootstrap.Modal('#commonCartUpdateModal').show();
-            }
-            $('#cartModalTitle').text(title);
-        });
-
-        $(document).on('click', '.select-option', function(e){
-            e.preventDefault();
-            let value = $(this).data('value');
-
-            let data = {
-                rowId: currentRowId,
-                _token: '{{ csrf_token() }}'
-            };
-
-            if(currentType === 'qty'){ data.qty = value; }
-            if(currentType === 'size_id'){ data.size_id = value; }
-            if(currentType === 'color_id'){ data.color_id = value; }
-
-            $.post('{{ route("front.updateCartOption") }}', data, function(res){
-                if(res.status){
-                    location.reload();
-                }
-            });
-        });  
-
+    <script>          
         $("#payment_cod").click(function(){
             if ($(this).is(":checked") == true){
                 $("#cod-form").removeClass('d-none');
@@ -1046,7 +948,6 @@
             });
         });
 
-
         $('#updateBooking').on('click', function () {
             let bookingType = $('input[name="booking_type"]:checked').val();
             let data = {
@@ -1073,16 +974,6 @@
 
                 success: function (response) {
                     if (response.status) {
-                        $('#bookingMessage')
-                            .removeClass('d-none alert-danger')
-                            .addClass('alert-success-inline')
-                            .html(response.message)
-                            .fadeIn();
-
-                        setTimeout(function () {
-                            $('#bookingMessage').fadeOut();
-                        }, 2000);
-
                         setTimeout(function () {
                             location.reload();
                         }, 200);

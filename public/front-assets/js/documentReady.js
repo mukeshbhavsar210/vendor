@@ -1,4 +1,18 @@
 $(document).ready(function(){
+    $(document).on('click', '.action-toggle', function (e) {
+        e.stopPropagation();
+
+        // Close other dropdowns
+        $('.action-dropdown').not($(this).siblings('.action-dropdown')).hide();
+
+        // Toggle current dropdown
+        $(this).siblings('.action-dropdown').toggle();
+    });
+
+    // Close when clicking anywhere outside
+    $(document).on('click', function () {
+        $('.action-dropdown').hide();
+    });
 
     $(document).on('click', '.open-signup', function (e) {
         e.preventDefault();

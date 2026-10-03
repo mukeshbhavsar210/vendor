@@ -133,12 +133,18 @@
                                                 <p class="tiny-font-orange">{{ $item->options->discount_percent }}% OFF</p>
                                             @endif
                                         </div>
-                                        <div class="right">                                    
-                                            <div class="qty-control">
+                                        <div class="right">    
+                                            <div class="select">        
+                                                <a href="javascript:void(0);" class="update-cart-modal" data-type="qty" data-rowid="{{ $item->rowId }}" data-selected="{{ $item->qty }}">
+                                                    Qty: {{ $item->qty }} <span class="caret"></span>
+                                                </a>
+                                            </div>
+
+                                            {{-- <div class="qty-control">
                                                 <button type="button" class="qty-btn qty-minus" data-rowid="{{ $item->rowId }}">−</button>
                                                 <span class="cart-qty" id="qty-{{ $item->rowId }}">{{ $item->qty }}</span>
                                                 <button type="button" class="qty-btn qty-plus" data-rowid="{{ $item->rowId }}">+</button>
-                                            </div>
+                                            </div> --}}
                                             
                                             <div class="amount">
                                                 <p><b>₹{{ round($item->options->discount_price) }}</b></p>

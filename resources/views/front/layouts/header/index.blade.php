@@ -1,5 +1,3 @@
-<header class="header">    
-    <div class="container">
         <div class="row row-hide">
             <nav class="navbar navbar-expand-lg">							
                 <div class="col-md-5 col-6">
@@ -327,8 +325,6 @@
                     <span class="sprites"></span> 
                 </a>
             </div>
-        </form>        
-    </div>
-</header>
+        </form>            
 
 <div class="menu-overlay"></div>

@@ -365,14 +365,16 @@
 
                 @if (in_array($item->id, $cartServiceIds))
                     @php
-                        $cartItem = $cartItems->firstWhere('id', $item->id);
-                    @endphp
+                        $item = $cartItems->firstWhere('id', $item->id);
+                    @endphp                   
 
-                    <div class="qty-control overlap-qty">
-                        <button type="button" class="qty-btn qty-minus" data-rowid="{{ $cartItem->rowId }}">−</button>
-                        <span class="cart-qty" id="qty-{{ $cartItem->rowId }}">{{ $cartItem->qty }}</span>
-                        <button type="button" class="qty-btn qty-plus" data-rowid="{{ $cartItem->rowId }}">+</button>
-                    </div>
+                    
+                        <div class="select">
+                            <a href="javascript:void(0);" class="update-cart-modal" data-type="qty" data-rowid="{{ $item->rowId }}" data-selected="{{ $item->qty }}">
+                                Qty: <b>{{ $item->qty }}</b> <span class="caret"></span>
+                            </a>              
+                        </div>
+                    
                 @else
                     <a href="javascript:void(0);" class="overlap-btn btn btn-outline-primary add-to-cart-btn" onclick="addToCart({{ $item->id }}, this)">Add</a>
                 @endif           
