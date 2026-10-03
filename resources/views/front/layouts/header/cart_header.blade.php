@@ -1,5 +1,4 @@
-<header class="cart-header">
-    <div class="container">
+    
         <div class="row">
             <nav class="navbar navbar-expand-lg">							
                 <div class="col-md-11 col-4">
@@ -40,6 +39,4 @@
                 </div>                
             </nav>
         </div>							
-    </div>    
-</header>
-
+    

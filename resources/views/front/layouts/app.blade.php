@@ -25,7 +25,25 @@
 </head>
 <body data-instant-intensity="mousedown" class="{{ request()->routeIs(['front.cart']) ? 'cart-wrapper' : 'default' }}" >
 
-@include(request()->routeIs(['front.cart','front.checkout','front.checkout.thankyou']) ? 'front.layouts.header.cart_header' : 'front.layouts.header.index')
+<header>
+    <div class="container">
+        <div class="alert-relative">
+            @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+            @endif    
+        </div>
+
+        @include(request()->routeIs(['front.cart','front.checkout','front.checkout.thankyou']) ? 'front.layouts.header.cart_header' : 'front.layouts.header.index')        
+    </div>
+</header>
 
 <main>
     @yield('content')
@@ -39,6 +57,20 @@
     <span class="sprites"></span>
 </a>
 
+<div class="modal fade commonCartUpdateModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-custom modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cartModalTitle">Sizes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-unstyled" id="modalList"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="{{ asset('front-assets/js/jquery-3.6.0.min.js') }}"></script>
 {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> --}}
 <script src="{{ asset('front-assets/js/bootstrap.bundle.5.1.3.min.js') }}"></script>
@@ -48,6 +80,59 @@
 <script src="{{ asset('front-assets/js/ion.rangeSlider.min.js') }}"></script>
 <script src="{{ asset('front-assets/js/documentReady.js') }}"></script>
 <script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $('.alert').fadeOut();
+        }, 3000);
+    });
+
+    //Quantity update modal
+    let currentRowId = '';
+    let currentType = '';       
+
+    $(document).on('click', '.update-cart-modal', function(){            
+        currentRowId = $(this).data('rowid');
+        currentType = $(this).data('type');
+        let selected = $(this).data('selected');
+
+        let title = '';
+        let options = [];            
+
+        if(currentType === 'qty'){
+            title = 'Select Quantity';
+            options = [1,2,3,4,5,6,7,8,9,10];
+
+            let html = '';
+            options.forEach(function(option){
+                let active = (option == selected) ? 'selected' : '';
+                html += `<li><a href="#" class="select-option ${active}" data-value="${option}">${option}</a></li>`;
+            });
+
+            $('#modalList').html(html);
+            new bootstrap.Modal('.commonCartUpdateModal').show();
+        }
+        $('#cartModalTitle').text(title);
+    });
+
+    $(document).on('click', '.select-option', function(e){
+        e.preventDefault();
+        let value = $(this).data('value');
+
+        let data = {
+            rowId: currentRowId,
+            _token: '{{ csrf_token() }}'
+        };
+
+        if(currentType === 'qty'){ data.qty = value; }            
+
+        $.post('{{ route("front.updateCartOption") }}', data, function(res){
+            if(res.status){
+                location.reload();
+            }
+        });
+    });
+
+
     $(document).on('click', '.qty-btn', function () {
         let button = $(this);
         let rowId = button.data('rowid');
@@ -68,6 +153,9 @@
             return;
         }
 
+        // Prevent multiple clicks while updating
+        button.prop('disabled', true);
+
         $.ajax({
             url: "{{ route('cart.updateQty') }}",
             type: "POST",
@@ -79,18 +167,32 @@
 
             success: function (response) {
                 if (response.status == true) {
+                    // Update quantity
                     qtyElement.text(response.qty);
-                    location.reload();
+
+                    // Update cart count
+                    $('.cart-count').text(response.cartCount);
+
+                    // Update subtotal
+                    $('.cart-subtotal').text('₹' + response.subtotal);
+
+                    // Update total
+                    $('.cart-total').text('₹' + response.total);
                 }
             },
 
             error: function (xhr) {
                 console.log('Status:', xhr.status);
                 console.log('Response:', xhr.responseText);
+
                 showAlert(
                     'Unable to update cart quantity.',
                     'error'
                 );
+            },
+
+            complete: function () {
+                button.prop('disabled', false);
             }
         });
     });

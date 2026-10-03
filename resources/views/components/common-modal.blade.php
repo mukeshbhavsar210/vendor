@@ -127,10 +127,7 @@
                 <form method="POST" action="{{ route('address.default') }}">
                     @csrf
 
-                    <div class="modal-body">
-                        <a href="#" class="btn btn-outline-dark mb-4" data-bs-toggle="modal" data-bs-target="#createAddressModal">
-                            + Add another address
-                        </a>                    
+                    <div class="modal-body">                                           
                         @foreach($addresses as $value)
                             <div class="default-card">                            
                                 <label class="delivery-address-card">
@@ -143,34 +140,26 @@
                                         <div class="address-content">
                                             <div class="cmn-wrapper">
                                                 <p><b>{{ $value->address_type }}</b></p>
-
                                                 {{-- <p>{{ $value->default_address ? 'Default' : 'Other' }} Address</p> --}}
                                                 {{-- <h6>{{ $value->name }} - {{ $value->mobile }}</h6> --}}
-                                                <p class="text-muted mb-0">{{ Str::limit($value->address, 50, '...') }}</p>
+                                                <p class="text-muted mb-0">{{ $value->address }}, {{ $value->locality }}, <br />{{ $value->city }}-{{ $value->zip }}, {{ $value->state->name ?? '' }}.</p>
+                                            </div>
 
-                                                <div class="d-none control-btn">
-                                                    <p class="text-muted mb-0">{{ $value->locality }}, {{ $value->city }} - {{ $value->zip }}, 
-                                                        {{ $value->state->name ?? '' }}.
-                                                    </p>                                                
-                                                    
-                                                    <div class="flex-end">
-                                                        <ul class="flex mt-3">                                                                                                                        
-                                                            <li><button type="submit" name="action" value="delete" class="btn btn-outline-danger btn-sm caps-btn">Delete</button></li>
-                                                            <li>
-                                                                <button type="button"
-                                                                    class="btn btn-outline-dark caps-btn btn-sm"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#editAddressModal"                                                
-                                                                    data-id="{{ $value->id }}"
-                                                                    data-name="{{ $value->name }}"
-                                                                    data-mobile="{{ $value->mobile }}"
-                                                                    data-address="{{ $value->address }}"
-                                                                    data-state="{{ $value->state_id }}">
-                                                                    Edit
-                                                                </button>
-                                                            </li>                                                             
-                                                        </ul>
-                                                    </div>
+                                            <div class="action-menu">
+                                                <button type="button" class="action-toggle">⋮</button>
+                                                <div class="action-dropdown">
+                                                    <a href="#"
+                                                        class="edit-action"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editAddressModal"
+                                                        data-id="{{ $value->id }}"
+                                                        data-name="{{ $value->name }}"
+                                                        data-mobile="{{ $value->mobile }}"
+                                                        data-address="{{ $value->address }}"
+                                                        data-state="{{ $value->state_id }}">
+                                                        Edit
+                                                    </a>
+                                                    <a href="#" name="action" value="delete" class="delete-action">Delete</a>                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -178,6 +167,10 @@
                                 </label>
                             </div>
                         @endforeach
+
+                        <a href="#" class="btn-link mt-3" data-bs-toggle="modal" data-bs-target="#createAddressModal">
+                            + Add another address
+                        </a> 
                     </div>
 
                     <div class="modal-footer">
@@ -193,7 +186,10 @@
                         <p>Join us now to be a part of {{ config('app.name') }} family.</p>
 
                         <form action="{{ route('account.authenticate') }}" method="post" class="mt-4" >
-                            @csrf                        
+                            @csrf
+                            
+                            <input type="hidden" name="redirect" value="{{ url()->full() }}">
+
                             <div class="form-group">
                                 <input type="text" class="form-control floating-input @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}">
                                 <label class="floating-label">Email</label>
@@ -208,10 +204,8 @@
                                     <p class="invalid-feedback">{{ $message }}</p>
                                 @enderror
                             </div>                            
-                            <div class="flex-end">
-                                {{-- <a href="#" class="forgot-link mt-3">Forgot Password?</a> --}}                                
-                                <p class="mt-2">Don't have an account? <a href="#" class="open-signup"><b>Sign up</b></a></p>
-                                {{-- <p class="mt-2">Don't have an account? <a href="{{ route('account.register') }}" ><b>Sign up</b></a></p> --}}
+                            <div class="flex-end">                                      
+                                <p class="mt-2">Don't have an account? <a href="#" class="open-signup"><b>Sign up</b></a></p>                                
                                 <button type="submit" class="btn btn-primary">{{ $button }}</button>
                             </div>
                         </form>
@@ -277,22 +271,7 @@
                             </div>                
                         </form> 
                     </div>
-                </div>
-
-            @elseif ($modalName == 'commonCartUpdateModal')
-                <div class="modal fade" id="commonCartUpdateModal" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered modal-custom modal-sm">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="cartModalTitle">Sizes</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <ul class="list-unstyled" id="modalList"></ul>                
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                </div>            
 
             @elseif ($modalName == 'discount-modal')
                 <div class="modal fade" id="discount" tabindex="-1" aria-labelledby="discountLabel" aria-hidden="true">

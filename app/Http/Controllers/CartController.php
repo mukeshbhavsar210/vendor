@@ -224,7 +224,6 @@ class CartController extends Controller {
     }
 
     
-
     public function updateQty(Request $request) {
         $rowId = $request->rowId;
         $qty   = (int) $request->qty;
@@ -237,17 +236,20 @@ class CartController extends Controller {
 
         if (!$item) {
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'Cart item not found.',
             ], 404);
         }
 
         Cart::update($rowId, $qty);
 
+        $item = Cart::get($rowId);
+
         return response()->json([
             'status'    => true,
-            'qty'       => Cart::get($rowId)->qty,
+            'qty'       => $item->qty,
             'cartCount' => Cart::count(),
+            'subtotal'  => round(Cart::subtotal()),
             'total'     => round(Cart::total()),
         ]);
     }
