@@ -81,13 +81,12 @@ Route::controller(ShopController::class)->group(function() {
 Route::controller(CartController::class)->group(function() {
     //Bag
     Route::post('/cart/update-qty', 'updateQty')->name('cart.updateQty');  
-    
+    Route::post('/cart/remove', 'removeFromCart')->name('cart.remove');
     Route::get('/checkout/cart','cart')->name('front.cart');      
     //Route::post('/checkout/cart', 'cart')->name('checkout.cart.post');
     Route::post('/checkout/update-cart','updateCart')->name('front.updateCart');
     Route::post('/checkout/update-booking','updateBooking')->name('cart.updateBooking');
     Route::post('/checkout/add-to-cart','addToCart')->name('front.addToCart');
-
 
     Route::post('/checkout/wishlist-to-cart','wishlistToCart')->name('front.wishlistToCart');
     Route::post('/checkout/delete-item','deleteItem')->name('front.deleteItem.cart');

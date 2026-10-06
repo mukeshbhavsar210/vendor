@@ -85,17 +85,17 @@
                                                         
                                 <div class="services-list"> 
                                     @foreach($subCategoryServices as $value)
-                                        <x-services
-                                            class="service-card"
-                                            show="services"
+                                        <x-services                                            
                                             :item="$value"
                                             :category="$category"
                                             :subcategory="$subCategory"
                                             :ratings="$value->ratings"
                                             :discounts="$subCategory->discounts"
-                                            :process="$subCategory->process"                                            
-                                            :hover="false"
+                                            :process="$subCategory->process"
+                                            class="service-card"
+                                            show="category-services"
                                             :price="true"
+                                            :reviews="true"
                                             :title_limit="50"
                                             :short_limit="15"
                                         />                                        
@@ -120,41 +120,45 @@
                         </ul>                        
                     </div>
                     <div class="cart mt-4">
-                        <div class="cart-body">
+                        <div class="cart-body {{ $cartContent->count() > 4 ? 'scroll' : '' }}">
                             @include('front.layouts.toast')
 
                             @if (Cart::count() > 0)                            
-                                <h4>Cart</h4>
-                                @foreach($cartContent as $item)
-                                    <div class="cart-repeate" id="cart-item-{{ $item->rowId }}">
-                                        <div class="item">
-                                            <p>{{ Str::limit($item->name, 50) }}</p>
-                                            @if ($item->options->discount_percent > 0)                                                                                            
-                                                <p class="tiny-font-orange">{{ $item->options->discount_percent }}% OFF</p>
-                                            @endif
-                                        </div>
-                                        <div class="right">    
-                                            <div class="select">        
-                                                <a href="javascript:void(0);" class="update-cart-modal" data-type="qty" data-rowid="{{ $item->rowId }}" data-selected="{{ $item->qty }}">
-                                                    Qty: {{ $item->qty }} <span class="caret"></span>
-                                                </a>
+                                <div class="cart-counts">
+                                    <h4>Cart <span>{{ Cart::count() }}</span></h4>
+                                </div>
+                                <div class="{{ $cartContent->count() > 4 ? 'cart-scroll' : '' }}">
+                                    @foreach($cartContent as $item)
+                                        <div class="cart-repeate" id="cart-item-{{ $item->rowId }}">
+                                            <div class="item">
+                                                <div class="title">
+                                                    <a href="javascript:void(0);" class="remove-cart-item delete-icon" data-rowid="{{ $item->rowId }}">
+                                                        <span class="sprites"></span>
+                                                    </a>
+                                                    <div class="text">
+                                                        {{ Str::limit($item->name, 50) }}
+                                                        @if ($item->options->discount_percent > 0)                                                                                            
+                                                            <p class="tiny-font-orange">{{ $item->options->discount_percent }}% OFF</p>
+                                                        @endif
+                                                    </div>
+                                                </div>                                                
                                             </div>
-
-                                            {{-- <div class="qty-control">
-                                                <button type="button" class="qty-btn qty-minus" data-rowid="{{ $item->rowId }}">−</button>
-                                                <span class="cart-qty" id="qty-{{ $item->rowId }}">{{ $item->qty }}</span>
-                                                <button type="button" class="qty-btn qty-plus" data-rowid="{{ $item->rowId }}">+</button>
-                                            </div> --}}
-                                            
-                                            <div class="amount">
-                                                <p><b>₹{{ round($item->options->discount_price) }}</b></p>
-                                                @if($item->options->discount_percent)
-                                                    <del class="tiny-font">₹{{ $item->options->original_price }}</del>
-                                                @endif
+                                            <div class="right">    
+                                                <div class="select">        
+                                                    <a href="javascript:void(0);" class="update-cart-modal" data-type="qty" data-rowid="{{ $item->rowId }}" data-selected="{{ $item->qty }}">
+                                                        {{ $item->qty }} <span class="caret"></span>
+                                                    </a>
+                                                </div>
+                                                <div class="amount">
+                                                    <p><b>₹{{ round($item->options->discount_price) }}</b></p>
+                                                    @if($item->options->discount_percent)
+                                                        <del class="tiny-font">₹{{ $item->options->original_price }}</del>
+                                                    @endif
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                @endforeach                                      
+                                    @endforeach
+                                </div>
                                 </div>
                                 <div class="cart-footer">
                                     <a href="{{ route('front.cart') }}" class="view-cart">

@@ -29,13 +29,15 @@
     <div class="container">
         <div class="alert-relative">
             @if(session('success'))
-                <div class="alert alert-success">
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="btn-close" data-dismiss="alert" aria-hidden="true">×</button>
                     {{ session('success') }}
                 </div>
             @endif
 
             @if(session('error'))
-                <div class="alert alert-danger">
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="btn-close" data-dismiss="alert" aria-hidden="true">×</button>
                     {{ session('error') }}
                 </div>
             @endif    
@@ -58,7 +60,7 @@
 </a>
 
 <div class="modal fade commonCartUpdateModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-custom modal-sm">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="cartModalTitle">Sizes</h5>
@@ -85,6 +87,41 @@
             $('.alert').fadeOut();
         }, 3000);
     });
+
+    //remove items from cart
+
+    $(document).on('click', '.remove-cart-item', function () {        
+        let rowId = $(this).data('rowid');
+        $.ajax({
+            url: "{{ route('cart.remove') }}",
+            type: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                rowId: rowId
+            },
+            success: function (response) {
+                if (response.status) {
+                    $('#cart-item-' + rowId).fadeOut(300, function () {
+                        $(this).remove();
+                        location.reload();
+
+                        // Update cart count
+                        $('.cart-count').text(response.cartCount);
+
+                        // Update total if you have one
+                        $('.cart-total').text('₹' + response.cartTotal);
+
+                        // Optional: reload if you need the
+                        // 3-item scrollbar class recalculated
+                        if (response.cartCount <= 3) {
+                            $('.cart-scroll').removeClass('cart-scroll');
+                        }
+                    });
+                }
+            }
+        });
+    });
+
 
     //Quantity update modal
     let currentRowId = '';
@@ -307,6 +344,33 @@
         //$('#login').modal('show');
     });
 
+    $(document).on('click', '.move-to-cart', function () {
+
+    let wishlistId = $(this).data('wishlist-id');
+    let serviceId = $(this).data('service-id');
+
+    $.ajax({
+        url: '{{ route("front.wishlistToCart") }}',
+        type: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+            wishlist_id: wishlistId,
+            service_id: serviceId
+        },
+        success: function(response) {
+
+            if (response.status) {
+                location.reload();
+            } else {
+                showAlert(response.message, 'error');
+            }
+        },
+        error: function(xhr) {
+            console.log(xhr.responseText);
+        }
+    });
+});
+
     function showAlert(message, type = 'success'){
         let toastEl = $('#commonToast');
         toastEl.removeClass('bg-success bg-danger bg-warning');
@@ -326,7 +390,6 @@
     var scrollSpy = new bootstrap.ScrollSpy(document.querySelector('.scrollspy-example'), {
         target: '#faq-nav'
     });
-
     
     setTimeout(function(){
         $('.toast').fadeOut('slow');
@@ -395,39 +458,6 @@
         })
     }    
    
-    $(document).on('click', '.move-to-cart', function(){
-        let wishlistId = $(this).data('wishlist-id');
-        let productId  = $(this).data('product-id');        
-
-        wishlistToCart(wishlistId, productId);
-    });
-
-    function wishlistToCart(wishlistId, productId, ) {
-        $.ajax({
-            url: '{{ route("front.wishlistToCart") }}',
-            type: 'POST',
-            data: {
-                wishlist_id: wishlistId,
-                product_id: productId,                
-                _token: '{{ csrf_token() }}'
-            },
-            success:function(response){
-                if(response.status){
-                    $("#wishlist-item-"+wishlistId).fadeOut(300,function(){
-                        $(this).remove();
-                    });
-                    $(".cart-count").text(response.cartCount);
-                    $(".wishlist-count").text(response.wishlistCount);
-
-                    showAlert(response.message,'success');
-                    location.reload();
-                }else{
-                    showAlert(response.message,'error');
-                }
-            }
-        });
-    }
-
     function toggleChat() {
         $("#chat-box").toggleClass("d-none");
     }

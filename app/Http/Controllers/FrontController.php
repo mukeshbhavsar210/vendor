@@ -20,7 +20,7 @@ class FrontController extends Controller {
         $getCategories = Category::with(['subCategories'])->where('showHome', 'outside')->orderBy('menu_order', 'ASC')->take(20)->get();
         $modalCategories = Category::where('showHome', 'inside')->where('status', 1)->orderBy('menu_order', 'ASC')->get()->groupBy('category_modal');
         $modalCategories2 = Category::where('status', 1)->orderBy('menu_order', 'ASC')->get();
-        $allServices = Category::where('category_modal', '!=', 'services')->orderBy('menu_order', 'ASC')->where('status', 1)->get();
+        $allServices = Category::where('category_modal', '!=', 'services')->orderBy('menu_order', 'ASC')->where('status', 1)->get();        
 
         function getServices($categorySlug) {
             return SubCategory::with(['category','ratings'])
@@ -41,7 +41,6 @@ class FrontController extends Controller {
         $data['modalCategories'] = $modalCategories;
         $data['modalCategories2'] = $modalCategories2;
         $data['allServices'] = $allServices;
-
         $data['most_booked'] = $most_booked;
         $data['new_and_noteworthy'] = $new_and_noteworthy;
         $data['women_spa'] = $women_spa;

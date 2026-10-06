@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Wishlist extends Model {
     use HasFactory;
 
-    public $fillable = ['user_id','product_id'];
+    public $fillable = ['user_id','service_id'];
 
 
-    public function product(){
-        return $this->belongsTo(Product::class);
+    public function service(){
+        return $this->belongsTo(Service::class, 'service_id');
     }
 
     public function category() {
@@ -22,9 +22,4 @@ class Wishlist extends Model {
     public function subCategory() {
         return $this->belongsTo(SubCategory::class);
     }
-
-    public function subSubCategory() {
-        return $this->belongsTo(SubSubCategory::class);
-    }
-
 }
