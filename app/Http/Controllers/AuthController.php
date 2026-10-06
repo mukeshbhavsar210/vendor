@@ -727,13 +727,25 @@ class AuthController extends Controller {
     }
 
     
-    public function wishlist(){
-        $wishlists = Wishlist::where('user_id', Auth::user()->id)->with(['product'])->get();
+    // public function wishlist(){
+    //     $wishlists = Wishlist::with('service.subCategory')->where('user_id', auth()->id())->get();
+    //     $wishlistProductIds = Wishlist::where('user_id', auth()->id())->pluck('service_id')->toArray();        
 
-        $data['wishlists'] = $wishlists;
+    //     $data['wishlists'] = $wishlists;
+    //     $data['wishlistProductIds'] = $wishlistProductIds;
 
-        return view('front.account.wishlist', $data);
-    }
+    //     return view('front.account.wishlist', $data);
+    // }
+
+    public function wishlist()
+{
+    $wishlists = Wishlist::with('service')
+        ->where('user_id', auth()->id())
+        ->get()
+        ->filter(fn ($wishlist) => $wishlist->service);
+
+    return view('front.account.wishlist', compact('wishlists'));
+}
 
 
     public function dealsWishlist(){

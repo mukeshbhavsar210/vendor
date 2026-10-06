@@ -254,87 +254,121 @@ class CartController extends Controller {
         ]);
     }
 
-    public function wishlistToCart(Request $request) { 
-        $service = Service::with(['product_images','discount'])->find($request->product_id);
+    public function removeFromCart(Request $request) {
+        $request->validate([
+            'rowId' => 'required|string',
+        ]);
+
+        Cart::remove($request->rowId);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Item removed from cart.',
+            'cartCount' => Cart::count(),
+            'cartTotal' => round(Cart::total()),
+        ]);
+    }
+
+
+
+    public function wishlistToCart(Request $request) {
+        $service = Service::with(['category','subCategory.discounts.discountPercentage'])->find($request->service_id);
+
+        $alreadyExists = false;
 
         if (!$service) {
             return response()->json([
-                "status" => false,
-                "message" => "Product not found"
+                'status' => false,
+                'message' => 'Service not found.'
             ]);
         }
-                
-        // Unique rowId check (product + variant + size)
-        $alreadyExists = false;
 
-        foreach (Cart::content() as $item) {
-            if (
-                $item->id == $service->id
-            ) {
-                $alreadyExists = true;
-                break;
+        // Check if already in cart
+        foreach (Cart::content() as $cartItem) {
+            if ($cartItem->id == $service->id) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $service->title . ' already added in cart.',
+                    'cartCount' => Cart::count(),
+                ]);
             }
         }
 
-        if (!$alreadyExists) {              
+        // Discount
+        $discount = $service->subCategory?->discounts?->first();
+
+        $discountPercent = (int) (
+            $discount?->discountPercentage?->percentage ?? 0
+        );
+
+        $originalPrice = (float) $service->price;
+
+        $discountPrice = $originalPrice;
+
+        if ($discountPercent > 0) {
+            $discountPrice = $originalPrice -
+                ($originalPrice * $discountPercent / 100);
+        }
+
+        if (!$alreadyExists) {
+            $subCategory = $service->subCategory;
+
             $discountPercent = 0;
+            $discount = $subCategory?->discounts?->first();
 
-            if ($service->discount) {
-                $discountPercent = $service->discount->percentage;
+            if ($discount?->discountPercentage) {
+                $discountPercent = (float) $discount->discountPercentage->percentage;
             }
-            // ✅ Get discount percent safely
-            $discountPercent = (int) optional($service->discount)->percentage;
-            //$discountPercent = optional($service->discounts->first())->percentage ?? 0;
 
-            // ✅ Calculate discount price
-            $discount_price = $service->price;
+            $originalPrice = (float) ($subCategory?->price ?? 0);
+
+            $discountPrice = $originalPrice;
 
             if ($discountPercent > 0) {
-                $discount_price = $service->price - ($service->price * $discountPercent / 100);
+                $discountPrice = $originalPrice -
+                    ($originalPrice * $discountPercent / 100);
             }
 
-            // $discountPercent = optional($service->discounts->first())->percentage ?? 0;
-            // $discount_price = $service->price;
-            // if ($discountPercent > 0) {
-            //     $discount_price = $service->price - ($service->price * $discountPercent / 100);
-            // }
-
             Cart::add([
-                'id'      => $service->id,
-                'name'    => $service->title,
-                'qty'     => 1,                
-                'price'   => round($service->price),                
-                'weight'  => 0,
+                'id'    => $service->id,
+                'name'  => $service->title,
+                'qty'   => 1,
+                'price' => round($discountPrice, 2),
+
                 'options' => [
-                    'original_price'    => $service->price,
-                    'discount_price'    => round($discount_price),
-                    'discount_percent'  => $discountPercent,                                  
-                    'short_description' => $service->short_description,
-                    'cod'               => $service->cod,
-                    'return_days'       => $service->return_days,
-                    'delivery_min_days' => $service->delivery_min_days,
-                    'delivery_max_days' => $service->delivery_max_days,
-                ]
+                    'image' => $subCategory?->image,
+                    'time' => $subCategory?->time,
+                    'original_price' => round($originalPrice, 2),
+                    'discount_price' => round($discountPrice, 2),
+                    'discount_percent' => $discountPercent,
+                    'category_id' => $service->category?->id,
+                    'category_name' => $service->category?->category_name,
+                    'subcategory_id' => $subCategory?->id,
+                    'subcategory_name' => $subCategory?->sub_category_name,                    
+                ],
             ]);
-
-            // ✅ Remove from wishlist
-            Wishlist::where('id', $request->wishlist_id)
-                    ->where('user_id', auth()->id())
-                    ->delete();
-
-            $status  = true;
-            $message = $service->title . ' added to Bag.';
+            $status = true;
+            $message = $service->title . ' added to Cart';
             session()->flash('success', $message);
         } else {
-            $status  = false;
-            $message = $service->title.' already added in cart';
-        }
+            $status = false;
+            $message = $service->title . ' already added in cart';
+        }           
+
+        // Remove from wishlist
+        Wishlist::where('id', $request->wishlist_id)->where('user_id', auth()->id())->where('service_id', $service->id)->delete();
+
+        $message = $service->title . ' added to Bag.';
+
+        session()->flash('success', $message);
+
         return response()->json([
-            "status"    => $status,
-            "message"   => $message,
-            "cartCount" => Cart::count(),
+            'status'    => true,
+            'message'   => $message,
+            'cartCount' => Cart::count(),
         ]);
     }
+   
 
     // public function processCheckout(Request $request) {
     //     // ✅ Ensure user logged in
@@ -1097,38 +1131,42 @@ class CartController extends Controller {
         ]);
     }
 
-    public function moveToWishlist(Request $request){
+    public function moveToWishlist(Request $request) {
         $rowId = $request->rowId;
         $itemInfo = Cart::get($rowId);
 
-        if($itemInfo == null ){
-            $errorMessage = 'Item not found in cart.';
+        if ($itemInfo == null) {
             return response()->json([
-                "status"=> false,
-                "message"=> $errorMessage,
+                'status' => false,
+                'message' => 'Item not found in cart.',
             ]);
         }
 
-        // Prevent duplicate wishlist entry
-        $alreadyExists = Wishlist::where('user_id', auth()->id())
-                            ->where('product_id', $itemInfo->id)
-                            ->exists();
+        $wishlists = Wishlist::with('service')->where('user_id', auth()->id())->get();
 
-        if(!$alreadyExists){
+        $wishlistProductIds = Wishlist::where('user_id', auth()->id())->pluck('service_id')->toArray();
+
+        $alreadyExists = Wishlist::where('user_id', auth()->id())
+            ->where('service_id', $itemInfo->id)
+            ->exists();
+
+        if (!$alreadyExists) {
             Wishlist::create([
                 'user_id'    => auth()->id(),
-                'product_id' => $itemInfo->id,
+                'service_id' => $itemInfo->id,
             ]);
         }
 
-        // Remove from cart
         Cart::remove($rowId);
 
+        // Flash message to session
+        session()->flash('success', 'Item moved to wishlist successfully.');
+
         return response()->json([
-            "status"=> true,
-            "message"=> "Item moved to wishlist successfully.",
+            'status' => true,
+            'message' => 'Item moved to wishlist successfully.',
         ]);
-    }   
+    }
 
     public function getOrderSummary(Request $request){
         $subTotal = Cart::subtotal(2,'.','');

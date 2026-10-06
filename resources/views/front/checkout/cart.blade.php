@@ -187,7 +187,7 @@
                             </div>
 
                             <div class="priceDetailsBox">
-                                <button type="submit" name="action" value="remove" class="btn p-0 text-danger bulk-action">Remove All</button>                            
+                                <button type="submit" name="action" value="remove" class="btn btn-outline-danger btn-sm bulk-action">Remove All</button>                            
                                 {{-- @auth                                
                                     <button type="submit" name="action" value="wishlist" class="btn bulk-action">Move to Wishlist</button>                               
                                 @else
@@ -198,9 +198,9 @@
                             </div>                            
                         </div>
                         
-                        <div class="{{ $cartContent->count() > 1 ? 'scroll-items' : '' }}">
+                        <div class="border {{ $cartContent->count() > 3 ? 'scroll-items' : '' }}">
                             @foreach($cartContent as $item)
-                                <div class="product-repeate active-card" id="cart-item-{{ $item->rowId }}"> 
+                                <div class="product-repeate active-card {{ $cartContent->count() > 1 ? 'border-btm' : '' }}" id="cart-item-{{ $item->rowId }}"> 
                                     <div class="checkbox">
                                         <label class="custom-checkbox">                                    
                                             <input type="checkbox" name="cart_ids[]" value="{{ $item->rowId }}" class="item-checkbox" checked
@@ -251,12 +251,11 @@
                                     </div>
 
                                     <div class="modal fade" id="removeItemModal_{{ $item->id }}" tabindex="-1" aria-labelledby="removeItemModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered modal-custom item-remove-modal">
+                                        <div class="modal-dialog modal-dialog-centered modal-sm item-remove-modal">
                                             <div class="modal-content">  
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>                                            
-
                                                 <div class="modal-header">
-                                                    <h5>Move from cart</h5>  
+                                                    <h5>Move from cart</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
 
                                                 <div class="modal-body">
@@ -270,24 +269,26 @@
                                                         </div>
                                                         <div class="text">
                                                             <h5>{{ $item->name }}</h5>
-                                                            <p>Are you sure you want to move this item from cart?</p>
+                                                            <p>Are you sure you want to move this item from Cart?</p>                                                            
                                                         </div>                                                    
                                                     </div>
                                                 </div>
-                                                <div class="btn-group-details">                                                
-                                                    <a href="#" class="btn btn-link text-danger w-50" onclick="deleteItem('{{ $item->rowId}}' );" data-bs-dismiss="modal">
-                                                        Remove
-                                                    </a>
+                                                
+                                                <div class="modal-footer">                                                    
                                                     @auth
-                                                        <a href="#" class="btn btn-link text-secondary w-50" onclick="moveToWishlist('{{ $item->rowId }}')" data-bs-dismiss="modal">
-                                                            Move to Wishlist
+                                                        <a href="#" class="btn btn-primary btn-sm" onclick="moveToWishlist('{{ $item->rowId }}')" data-bs-dismiss="modal">
+                                                            Move&nbsp;to&nbsp;Wishlist
                                                         </a>
                                                     @else
-                                                        <a href="#" class="btn btn-link text-secondary" data-bs-toggle="modal" data-bs-target="#login" >
-                                                            Login to Move Wishlist
+                                                        <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#login" >
+                                                            Move&nbsp;to&nbsp;Wishlist
                                                         </a>
                                                     @endauth
-                                                </div>                                        
+
+                                                    <a href="#" class="btn btn-outline-danger btn-sm" onclick="deleteItem('{{ $item->rowId}}' );" data-bs-dismiss="modal">
+                                                        Yes, Remove it
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -676,12 +677,7 @@
                     }else{
                         showAlert(response.message,'error');
                     }
-                    location.reload();
-                    // if(response.status){
-                    //     window.location.href='{{ route("front.cart") }}';
-                    // } else {
-                    //     alert(response.message);
-                    // }
+                    location.reload();                    
                 }
             })            
         } 

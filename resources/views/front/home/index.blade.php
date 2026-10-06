@@ -13,120 +13,25 @@
                     @if ($getCategories->isNotEmpty())
                         <div class="category-card">
                             @foreach ($getCategories as $category)
-                                @if ($category->open_to == 'link')
-                                    <a href="{{ route('front.category', [$category->category_slug]) }}" class="repeate">
-                                        <div class="thumb">
-                                            <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}">                                        
-                                        </div>
-                                        <p>{{ $category->category_name }}</p>
-                                    </a>
-                                @elseif($category->open_to == 'modal')
-                                    <div class="repeate" data-bs-toggle="modal" data-bs-target="#modal_{{ $category->category_slug }}">
-                                        <div class="thumb">                                        
-                                            <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}">
-                                        </div>
-                                        <p>{{ $category->category_name }}</p>
-                                    </div>                            
-                                @elseif($category->open_to == 'all')
-                                    <div class="repeate" data-bs-toggle="modal" data-bs-target="#modal_{{ $category->category_slug }}">
-                                        <div class="thumb">                                        
-                                            <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}">
-                                        </div>
-                                        <p>{{ $category->category_name }}</p>
-                                    </div>
-                                @endif                                
-                                
-                                <div class="modal fade" id="modal_{{ $category->category_slug }}" tabindex="-1" aria-labelledby="categoryLabel_{{ $category->category_modal }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered modal-custom">
-                                        <div class="modal-content">
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                @php
+                                    $openTo = $category->open_to;
+                                    $modalType = $category->category_modal;
+                                    $categories = $modalCategories->get($modalType, collect());
+                                @endphp 
 
-                                            @if($category->open_to !== 'all')
-                                                <div class="modal-header">
-                                                    <h2 id="categoryModalLabel{{ $category->category_modal }}">{{ $category->category_name }}</h2>
-                                                </div>
-                                            @endif                                            
-
-                                            <div class="modal-body">
-                                                @php
-                                                    $modalType = $category->category_modal;
-                                                    $categories = $modalCategories->get($modalType, collect());                                                    
-                                                @endphp 
-                                                                                        
-                                                @if ($categories->isNotEmpty())
-                                                    @if ($modalType === 'ac-appliance-repair' || $modalType === 'electrician-plumber-carpenter')
-                                                        @foreach ($categories->groupBy('appliance_types') as $applianceType => $items)
-                                                            <h5 class="mb-2">{{ $applianceType }}</h5>
-                                                            <div class="modal-card">
-                                                                @foreach ($items as $category)
-                                                                    <div class="repeate">
-                                                                        <div class="thumb">
-                                                                            <a href="{{ route('front.category', $category->category_slug) }}">
-                                                                                <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}" />
-                                                                            </a>
-                                                                        </div>
-                                                                        <p>{{ $category->category_name }}</p>
-                                                                    </div>
-                                                                @endforeach
-                                                            </div>
-                                                        @endforeach                                                    
-                                                    @else
-                                                        <div class="modal-card">
-                                                            @foreach ($categories as $category)
-                                                                <div class="repeate">
-                                                                    @if ($category->image)
-                                                                        <div class="thumb">
-                                                                            <a href="{{ route('front.category', $category->category_slug) }}">
-                                                                                <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}" />
-                                                                            </a>
-                                                                        </div>
-                                                                    @endif
-                                                                    <p>{{ $category->category_name }}</p>
-                                                                </div>
-                                                            @endforeach
-                                                        </div>
-                                                    @endif
-                                                @elseif($allServices)                                                
-                                                    @foreach ($allServices->groupBy(['category_modal', 'appliance_types']) as $categoryModal => $applianceGroups)
-                                                        @foreach ($applianceGroups as $applianceType => $items)
-                                                            @php
-                                                                $section = $items->firstWhere('showHome', 'outside');
-                                                                $insideItems = $items->where('showHome', 'inside');
-                                                            @endphp
-
-                                                            @if ($section)
-                                                                <h4 class="mb-3">{{ $section->category_name }}</h4>
-                                                            @endif
-
-                                                            @if ($insideItems->isNotEmpty())
-                                                                @if ($applianceType)
-                                                                    <h6 class="mb-2">{{ $applianceType }}</h6>
-                                                                @endif
-
-                                                                <div class="modal-card">
-                                                                    @foreach ($insideItems as $category)
-                                                                        <div class="repeate">
-                                                                            @if ($category->image)
-                                                                                <div class="thumb">
-                                                                                    <a href="{{ route('front.category', $category->category_slug) }}">
-                                                                                        <img src="{{ asset('uploads/category/' . $category->image) }}"
-                                                                                            alt="{{ $category->category_name }}">
-                                                                                    </a>
-                                                                                </div>
-                                                                            @endif
-                                                                            <p>{{ $category->category_name }}</p>
-                                                                        </div>
-                                                                    @endforeach
-                                                                </div>
-                                                            @endif                                                            
-                                                        @endforeach
-                                                        <hr>
-                                                    @endforeach                                                  
-                                                @endif                                                
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>                               
+                                <x-services
+                                    :item="$category"
+                                    :data="$category"
+                                    :category="$category"
+                                    :allServices="$allServices"
+                                    :categories="$modalCategories->get($modalType, collect())"
+                                    :modalType="$modalType"
+                                    :openTo="$openTo"
+                                    show="thumb-services"
+                                    class=""
+                                    :reviews="false"
+                                    :price="false"
+                                />                                                                                            
                             @endforeach
                         </div>
                     @endif                                      
@@ -219,11 +124,9 @@
                                 :category="$subCategory->category"
                                 :subcategory="$subCategory"
                                 :ratings="$subCategory->services->flatMap->ratings"
-                                show="services_new"
-                                gallery="homeServices"
+                                show="all-services"                                
                                 class="home-gallery"
                                 :reviews="true"
-                                :hover="false"
                                 :price="true"
                             />
                         @endforeach
