@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 30, 2026 at 08:59 AM
+-- Generation Time: Oct 08, 2026 at 10:02 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -143,8 +143,8 @@ CREATE TABLE `customer_addresses` (
 --
 
 INSERT INTO `customer_addresses` (`id`, `user_id`, `address_type`, `default_address`, `name`, `mobile`, `address`, `locality`, `city`, `state_id`, `zip`, `created_at`, `updated_at`) VALUES
-(22, 1, 'Home', 1, 'Mukesh', '9978835005', 'B-1003, Shlok Heights, Mansarovar road,', 'Chandkheda', 'Ahmedabad', 7, '382424', '2026-09-11 05:54:05', '2026-09-11 06:10:30'),
-(23, 1, 'Office', 0, 'Priyanka', '09538135005', 'Surayansh  Vedura', 'Chandkheda', 'Ahmedabad', 7, '382424', '2026-09-11 05:58:35', '2026-09-11 06:10:30');
+(22, 1, 'Home', 1, 'Mukesh', '9978835005', 'B-1003, Shlok Heights, Mansarovar road,', 'Chandkheda', 'Ahmedabad', 7, '382424', '2026-09-11 05:54:05', '2026-10-01 08:01:28'),
+(24, 1, 'Office', 0, 'Priyanka', '09538135005', 'Surayansh  Vedura', 'Chandkheda', 'Ahmedabad', 7, '382424', '2026-09-30 05:51:37', '2026-10-01 08:01:28');
 
 -- --------------------------------------------------------
 
@@ -191,7 +191,10 @@ CREATE TABLE `discounts` (
 
 INSERT INTO `discounts` (`id`, `sub_category_id`, `discount_percentages_id`, `start_date`, `end_date`, `status`, `created_at`, `updated_at`) VALUES
 (1, 19, 2, '2026-09-01', '2026-09-30', 1, NULL, NULL),
-(28, 20, 3, '2026-09-01', '2026-09-30', 1, NULL, NULL);
+(28, 20, 3, '2026-09-01', '2026-09-30', 1, NULL, NULL),
+(29, 15, 1, '2026-09-01', '2026-09-30', 1, NULL, NULL),
+(30, 16, 1, '2026-09-01', '2026-09-30', 1, NULL, NULL),
+(31, 38, 1, '2026-09-01', '2026-09-30', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -480,7 +483,7 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `user_id`, `customer_address_id`, `subtotal`, `grandtotal`, `razorpay_order_id`, `transaction_id`, `razorpay_signature`, `payment_status`, `payment_method`, `status`, `created_at`, `updated_at`) VALUES
-(329, 7, NULL, 5176.00, 4227.00, 'order_SbiFimoPDvWIZr', 'pay_SbiFmTOTKicNb3', '098d259e87affa2f431855bd8a9c119016a7130907401c6b1052b70882dca1ad', 'paid', 'razorpay', 'Delivered', '2026-04-10 02:17:48', '2026-04-10 02:34:04'),
+(329, 7, 22, 5176.00, 4227.00, 'order_SbiFimoPDvWIZr', 'pay_SbiFmTOTKicNb3', '098d259e87affa2f431855bd8a9c119016a7130907401c6b1052b70882dca1ad', 'paid', 'razorpay', 'Delivered', '2026-04-10 02:17:48', '2026-04-10 02:34:04'),
 (330, 7, NULL, 5176.00, 4227.00, 'order_SbiFimoPDvWIZr', 'pay_SbiFmTOTKicNb3', '098d259e87affa2f431855bd8a9c119016a7130907401c6b1052b70882dca1ad', 'paid', 'razorpay', 'Cancelled', '2026-04-10 02:17:48', '2026-04-10 02:34:04');
 
 -- --------------------------------------------------------
@@ -787,24 +790,12 @@ CREATE TABLE `services` (
   `vendor_id` bigint(20) UNSIGNED DEFAULT NULL,
   `category_id` bigint(20) UNSIGNED DEFAULT NULL,
   `sub_category_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `discount_percentage_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `title` varchar(100) NOT NULL,
-  `slug` varchar(100) NOT NULL,
   `short_description` varchar(100) DEFAULT NULL,
   `description` text DEFAULT NULL,
-  `qty` int(11) DEFAULT NULL,
-  `city` varchar(50) DEFAULT NULL,
-  `state` varchar(50) DEFAULT NULL,
-  `pincode` varchar(10) DEFAULT NULL,
   `status` enum('pending','approved','rejected','blocked') NOT NULL DEFAULT 'pending',
   `is_featured` tinyint(1) NOT NULL DEFAULT 0,
   `admin_note` text DEFAULT NULL,
   `approved_at` timestamp NULL DEFAULT NULL,
-  `views` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
-  `search_count` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
-  `meta_title` varchar(255) DEFAULT NULL,
-  `meta_description` varchar(255) DEFAULT NULL,
-  `sort_order` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -813,36 +804,29 @@ CREATE TABLE `services` (
 -- Dumping data for table `services`
 --
 
-INSERT INTO `services` (`id`, `vendor_id`, `category_id`, `sub_category_id`, `discount_percentage_id`, `title`, `slug`, `short_description`, `description`, `qty`, `city`, `state`, `pincode`, `status`, `is_featured`, `admin_note`, `approved_at`, `views`, `search_count`, `meta_title`, `meta_description`, `sort_order`, `created_at`, `updated_at`) VALUES
-(1, 2, 192, 17, 2, 'Foam-jet service (2 ACs)', 'foam-jet_service_(2_ACs)', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(2, 2, 192, 14, NULL, 'Foam-jet service (3 ACs)', 'foam-jet_service_(3_ACs)', NULL, NULL, NULL, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(3, 2, 192, 17, NULL, 'Foam-jet AC service', 'foam-jet_ac_service', NULL, NULL, NULL, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(10, 2, 192, 15, NULL, 'test', '', NULL, NULL, NULL, NULL, NULL, NULL, 'pending', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(14, 2, 192, 15, 2, 'Test', 'test', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(15, 2, 192, 16, 2, 'Test2', 'test2', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(16, 2, 183, 24, 2, 'Test3', 'test3', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(17, 2, 183, 26, 2, 'Test4', 'test4', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(18, 2, 184, 19, 2, 'Hair cut for men', 'hair-cut-for-men', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(19, 2, 184, 20, 2, 'Hair cut for boys', 'hair-cut-for-boys', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(20, 2, 184, 21, 2, 'Head, neck & shoulder massage', 'head-neck-&-shoulder-massage', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(21, 2, 184, 22, 2, 'brightening-lemon-deep-cleanse-pedicure', 'brightening-lemon-deep-cleanse-pedicure', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(22, 2, 183, 23, 2, 'brightening-lemon-deep-cleanse-pedicure2', 'brightening-lemon-deep-cleanse-pedicure2', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(23, 2, 183, 25, 2, 'brightening-lemon-deep-cleanse-pedicure3', 'brightening-lemon-deep-cleanse-pedicure3', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(24, 2, 183, 27, 2, '4', '4', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(25, 2, 183, 28, 2, '44', '44', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(26, 2, 187, 29, 2, 'Foam-jet AC service', 'foam-jet-ac-service', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(27, 2, 187, 29, 2, 'Foam-jet AC service 2 ', 'foam-jet-ac-service 2', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(28, 2, 187, 30, 2, 'AC Repair', 'ac-repair', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(29, 2, 187, 31, 2, 'Water Purifier Service & Installation', 'water-purifier-service-&-installation', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(30, 2, 187, 32, 2, 'AC uninstallation', 'ac-uninstallation', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(31, 2, 187, 33, 2, 'TV check-up', 'tv-check-up', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(32, 2, 187, 34, 2, 'Geyser Check-up', 'geyser-check-up', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(33, 2, 187, 35, 2, 'Microwave check-up', 'microwave-check-up', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(34, 2, 187, 36, 2, 'Deep chimney service', 'deep-chimney-service', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(35, 2, 187, 37, 2, 'AC installation', 'ac-installation', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(36, 2, 199, 38, 2, 'Drill & hang (wall decor)', 'drill-&-hang-wall-decor', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(37, 2, 199, 39, 2, 'Tap repair', 'tap-repair', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL),
-(38, 2, 199, 40, 2, 'Switchboard/switchbox repair', 'switchboard-switchbox-repair', 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 2, NULL, NULL, NULL, 'approved', 0, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, NULL);
+INSERT INTO `services` (`id`, `vendor_id`, `category_id`, `sub_category_id`, `short_description`, `description`, `status`, `is_featured`, `admin_note`, `approved_at`, `created_at`, `updated_at`) VALUES
+(1, 4, 192, 17, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(2, 4, 192, 14, NULL, NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(3, 4, 192, 17, NULL, NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(18, 2, 184, 19, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(19, 2, 184, 20, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(20, 2, 184, 21, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(21, 2, 184, 22, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(22, 4, 183, 23, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(23, 2, 183, 25, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(26, 4, 187, 29, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(27, 2, 187, 29, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(28, 2, 187, 30, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(29, 2, 187, 31, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(30, 2, 187, 32, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(31, 2, 187, 33, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(32, 2, 187, 34, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(33, 2, 187, 35, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(34, 2, 187, 36, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(35, 2, 187, 37, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(36, 2, 199, 38, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(37, 4, 199, 39, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(38, 2, 199, 40, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1004,8 +988,8 @@ CREATE TABLE `sub_categories` (
 
 INSERT INTO `sub_categories` (`id`, `category_id`, `process_id`, `sub_category_name`, `sub_category_slug`, `image`, `price`, `price_type`, `time`, `instant`, `banner`, `banner_title`, `banner_label`, `banner_details`, `banner_image`, `sort_order`, `status`, `created_at`, `updated_at`) VALUES
 (14, 192, NULL, 'Service', 'service', '14_service.jpeg', NULL, 'fixed', NULL, 'no', 'yes', 'Foam-jet AC Service', 'Free gas check', 'Deep clean AC vents for efficient cooling', '17_banner.jpeg', 2, 1, NULL, NULL),
-(15, 192, NULL, 'Repair & gas refill', 'repair_&_gas_refill', '15_repair_&_gas_refill.jpeg', NULL, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 3, 1, NULL, NULL),
-(16, 192, NULL, 'Installation/Uninstallation', 'installation_uninstallation', '16_installation_uninstallation.jpeg', NULL, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 4, 1, NULL, NULL),
+(15, 192, 1, 'Repair & gas refill', 'repair_&_gas_refill', '15_repair_&_gas_refill.jpeg', 999.00, 'fixed', '2 hrs', 'no', 'no', NULL, NULL, NULL, NULL, 3, 1, NULL, NULL),
+(16, 192, NULL, 'Installation/Uninstallation', 'installation_uninstallation', '16_installation_uninstallation.jpeg', 299.00, 'fixed', '2 hrs', 'no', 'no', NULL, NULL, NULL, NULL, 4, 1, NULL, NULL),
 (17, 192, NULL, 'Super Saver Packages', 'super_saver_packages', '17_super_saver_packages.jpeg', NULL, 'fixed', NULL, 'no', 'yes', 'Foam-jet AC Service', 'Free gas check', 'Deep clean AC vents for efficient cooling', '17_banner.jpeg', 1, 1, NULL, NULL),
 (18, 183, NULL, 'Women Salon Spa', 'women-salon-spa', '18_womens-salon-spa.jpeg', NULL, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
 (19, 184, 2, 'Haircut for men', 'haircut-for-men', '19_haircut-for-men.jpeg', 279.00, 'fixed', '30 mins', 'yes', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
@@ -1114,7 +1098,101 @@ INSERT INTO `temp_images` (`id`, `name`, `created_at`, `updated_at`) VALUES
 (460, '1775563128.JPG', '2026-04-07 06:28:48', '2026-04-07 06:28:48'),
 (461, '1775563321.JPG', '2026-04-07 06:32:01', '2026-04-07 06:32:01'),
 (462, '1775563323.JPG', '2026-04-07 06:32:03', '2026-04-07 06:32:03'),
-(463, '1775563325.JPG', '2026-04-07 06:32:05', '2026-04-07 06:32:05');
+(463, '1775563325.JPG', '2026-04-07 06:32:05', '2026-04-07 06:32:05'),
+(464, '1791360886.JPG', '2026-10-07 02:44:46', '2026-10-07 02:44:46'),
+(465, '1791360920.JPG', '2026-10-07 02:45:20', '2026-10-07 02:45:20'),
+(466, '1791360960.JPG', '2026-10-07 02:46:00', '2026-10-07 02:46:00'),
+(467, '1791361065.JPG', '2026-10-07 02:47:45', '2026-10-07 02:47:45'),
+(468, '1791372221.jpg', '2026-10-07 05:53:41', '2026-10-07 05:53:41'),
+(469, '1791372303.jpg', '2026-10-07 05:55:03', '2026-10-07 05:55:03'),
+(470, '1791372334.jpg', '2026-10-07 05:55:34', '2026-10-07 05:55:34'),
+(471, '1791372407.jpg', '2026-10-07 05:56:47', '2026-10-07 05:56:47'),
+(472, '1791372462.jpg', '2026-10-07 05:57:42', '2026-10-07 05:57:42'),
+(473, '1791372533.jpg', '2026-10-07 05:58:53', '2026-10-07 05:58:53'),
+(474, '1791372580.jpg', '2026-10-07 05:59:40', '2026-10-07 05:59:40'),
+(475, '1791372627.jpg', '2026-10-07 06:00:27', '2026-10-07 06:00:27'),
+(476, '1791372674.jpg', '2026-10-07 06:01:14', '2026-10-07 06:01:14'),
+(477, '1791372717.jpg', '2026-10-07 06:01:57', '2026-10-07 06:01:57'),
+(478, '1791372722.jpg', '2026-10-07 06:02:02', '2026-10-07 06:02:02'),
+(479, '1791372778.jpg', '2026-10-07 06:02:58', '2026-10-07 06:02:58'),
+(480, '1791372872.jpg', '2026-10-07 06:04:32', '2026-10-07 06:04:32'),
+(481, '1791373043.jpg', '2026-10-07 06:07:23', '2026-10-07 06:07:23'),
+(482, '1791373049.jpg', '2026-10-07 06:07:29', '2026-10-07 06:07:29'),
+(483, '1791373094.jpg', '2026-10-07 06:08:14', '2026-10-07 06:08:14'),
+(484, '1791373098.jpg', '2026-10-07 06:08:18', '2026-10-07 06:08:18'),
+(485, '1791373188.jpg', '2026-10-07 06:09:48', '2026-10-07 06:09:48'),
+(486, '1791373192.jpg', '2026-10-07 06:09:52', '2026-10-07 06:09:52'),
+(487, '1791373197.jpg', '2026-10-07 06:09:57', '2026-10-07 06:09:57'),
+(488, '1791373218.jpg', '2026-10-07 06:10:18', '2026-10-07 06:10:18'),
+(489, '1791373227.jpg', '2026-10-07 06:10:27', '2026-10-07 06:10:27'),
+(490, '1791373253.jpg', '2026-10-07 06:10:53', '2026-10-07 06:10:53'),
+(491, '1791373257.jpg', '2026-10-07 06:10:57', '2026-10-07 06:10:57'),
+(492, '1791373261.jpg', '2026-10-07 06:11:01', '2026-10-07 06:11:01'),
+(493, '1791373312.jpg', '2026-10-07 06:11:52', '2026-10-07 06:11:52'),
+(494, '1791373316.jpg', '2026-10-07 06:11:56', '2026-10-07 06:11:56'),
+(495, '1791373319.jpg', '2026-10-07 06:11:59', '2026-10-07 06:11:59'),
+(496, '1791373375.jpg', '2026-10-07 06:12:55', '2026-10-07 06:12:55'),
+(497, '1791373378.jpg', '2026-10-07 06:12:58', '2026-10-07 06:12:58'),
+(498, '1791373381.jpg', '2026-10-07 06:13:01', '2026-10-07 06:13:01'),
+(499, '1791373462.jpg', '2026-10-07 06:14:22', '2026-10-07 06:14:22'),
+(500, '1791373467.jpg', '2026-10-07 06:14:27', '2026-10-07 06:14:27'),
+(501, '1791373471.jpg', '2026-10-07 06:14:31', '2026-10-07 06:14:31'),
+(502, '1791373476.jpg', '2026-10-07 06:14:36', '2026-10-07 06:14:36'),
+(503, '1791373480.jpg', '2026-10-07 06:14:40', '2026-10-07 06:14:40'),
+(504, '1791373528.jpg', '2026-10-07 06:15:28', '2026-10-07 06:15:28'),
+(505, '1791373531.jpg', '2026-10-07 06:15:31', '2026-10-07 06:15:31'),
+(506, '1791373567.jpg', '2026-10-07 06:16:07', '2026-10-07 06:16:07'),
+(507, '1791373570.jpg', '2026-10-07 06:16:10', '2026-10-07 06:16:10'),
+(508, '1791373588.jpg', '2026-10-07 06:16:28', '2026-10-07 06:16:28'),
+(509, '1791373590.jpg', '2026-10-07 06:16:30', '2026-10-07 06:16:30'),
+(510, '1791373593.jpg', '2026-10-07 06:16:33', '2026-10-07 06:16:33'),
+(511, '1791373610.jpg', '2026-10-07 06:16:50', '2026-10-07 06:16:50'),
+(512, '1791373752.jpg', '2026-10-07 06:19:12', '2026-10-07 06:19:12'),
+(513, '1791373756.jpg', '2026-10-07 06:19:16', '2026-10-07 06:19:16'),
+(514, '1791373825.jpg', '2026-10-07 06:20:25', '2026-10-07 06:20:25'),
+(515, '1791373855.jpg', '2026-10-07 06:20:55', '2026-10-07 06:20:55'),
+(516, '1791373901.jpg', '2026-10-07 06:21:41', '2026-10-07 06:21:41'),
+(517, '1791373953.jpg', '2026-10-07 06:22:33', '2026-10-07 06:22:33'),
+(518, '1791374015.jpg', '2026-10-07 06:23:35', '2026-10-07 06:23:35'),
+(519, '1791374121.jpg', '2026-10-07 06:25:21', '2026-10-07 06:25:21'),
+(520, '1791374134.jpg', '2026-10-07 06:25:34', '2026-10-07 06:25:34'),
+(521, '1791374137.jpg', '2026-10-07 06:25:37', '2026-10-07 06:25:37'),
+(522, '1791374143.jpg', '2026-10-07 06:25:43', '2026-10-07 06:25:43'),
+(523, '1791374147.jpg', '2026-10-07 06:25:47', '2026-10-07 06:25:47'),
+(524, '1791374200.jpg', '2026-10-07 06:26:40', '2026-10-07 06:26:40'),
+(525, '1791374201.jpg', '2026-10-07 06:26:41', '2026-10-07 06:26:41'),
+(526, '1791374203.jpg', '2026-10-07 06:26:43', '2026-10-07 06:26:43'),
+(527, '1791374203.jpg', '2026-10-07 06:26:43', '2026-10-07 06:26:43'),
+(528, '1791374204.jpg', '2026-10-07 06:26:44', '2026-10-07 06:26:44'),
+(529, '1791374229.jpg', '2026-10-07 06:27:09', '2026-10-07 06:27:09'),
+(530, '1791374233.jpg', '2026-10-07 06:27:13', '2026-10-07 06:27:13'),
+(531, '1791374303.jpg', '2026-10-07 06:28:23', '2026-10-07 06:28:23'),
+(532, '1791374304.jpg', '2026-10-07 06:28:24', '2026-10-07 06:28:24'),
+(533, '1791374305.jpg', '2026-10-07 06:28:25', '2026-10-07 06:28:25'),
+(534, '1791374306.jpg', '2026-10-07 06:28:26', '2026-10-07 06:28:26'),
+(535, '1791374307.jpg', '2026-10-07 06:28:27', '2026-10-07 06:28:27'),
+(536, '1791374376.jpg', '2026-10-07 06:29:36', '2026-10-07 06:29:36'),
+(537, '1791374377.jpg', '2026-10-07 06:29:37', '2026-10-07 06:29:37'),
+(538, '1791374378.jpg', '2026-10-07 06:29:38', '2026-10-07 06:29:38'),
+(539, '1791374379.jpg', '2026-10-07 06:29:39', '2026-10-07 06:29:39'),
+(540, '1791374380.jpg', '2026-10-07 06:29:40', '2026-10-07 06:29:40'),
+(541, '1791374383.jpg', '2026-10-07 06:29:43', '2026-10-07 06:29:43'),
+(542, '1791374412.jpg', '2026-10-07 06:30:12', '2026-10-07 06:30:12'),
+(543, '1791374413.jpg', '2026-10-07 06:30:13', '2026-10-07 06:30:13'),
+(544, '1791374414.jpg', '2026-10-07 06:30:14', '2026-10-07 06:30:14'),
+(545, '1791374415.jpg', '2026-10-07 06:30:15', '2026-10-07 06:30:15'),
+(546, '1791374416.jpg', '2026-10-07 06:30:16', '2026-10-07 06:30:16'),
+(547, '1791374482.jpg', '2026-10-07 06:31:22', '2026-10-07 06:31:22'),
+(548, '1791374483.jpg', '2026-10-07 06:31:23', '2026-10-07 06:31:23'),
+(549, '1791374484.jpg', '2026-10-07 06:31:24', '2026-10-07 06:31:24'),
+(550, '1791374485.jpg', '2026-10-07 06:31:25', '2026-10-07 06:31:25'),
+(551, '1791374486.jpg', '2026-10-07 06:31:26', '2026-10-07 06:31:26'),
+(552, '1791374534.jpg', '2026-10-07 06:32:14', '2026-10-07 06:32:14'),
+(553, '1791374535.jpg', '2026-10-07 06:32:15', '2026-10-07 06:32:15'),
+(554, '1791374537.jpg', '2026-10-07 06:32:17', '2026-10-07 06:32:17'),
+(555, '1791374537.jpg', '2026-10-07 06:32:17', '2026-10-07 06:32:17'),
+(556, '1791374538.jpg', '2026-10-07 06:32:18', '2026-10-07 06:32:18'),
+(557, '1791374539.jpg', '2026-10-07 06:32:19', '2026-10-07 06:32:19');
 
 -- --------------------------------------------------------
 
@@ -1130,7 +1208,7 @@ CREATE TABLE `users` (
   `mobile` varchar(11) DEFAULT NULL,
   `birthdate` date DEFAULT NULL,
   `gender` enum('male','female') DEFAULT 'male',
-  `role` int(11) NOT NULL DEFAULT 1,
+  `role` enum('user','vendor','admin') NOT NULL DEFAULT 'user',
   `avatar_color` varchar(10) DEFAULT NULL,
   `image` varchar(20) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT 1,
@@ -1147,9 +1225,10 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `phone`, `mobile`, `birthdate`, `gender`, `role`, `avatar_color`, `image`, `status`, `email_verified_at`, `password`, `is_active`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'Admin', 'mukeshbhavsar210@gmail.com', '', NULL, NULL, NULL, 2, NULL, 'mukesh.webp', 1, NULL, '$2y$12$Iy5Wh1TVAkCYAvaefrR71OEKD4QDjhnnWBxknqjwnioSSM6sAJMnO', 1, NULL, '2023-11-17 23:52:06', '2023-12-01 05:59:34'),
-(3, 'Priyanka', 'p.bhavsar2610@gmail', '9538135005', '9978812324', '2026-02-18', 'female', 1, NULL, 'priyanka.png', 1, NULL, '$2y$12$Iy5Wh1TVAkCYAvaefrR71OEKD4QDjhnnWBxknqjwnioSSM6sAJMnO', 1, NULL, '2023-11-25 00:32:42', '2026-03-04 00:10:24'),
-(7, 'Dhruv Bhavsar', 'dhruvbhavsar210@gmail.com', '9538135005', '9978812324', '2026-02-18', 'male', 1, '#FF5733', '', 1, NULL, '$2y$12$Iy5Wh1TVAkCYAvaefrR71OEKD4QDjhnnWBxknqjwnioSSM6sAJMnO', 1, NULL, '2023-11-25 00:32:42', '2026-03-31 07:01:33');
+(1, 'Admin', 'mukeshbhavsar210@gmail.com', '', NULL, NULL, NULL, 'admin', NULL, '', 1, NULL, '$2y$12$Iy5Wh1TVAkCYAvaefrR71OEKD4QDjhnnWBxknqjwnioSSM6sAJMnO', 1, NULL, '2023-11-17 23:52:06', '2023-12-01 05:59:34'),
+(3, 'Priyanka', 'p.bhavsar2610@gmail', '9538135005', '9978812324', '2026-02-18', 'female', 'vendor', NULL, 'priyanka.png', 1, NULL, '$2y$12$Iy5Wh1TVAkCYAvaefrR71OEKD4QDjhnnWBxknqjwnioSSM6sAJMnO', 1, NULL, '2023-11-25 00:32:42', '2026-03-04 00:10:24'),
+(7, 'Dhruv Bhavsar', 'dhruvbhavsar210@gmail.com', '9538135005', '9978812324', '2026-02-18', 'male', 'vendor', '#FF5733', '', 1, NULL, '$2y$12$Iy5Wh1TVAkCYAvaefrR71OEKD4QDjhnnWBxknqjwnioSSM6sAJMnO', 1, NULL, '2023-11-25 00:32:42', '2026-03-31 07:01:33'),
+(16, 'Sona', 'sonabhavsar@gmail.com', '9978835005', '9978835005', NULL, 'male', '', '#2ECC71', NULL, 1, NULL, '$2y$10$70tWC5qyH2GA03SyHV/.oeaLcZKtYAbyI9X1P.8KaTU.iVMisMKma', 1, NULL, '2026-10-01 06:12:40', '2026-10-01 06:12:40');
 
 -- --------------------------------------------------------
 
@@ -1186,7 +1265,9 @@ CREATE TABLE `vendors` (
 --
 
 INSERT INTO `vendors` (`id`, `user_id`, `business_name`, `slug`, `phone`, `email`, `description`, `logo`, `cover_image`, `address`, `city`, `state`, `pincode`, `latitude`, `longitude`, `status`, `is_verified`, `admin_note`, `approved_at`, `created_at`, `updated_at`) VALUES
-(2, 7, 'Hitachi AC Services Pvt. Ltd.', 'hitachi_ac_services_pvt_ltd', '9999999999', 'test@gmail.com', 't', 'vendors/logos/hitachi-ac-services-pvt-ltd.JPG', 'vendors/covers/hitachi-ac-services-pvt-ltd_cover.JPG', 'te', 'Sabarmati', 'te', 'te', 1.0000000, 1.0000000, 'approved', 1, NULL, NULL, '2026-08-24 05:27:38', '2026-08-24 05:56:54');
+(2, 7, 'Hitachi AC Services Pvt. Ltd.', 'hitachi_ac_services_pvt_ltd', '9999999999', 'test@gmail.com', 't', 'vendors/logos/hitachi-ac-services-pvt-ltd.JPG', 'vendors/covers/hitachi-ac-services-pvt-ltd_cover.JPG', 'te', 'Sabarmati', 'te', 'te', 1.0000000, 1.0000000, 'approved', 1, NULL, NULL, '2026-08-24 05:27:38', '2026-08-24 05:56:54'),
+(4, 3, 'Samsung Pvt. Ltd.', 'samsung', '9999999999', 'test@gmail.com', 't', 'vendors/logos/hitachi-ac-services-pvt-ltd.JPG', 'vendors/covers/hitachi-ac-services-pvt-ltd_cover.JPG', 'te', 'Sabarmati', 'te', 'te', 1.0000000, 1.0000000, 'approved', 1, NULL, NULL, '2026-08-24 05:27:38', '2026-08-24 05:56:54'),
+(5, 1, 'Sony Pvt. Ltd.', 'sony', '9999999999', 'test@gmail.com', 't', 'vendors/logos/hitachi-ac-services-pvt-ltd.JPG', 'vendors/covers/hitachi-ac-services-pvt-ltd_cover.JPG', 'te', 'Sabarmati', 'te', 'te', 1.0000000, 1.0000000, 'approved', 1, NULL, NULL, '2026-08-24 05:27:38', '2026-08-24 05:56:54');
 
 -- --------------------------------------------------------
 
@@ -1218,11 +1299,19 @@ INSERT INTO `warantees` (`id`, `name`, `description`, `image`, `created_at`, `up
 
 CREATE TABLE `wishlists` (
   `id` bigint(20) UNSIGNED NOT NULL,
+  `service_id` bigint(20) UNSIGNED DEFAULT NULL,
   `user_id` bigint(20) UNSIGNED NOT NULL,
-  `product_id` bigint(20) UNSIGNED NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `wishlists`
+--
+
+INSERT INTO `wishlists` (`id`, `service_id`, `user_id`, `created_at`, `updated_at`) VALUES
+(141, 20, 1, '2026-10-06 07:18:47', '2026-10-06 07:18:47'),
+(142, 19, 1, '2026-10-06 07:21:53', '2026-10-06 07:21:53');
 
 --
 -- Indexes for dumped tables
@@ -1433,15 +1522,13 @@ ALTER TABLE `reviews`
 --
 ALTER TABLE `services`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `services_slug_unique` (`slug`),
   ADD KEY `services_vendor_id_status_index` (`status`),
   ADD KEY `services_category_id_status_index` (`status`),
-  ADD KEY `services_city_status_index` (`city`,`status`),
+  ADD KEY `services_city_status_index` (`status`),
   ADD KEY `services_status_is_featured_index` (`status`,`is_featured`),
   ADD KEY `services_vendor_id_foreign` (`vendor_id`),
   ADD KEY `services_category_id_foreign` (`category_id`),
-  ADD KEY `services_sub_category_id_foreign` (`sub_category_id`),
-  ADD KEY `services_discount_percentage_id_foreign` (`discount_percentage_id`);
+  ADD KEY `services_sub_category_id_foreign` (`sub_category_id`);
 
 --
 -- Indexes for table `service_images`
@@ -1521,7 +1608,7 @@ ALTER TABLE `warantees`
 ALTER TABLE `wishlists`
   ADD PRIMARY KEY (`id`),
   ADD KEY `wishlists_user_id_foreign` (`user_id`),
-  ADD KEY `wishlists_product_id_foreign` (`product_id`);
+  ADD KEY `wishlists_service_id_foreign` (`service_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -1549,7 +1636,7 @@ ALTER TABLE `coupon_product`
 -- AUTO_INCREMENT for table `customer_addresses`
 --
 ALTER TABLE `customer_addresses`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `deal_stock_notifications`
@@ -1561,7 +1648,7 @@ ALTER TABLE `deal_stock_notifications`
 -- AUTO_INCREMENT for table `discounts`
 --
 ALTER TABLE `discounts`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `discount_coupons`
@@ -1729,19 +1816,19 @@ ALTER TABLE `sub_categories`
 -- AUTO_INCREMENT for table `temp_images`
 --
 ALTER TABLE `temp_images`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=464;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=558;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `vendors`
 --
 ALTER TABLE `vendors`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `warantees`
@@ -1753,7 +1840,7 @@ ALTER TABLE `warantees`
 -- AUTO_INCREMENT for table `wishlists`
 --
 ALTER TABLE `wishlists`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=130;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=143;
 
 --
 -- Constraints for dumped tables
@@ -1863,7 +1950,6 @@ ALTER TABLE `reviews`
 --
 ALTER TABLE `services`
   ADD CONSTRAINT `services_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `services_discount_percentage_id_foreign` FOREIGN KEY (`discount_percentage_id`) REFERENCES `discount_percentages` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `services_sub_category_id_foreign` FOREIGN KEY (`sub_category_id`) REFERENCES `sub_categories` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `services_vendor_id_foreign` FOREIGN KEY (`vendor_id`) REFERENCES `vendors` (`id`) ON DELETE CASCADE;
 
@@ -1903,7 +1989,7 @@ ALTER TABLE `vendors`
 -- Constraints for table `wishlists`
 --
 ALTER TABLE `wishlists`
-  ADD CONSTRAINT `wishlists_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `wishlists_service_id_foreign` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `wishlists_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 

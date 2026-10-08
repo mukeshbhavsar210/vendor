@@ -677,10 +677,10 @@
                     }else{
                         showAlert(response.message,'error');
                     }
-                    location.reload();                    
+                    location.reload();
                 }
             })            
-        } 
+        }
 
         $(document).on('change', 'input[name="coupon_id"]', function() {    
             $('.coupon-box').removeClass('active');

@@ -29,150 +29,193 @@
                     <input type="hidden" name="_method" id="{{ $method_id }}" value="POST" class="form-control">
                     
                     <div class="row">
-                        @foreach($formConfig['fields'] as $field)                        
-                            <div class="{{ $field['col'] ?? 'col-md-12' }}">
-                                <div class="{{ $field['type'] !== 'accordion' ? 'form-group' : 'accordion' }}">
-                                    @if($field['type'] !== 'accordion')
+                        @foreach($formConfig['fields'] as $field)                                                    
+                            @if($field['type'] !== 'accordion')
+                                <div class="{{ $field['col'] ?? 'col-md-12' }}">
+                                    <div class="form-group">                                    
                                         <label for="{{ $field['name'] }}">{{ $field['label'] }}</label>
-                                    @endif
 
-                                    @if($field['type'] == 'text')                                                                            
-                                        <input type="{{ $field['type'] }}" name="{{ $field['name'] }}" id="{{ $field['id'] ?? '' }}" value="{{ old($field['name']) }}" class="form-control {{ $field['animate_label'] ?? '' }} {{ $field['class'] ?? '' }}" 
-                                            @if(isset($field['data']))
-                                                @foreach($field['data'] as $key => $value)
-                                                    data-{{ $key }}="{{ $value }}"
-                                                @endforeach
-                                            @endif 
-                                        >
+                                        @if($field['type'] == 'text')
+                                            <input type="{{ $field['type'] }}" name="{{ $field['name'] }}" id="{{ $field['id'] ?? '' }}" value="{{ old($field['name']) }}" class="form-control {{ $field['animate_label'] ?? '' }} {{ $field['class'] ?? '' }}" 
+                                                @if(isset($field['data']))
+                                                    @foreach($field['data'] as $key => $value)
+                                                        data-{{ $key }}="{{ $value }}"
+                                                    @endforeach
+                                                @endif 
+                                            >
 
-                                    @elseif($field['type'] == 'email')                                                                                    
-                                        <input type="{{ $field['type'] }}" id="{{ $field['name'] }}" name="{{ $field['name'] }}" class="form-control" placeholder="{{ $field['placeholder'] ?? '' }}">                                            
+                                        @elseif($field['type'] == 'email')                                                                                    
+                                            <input type="{{ $field['type'] }}" id="{{ $field['name'] }}" name="{{ $field['name'] }}" class="form-control" placeholder="{{ $field['placeholder'] ?? '' }}">                                            
 
-                                    @elseif($field['type'] == 'textarea')
-                                        <textarea name="{{ $field['name'] }}" class="form-control {{ $field['summer_class'] }}" rows="4"></textarea>                                                                                
-                                        
-                                    @elseif($field['type'] == 'color')                                        
-                                        <input type="{{ $field['type'] }}" id="{{ $field['name'] }}" name="{{ $field['name'] }}" class="form-control" placeholder="{{ $field['placeholder'] ?? '' }}">                                            
+                                        @elseif($field['type'] == 'textarea')
+                                            <textarea name="{{ $field['name'] }}" class="form-control {{ $field['summer_class'] }}" rows="4"></textarea>                                                                                
+                                            
+                                        @elseif($field['type'] == 'color')                                        
+                                            <input type="{{ $field['type'] }}" id="{{ $field['name'] }}" name="{{ $field['name'] }}" class="form-control" placeholder="{{ $field['placeholder'] ?? '' }}">                                            
 
-                                    @elseif($field['type'] == 'date')                                        
-                                        <input type="{{ $field['type'] }}" id="{{ $field['name'] }}" name="{{ $field['name'] }}" class="form-control" placeholder="{{ $field['placeholder'] ?? '' }}">                                            
+                                        @elseif($field['type'] == 'date')                                        
+                                            <input type="{{ $field['type'] }}" id="{{ $field['name'] }}" name="{{ $field['name'] }}" class="form-control" placeholder="{{ $field['placeholder'] ?? '' }}">                                            
 
-                                    @elseif($field['type'] == 'file')                                        
-                                        <input type="{{ $field['type'] }}" id="{{ $field['name'] }}" name="{{ $field['name'] }}" class="form-control" placeholder="{{ $field['placeholder'] ?? '' }}">                                        
+                                        @elseif($field['type'] == 'file')                                        
+                                            <input type="{{ $field['type'] }}" 
+                                                id="{{ $field['name'] }}" 
+                                                name="{{ $field['name'] }}" 
+                                                class="form-control" 
+                                                accept="{{ $field['accept'] ?? '*' }}"
+                                                @if($field['multiple'] ?? false) multiple @endif
+                                                placeholder="{{ $field['placeholder'] ?? '' }}">
 
-                                    @elseif($field['type'] == 'select')
-                                        @php
-                                            $selectedValue = old(
-                                                $field['name'],
-                                                $model->{$field['name']} ?? ($field['default'] ?? null)
-                                            );
-                                        @endphp
-
-                                        <select name="{{ $field['name'] }}" class="form-select" id="{{ $field['name'] }}">
-                                            @foreach($field['options'] as $value => $label)
-                                                <option value="{{ $value }}"
-                                                    {{ (string) $selectedValue === (string) $value ? 'selected' : '' }}>
-                                                    {{ $label }}
-                                                </option>
-                                            @endforeach
-                                        </select>                                                 
-                                        
-                                    @elseif($field['type'] == 'category')                                                                                
-                                        <select name="sub_category_id" id="sub_category" class="form-select" >
-                                            <option value="">Sub Category</option>
-                                        </select>                                        
-                                    
-                                    @elseif($field['type'] == 'dropzone')
-                                        <input type="hidden" id="{{ $field['name'] }}_id" name="{{ $field['name'] }}_id" value=" ">                                        
-                                        <div id="{{ $field['name'] }}" data-input="{{ $field['name'] }}_id" class="dropzone custom-dropzone dz-clickable">
-                                            <div class="dz-message needsclick">
-                                                <br>Drop files here or click to upload.<br><br>
-                                            </div>
-                                        </div>
-
-                                    @elseif($field['type'] == 'accordion')
-                                        @foreach($field['items'] as $key => $item)
+                                        @elseif($field['type'] == 'select')
                                             @php
-                                                $accordionId = $field['name'] . '_' . $key;
+                                                $selectedValue = old(
+                                                    $field['name'],
+                                                    $model->{$field['name']} ?? ($field['default'] ?? null)
+                                                );
                                             @endphp
 
-                                            <div class="accordion-item">
-                                                <h2 class="accordion-header" id="heading{{ $accordionId }}">
-                                                    <button class="accordion-button {{ $key != 0 ? 'collapsed' : '' }}"
-                                                        type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target="#collapse{{ $accordionId }}"
-                                                        aria-expanded="{{ $key == 0 ? 'true' : 'false' }}"
-                                                        aria-controls="collapse{{ $accordionId }}">
+                                            <select name="{{ $field['name'] }}" class="form-select" id="{{ $field['name'] }}">
+                                                @foreach($field['options'] as $value => $label)
+                                                    <option value="{{ $value }}"
+                                                        {{ (string) $selectedValue === (string) $value ? 'selected' : '' }}>
+                                                        {{ $label }}
+                                                    </option>
+                                                @endforeach
+                                            </select>                                                 
+                                            
+                                        @elseif($field['type'] == 'category')                                                                                
+                                            <select name="sub_category_id" id="sub_category" class="form-select" >
+                                                <option value="">Sub Category</option>
+                                            </select>                                        
+                                        
+                                        @elseif($field['type'] == 'dropzone')
+                                            <input type="hidden" id="{{ $field['name'] }}_id" name="{{ $field['name'] }}_id" value=" ">
+                                            <div id="{{ $field['name'] }}" data-input="{{ $field['name'] }}_id" class="dropzone custom-dropzone dz-clickable">
+                                                <div class="dz-message needsclick">
+                                                    <br>Drop files here or click to upload.<br><br>
+                                                </div>
+                                            </div>                                        
+                                        @endif
+                                    </div>
+                            @else
+                                @php
+                                    $accordionName = $field['name'] ?? 'accordion';
+                                    $accordionWrapperId = $accordionName . '_accordion';
+                                @endphp
+                                
+                                <div class="accordion" id="{{ $accordionWrapperId }}">
+                                    @foreach($field['items'] ?? [] as $key => $accordionItem)
+                                        @php
+                                            $accordionId = $accordionName . '_' . $key;
+                                            $collapseId = 'collapse_' . $accordionId;
+                                            $headingId = 'heading_' . $accordionId;
+                                        @endphp
 
-                                                        <b>{{ $item['title'] }}</b>
-                                                    </button>
-                                                </h2>
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="{{ $headingId }}">
+                                                <button class="accordion-button {{ $key != 0 ? 'collapsed' : '' }}"
+                                                    type="button" data-bs-toggle="collapse"
+                                                    data-bs-target="#{{ $collapseId }}"
+                                                    aria-expanded="{{ $key == 0 ? 'true' : 'false' }}"
+                                                    aria-controls="{{ $collapseId }}" >
+                                                    <b>{{ $accordionItem['title'] }}</b>
+                                                </button>
+                                            </h2>
 
-                                                <div id="collapse{{ $accordionId }}"
-                                                    class="accordion-collapse collapse {{ $key == 0 ? 'show' : '' }}"
-                                                    aria-labelledby="heading{{ $accordionId }}"
-                                                    data-bs-parent="#{{ $field['name'] }}Accordion">
+                                            <div id="{{ $collapseId }}" class="accordion-collapse collapse {{ $key == 0 ? 'show' : '' }}"
+                                                aria-labelledby="{{ $headingId }}" data-bs-parent="#{{ $accordionWrapperId }}" >
+                                                <div class="accordion-body">
+                                                    <div class="row">
+                                                        @foreach($accordionItem['fields'] ?? [] as $innerField)
+                                                            <div class="{{ $innerField['col'] ?? 'col-md-6' }}">
+                                                                <div class="form-group">
+                                                                    <label class="form-label">{{ $innerField['label'] }}</label>
 
-                                                    <div class="accordion-body">
-                                                        <div class="row">
-                                                            @foreach($item['fields'] as $field)                                                                            
-                                                                <div class="{{ $field['col'] ?? 'col-md-6' }}">
-                                                                    <div class="form-group">
-                                                                        <label class="form-label">{{ $field['label'] }}</label>
-                                                                    
-                                                                        @if($field['type'] == 'text') 
-                                                                            <input type="{{ $field['type'] }}" name="{{ $field['name'] }}" id="{{ $field['id'] ?? '' }}" value="{{ old($field['name']) }}" class="form-control {{ $field['animate_label'] ?? '' }} {{ $field['class'] ?? '' }}" 
-                                                                                @if(isset($field['data']))
-                                                                                    @foreach($field['data'] as $key => $value)
-                                                                                        data-{{ $key }}="{{ $value }}"
-                                                                                    @endforeach
-                                                                                @endif 
-                                                                            >
-                                                                        
-                                                                        @elseif($field['type'] == 'textarea')
-                                                                            <textarea name="{{ $field['name'] }}" class="form-control" rows="3" >
-                                                                                {{ old(
-                                                                                    $field['name'],
-                                                                                    $model->{$field['name']} ?? ''
-                                                                                ) }}
-                                                                            </textarea>
-
-                                                                        @elseif($field['type'] == 'file')
-                                                                            <input type="file" name="{{ $field['name'] }}" class="form-control" id="{{ $field['name'] }}"
-                                                                                accept="{{ $field['accept'] ?? '*/*' }}" >
-
-                                                                        @elseif($field['type'] == 'select')
-                                                                            @php
-                                                                                $selectedValue = old(
-                                                                                    $field['name'],
-                                                                                    $model->{$field['name']} ?? ($field['default'] ?? null)
-                                                                                );
-                                                                            @endphp                                                                                        
-
-                                                                            <select name="{{ $field['name'] }}" class="form-select" id="{{ $field['name'] }}">
-                                                                                @foreach($field['options'] as $value => $label)
-                                                                                    <option value="{{ $value }}"
-                                                                                        {{ (string) $selectedValue === (string) $value ? 'selected' : '' }}>
-                                                                                        {{ $label }}
-                                                                                    </option>
+                                                                    @if($innerField['type'] == 'text') 
+                                                                        <input type="{{ $innerField['type'] }}" name="{{ $innerField['name'] }}" id="{{ $innerField['id'] ?? '' }}" value="{{ old($innerField['name']) }}" class="form-control {{ $innerField['animate_label'] ?? '' }} {{ $innerField['class'] ?? '' }}" 
+                                                                            @if(isset($innerField['data']))
+                                                                                @foreach($innerField['data'] as $key => $value)
+                                                                                    data-{{ $key }}="{{ $value }}"
                                                                                 @endforeach
-                                                                            </select>                                                                                    
+                                                                            @endif
+                                                                        >
+                                                                    @elseif($innerField['type'] == 'textarea')
+                                                                        <textarea name="{{ $innerField['name'] }}" class="form-control" rows="3" >
+                                                                            {{ old(
+                                                                                $innerField['name'],
+                                                                                $model->{$innerField['name']} ?? ''
+                                                                            ) }}
+                                                                        </textarea>
+                                                                    @elseif($innerField['type'] == 'file')
+                                                                        <input type="file" name="{{ $innerField['name'] }}" class="form-control" id="{{ $innerField['name'] }}"
+                                                                            accept="{{ $innerField['accept'] ?? '*/*' }}" >
+
+                                                                    @elseif($innerField['type'] == 'select')
+                                                                        @php
+                                                                            $selectedValue = old(
+                                                                                $innerField['name'],
+                                                                                $model->{$innerField['name']} ?? ($innerField['default'] ?? null)
+                                                                            );
+                                                                        @endphp                                                                                        
+
+                                                                        <select name="{{ $innerField['name'] }}" class="form-select" id="{{ $innerField['name'] }}">
+                                                                            @foreach($innerField['options'] as $value => $label)
+                                                                                <option value="{{ $value }}"
+                                                                                    {{ (string) $selectedValue === (string) $value ? 'selected' : '' }}>
+                                                                                    {{ $label }}
+                                                                                </option>
+                                                                            @endforeach
+                                                                        </select>  
+                                                                        
+                                                                    @elseif($innerField['type'] == 'dropzone')
+                                                                        <input type="hidden" id="{{ $innerField['name'] }}_id" name="{{ $innerField['name'] }}_id" value=" ">
+
+                                                                        <div id="image" id="{{ $innerField['name'] }}" data-input="{{ $innerField['name'] }}_id"
+                                                                            data-max-files="{{ $innerField['maxFiles'] ?? 1 }}"
+                                                                            data-accepted-files="{{ $innerField['acceptedFiles'] ?? 'image/*' }}" 
+                                                                            class="dropzone dz-clickable">
+                                                                            <div class="dz-message needsclick">Drop files here or click to upload.</div>
+                                                                        </div> 
+                                                                        
+                                                                        {{-- <div
+                                                                            id="{{ $innerField['name'] }}"
+                                                                            data-input="{{ $innerField['name'] }}_id"
+                                                                            data-max-files="{{ $innerField['maxFiles'] ?? 1 }}"
+                                                                            data-accepted-files="{{ $innerField['acceptedFiles'] ?? 'image/*' }}"
+                                                                            class="dropzone dz-clickable"
+                                                                        >
+                                                                            <div class="dz-message needsclick">Drop files here or click to upload.</div>
+                                                                        </div> --}}
+                                                                                                                                                    
+                                                                        @if(isset($service) && $service->images->isNotEmpty())                        
+                                                                            <div id="product-gallery" class="row">                                    
+                                                                                @foreach ($service->images as $index => $image)
+                                                                                    <div class="col-3 uploaded-images" id="image-row-{{ $image->id }}">                                        
+                                                                                        <input type="hidden" name="image_array[{{ $index }}][image_id]" value="{{ $image->id }}">
+                                                                                        <img src="{{ asset('uploads/service/'.$image->image) }}" class="rounded" />
+
+                                                                                        <a href="javascript:void(0)" class="deleteProductImg delete-icon-edit" data-id="{{ $image->id }}">
+                                                                                            <span class="sprites"></span>
+                                                                                        </a>
+                                                                                    </div>
+                                                                                @endforeach                                                            
+                                                                            </div>                               
                                                                         @endif
-                                                                    </div>
+
+                                                                        <div id="product-gallery"></div>
+                                                                    @endif
                                                                 </div>
-                                                            @endforeach
-                                                        </div>
+                                                            </div>                                                                
+                                                        @endforeach
                                                     </div>
                                                 </div>
                                             </div>
-                                        @endforeach
-                                    @endif
+                                        </div>
+                                    @endforeach
                                 </div>
-                            </div>
-                        @endforeach                        
+                            @endif                                                                                                                                                            
+                        </div>
+                        @endforeach
                     </div>
-                </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
                         {{ $formConfig['button'] }}
@@ -443,7 +486,6 @@
 
     document.getElementById('discountModal').addEventListener('hidden.bs.modal', function () {
         document.getElementById('discountForm').reset();
-    });
-
+    });    
 </script>
 @endsection

@@ -13,6 +13,7 @@ use App\Models\ServiceImage;
 use App\Models\StockNotification;
 use App\Models\SubCategory;
 use App\Models\SubSubCategory;
+use App\Models\Vendor;
 use App\Models\TempImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -21,17 +22,204 @@ use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 use Carbon\Carbon;
 
-class ProductController extends Controller {
+class ServiceController extends Controller {
+    
     public function index(Request $request){
-        $services = Service::latest('id')->with(['service_images']);
+        $categories = Category::withCount('subCategories')->orderBy('menu_order', 'ASC')->where('status', 1)->paginate(20);
+        $discounts = DiscountPercentage::get();
+        $subCategories = SubCategory::where('status', 1)->get();        
+
+        $user = auth('admin')->user();
+        $vendorId = null;
+
+        if ($user?->role === 'vendor') {
+            $vendorId = $user->vendor?->id;
+        }
+
+        $services = Service::with(['service_images'])
+            ->when($vendorId, function ($query) use ($vendorId) {
+                $query->where('vendor_id', $vendorId);
+            })->latest('id')->get();
+
+        $vendorServices = Service::with(['service_images'])
+            ->when($vendorId, function ($query) use ($vendorId) {
+                $query->where('vendor_id', $vendorId);
+            })->latest('id')->get();
 
         if ($request->get('keyword') != ""){
             $services = $services->where('name', 'like', '%'.$request->keyword.'%');
         }
-        $services = $services->paginate();
-        $data['services'] = $services;
+        
+        $vendor = Vendor::where('user_id', auth()->id())->firstOrFail();
+        $serviceTotal = Service::when($vendorId, function ($query) use ($vendorId) {
+                $query->where('vendor_id', $vendorId);
+            })->count();
+                          
+        $data = [                                 
+            'refresh'       => route('categories.index'),
+            'total'         => $serviceTotal,            
+            'modals' => [
+                'category' => [
+                    'title'      => 'Create Service',
+                    'modal_id'   => 'serviceModal',
+                    'form_id'    => 'serviceForm',
+                    'method_id'  => 'service_method',                    
+                    'formConfig' => [
+                        'action' => '',
+                        'method' => 'POST',
+                        'button' => 'Submit',
+                        'fields' => [                            
+                            [
+                                'type' => 'accordion',
+                                'name' => '',
+                                'label' => '',
+                                'class' => '',
+                                'items' => [
+                                    [
+                                        'title' => 'Service Details',
+                                        'fields' => [                                           
+                                            [
+                                                'type' => 'select',
+                                                'name' => 'vendor_id',
+                                                'label' => 'Vendor',
+                                                'options' => [
+                                                    $vendor->id => $vendor->business_name
+                                                ],
+                                                'value' => $vendor->id,
+                                                'col' => 'col-12 d-none',
+                                            ],
+                                            [
+                                                'type' => 'select',
+                                                'name' => 'category_id',
+                                                'label' => 'Select Category',
+                                                'options' => $categories->pluck('category_name','id')->toArray(),
+                                                'col' => 'col-12',
+                                                'id' => 'category_id',
+                                            ],
+                                            [
+                                                'type' => 'select',
+                                                'name' => 'sub_category_id',
+                                                'label' => 'Select Sub Category',
+                                                'options' => [],
+                                                'col' => 'col-12',
+                                                'id' => 'sub_category_id',
+                                            ],
+                                            [
+                                                'type' => 'text',
+                                                'name' => 'title',
+                                                'id' => 'title', 
+                                                'label' => 'Service Title',
+                                                'placeholder' => 'Enter Service Title',
+                                                'slug_create' => 'slug-source',
+                                                'class' => 'slug-source',
+                                                'data'  => [
+                                                    'target' => '#slug'
+                                                ],
+                                                'col' => 'col-12',
+                                            ], 
+                                            [
+                                                'type' => 'text',
+                                                'name' => 'slug',
+                                                'label' => 'slug',
+                                                'placeholder' => '',
+                                                'id'    => 'slug',
+                                                'col' => 'col-12 d-none',
+                                            ],                                                                                        
+                                            [
+                                                'type' => 'select',
+                                                'name' => 'status',
+                                                'label' => 'Status',
+                                                'options' => [
+                                                    'approved' => 'Approved',
+                                                    'pending' => 'Pending'
+                                                ],
+                                                'value' => 'pending',
+                                                'default' => 'pending',
+                                                'col' => 'col-6'
+                                            ],
+                                            [
+                                                'type' => 'select',
+                                                'name' => 'discount_percentage_id',
+                                                'label' => 'Discount',
+                                                'options' => $discounts->pluck('percentage','id')->toArray(),
+                                                'col' => 'col-3',
+                                            ],
+                                            [
+                                                'type' => 'select',
+                                                'name' => 'is_featured',
+                                                'label' => 'Featured',
+                                                'options' => [
+                                                    'yes' => 'Yes',
+                                                    'no' => 'No'
+                                                ],
+                                                'value' => 'yes',
+                                                'default' => 'yes',
+                                                'col' => 'col-3'
+                                            ],    
+                                            [
+                                                'type' => 'dropzone',
+                                                'name' => 'images',
+                                                'label' => 'Service Images',
+                                                'col' => 'col-12',
+                                                'maxFiles' => 5,
+                                                'acceptedFiles' => 'image/*',
+                                                'multiple' => true,
+                                            ],                                       
+                                        ],
+                                    ],
+                                    [
+                                        'title' => 'Other Details',
+                                        'fields' => [
+                                            
+                                            [
+                                                'type' => 'textarea',
+                                                'name' => 'short_description',
+                                                'label' => 'Short Description',
+                                                'placeholder' => 'Short Description',
+                                                'col' => 'col-12'
+                                            ],
+                                            [
+                                                'type' => 'textarea',
+                                                'name' => 'description',
+                                                'label' => 'Description',
+                                                'placeholder' => 'Description',
+                                                'col' => 'col-12'
+                                            ],   
+                                            
+                                        ],
+                                    ],
+                                ],
+                            ],                                                                                    
+                        ]                        
+                    ]
+                ],
+            ],     
+                                   
+            'services' => $services,
+            'vendorServices' => $vendorServices
+        ]; 
 
-        return view ('admin.services.list',$data);
+        //$data['$serviceTotal'] = $serviceTotal;
+
+        return view ('admin.services', $data);
+    }
+
+
+    public function subCategories($categoryId) {
+        $subCategories = SubCategory::where('category_id', $categoryId)
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'data' => $subCategories->map(function ($item) {
+                return [
+                    'id'   => $item->id,
+                    'name' => $item->sub_category_name,
+                ];
+            }),
+        ]);
     }
 
     public function create(){

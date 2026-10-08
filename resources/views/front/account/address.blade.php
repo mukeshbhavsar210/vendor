@@ -8,9 +8,7 @@
     @include('front.account.common.sidebar')  
 
     <div class="col-md-9 col-12 px-md-0">
-        <div class="orders-details">
-            @include('front.account.common.message')            
-
+        <div class="orders-details">            
             <div class="flex-end">
                 <h5 class="h5">Saved Address</h5>
                 @if($address->count() > 0)
@@ -115,7 +113,6 @@
         </div>                                    
     </div>
 </div>    
-
 @endsection
 
 @section('customJs')

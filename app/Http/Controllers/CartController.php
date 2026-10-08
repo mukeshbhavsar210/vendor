@@ -60,18 +60,16 @@ class CartController extends Controller {
 
             Cart::add([
                 'id'    => $service->id,
-                'name'  => $service->title,
+                'name'  => $service->subCategory->sub_category_name,
                 'qty'   => 1,
                 'price' => round($discountPrice, 2),
 
                 'options' => [
                     'image' => $subCategory?->image,
                     'time' => $subCategory?->time,
-
                     'original_price' => round($originalPrice, 2),
                     'discount_price' => round($discountPrice, 2),
                     'discount_percent' => $discountPercent,
-
                     'category_id' => $service->category?->id,
                     'category_name' => $service->category?->category_name,
 
@@ -270,45 +268,31 @@ class CartController extends Controller {
     }
 
 
-
     public function wishlistToCart(Request $request) {
-        $service = Service::with(['category','subCategory.discounts.discountPercentage'])->find($request->service_id);
+        $request->validate([
+            'wishlist_id' => 'required|integer',
+            'service_id'  => 'required|integer',
+        ]);                
 
-        $alreadyExists = false;
+        $wishlist = Wishlist::where('service_id', $request->service_id)->where('user_id', auth()->id())->first();
+
+        if (!$wishlist) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Wishlist item not found.'
+            ]);
+        }
+
+        $service = Service::find($request->service_id);
 
         if (!$service) {
             return response()->json([
                 'status' => false,
                 'message' => 'Service not found.'
             ]);
-        }
+        }                                  
 
-        // Check if already in cart
-        foreach (Cart::content() as $cartItem) {
-            if ($cartItem->id == $service->id) {
-                return response()->json([
-                    'status' => false,
-                    'message' => $service->title . ' already added in cart.',
-                    'cartCount' => Cart::count(),
-                ]);
-            }
-        }
-
-        // Discount
-        $discount = $service->subCategory?->discounts?->first();
-
-        $discountPercent = (int) (
-            $discount?->discountPercentage?->percentage ?? 0
-        );
-
-        $originalPrice = (float) $service->price;
-
-        $discountPrice = $originalPrice;
-
-        if ($discountPercent > 0) {
-            $discountPrice = $originalPrice -
-                ($originalPrice * $discountPercent / 100);
-        }
+        $alreadyExists = false;
 
         if (!$alreadyExists) {
             $subCategory = $service->subCategory;
@@ -321,7 +305,6 @@ class CartController extends Controller {
             }
 
             $originalPrice = (float) ($subCategory?->price ?? 0);
-
             $discountPrice = $originalPrice;
 
             if ($discountPercent > 0) {
@@ -331,7 +314,7 @@ class CartController extends Controller {
 
             Cart::add([
                 'id'    => $service->id,
-                'name'  => $service->title,
+                'name'  => $service->subCategory->sub_category_name,
                 'qty'   => 1,
                 'price' => round($discountPrice, 2),
 
@@ -350,22 +333,21 @@ class CartController extends Controller {
             $status = true;
             $message = $service->title . ' added to Cart';
             session()->flash('success', $message);
-        } else {
-            $status = false;
-            $message = $service->title . ' already added in cart';
-        }           
+        }      
+                
+        $wishlist->delete();
+        $cartCount = Cart::count();
+        $wishlistCount = Wishlist::where('user_id', auth()->id())->count();
 
-        // Remove from wishlist
-        Wishlist::where('id', $request->wishlist_id)->where('user_id', auth()->id())->where('service_id', $service->id)->delete();
-
-        $message = $service->title . ' added to Bag.';
+        $message = $service->title . ' moved to cart successfully.';
 
         session()->flash('success', $message);
 
         return response()->json([
             'status'    => true,
             'message'   => $message,
-            'cartCount' => Cart::count(),
+            'cartCount' => $cartCount,
+            'wishlistCount' => $wishlistCount,
         ]);
     }
    

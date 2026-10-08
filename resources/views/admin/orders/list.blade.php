@@ -15,9 +15,7 @@
                 <table class="table table-text mb-0">
                     <thead class="table-light">
                         <tr>                            
-                            <th class="border-top-0" width="140">Photo</th>   
-                            <th class="border-top-0 text-end" width="130">Size</th>
-                            <th class="border-top-0 text-end" width="130">Color</th>
+                            <th class="border-top-0" width="140">Photo</th>                               
                             <th class="border-top-0 text-end" width="150">Grand Total</th>
                             <th class="border-top-0 text-end" width="140">Status</th> 
                         </tr>
@@ -28,7 +26,18 @@
                                 <td>                                    
                                     <div class="product-row">
                                         @foreach($order->items as $item)
-                                           
+                                           <a href="{{ route('front.product', [
+                                                    $item->product->category->category_slug,
+                                                    $item->product->subCategory->sub_category_slug,                                                    
+                                                    'slug' => $item->product->slug
+                                                ]) }}" target="_blank" class="">                                                
+                                                
+                                                @if($image && !empty($image->image))
+                                                    <img src="{{ asset('uploads/services/small/'.$image->image) }}" height="90" class="me-3 align-self-center rounded" />
+                                                @else
+                                                    <img src="{{ asset('admin-assets/img/default-150x150.png') }}" height="90" class="me-3 align-self-center rounded" />
+                                                @endif
+                                            </a>                                                                                
                                         @endforeach
 
                                         @php
@@ -36,14 +45,14 @@
                                             $firstItem = $items->first();
                                             $remainingCount = $items->count() - 1;
 
-                                            $productImage = $item->product->images->first();
+                                            //$productImage = $item->product->images->first();
                                             $image = null;
-                                            if (!empty($item->product_variant_id)) {
-                                                $image = $item->variant->variant_image ?? null;
-                                            }
-                                            if (!$image) {
-                                                $image = $productImage ?? null;
-                                            }
+                                            // if (!empty($item->product_variant_id)) {
+                                            //     $image = $item->variant->variant_image ?? null;
+                                            // }
+                                            // if (!$image) {
+                                            //     $image = $productImage ?? null;
+                                            // }
                                         @endphp
 
                                     @if($firstItem)
@@ -76,44 +85,9 @@
                                                 </p>
                                             </div>
                                         </div>
-                                        @endif                                        
+                                        @endif                                         
                                     </div>
-                                </td>       
-                                <td class="text-end">
-                                    @php
-                                        $uniqueSizes = $order->items->pluck('size')->filter()->unique('id')->values();
-                                    @endphp
-
-                                    @if($uniqueSizes->count())
-                                        <p class="mt-2">{{ $uniqueSizes->first()->name }}</p>
-
-                                        @if($uniqueSizes->count() > 1)
-                                            <span class="text-muted">
-                                                +{{ $uniqueSizes->count() - 1 }}
-                                            </span>
-                                        @endif
-                                    @else
-                                        -
-                                    @endif                                    
-                                </td>
-
-                                <td class="text-end">
-                                    @php
-                                        $uniqueColors = $order->items->pluck('color')->filter()->unique('id')->values();
-                                    @endphp
-
-                                    @if($uniqueColors->count())
-                                        <p class="mt-2">{{ $uniqueColors->first()->name }}</p>
-
-                                        @if($uniqueColors->count() > 1)
-                                            <span class="text-muted">
-                                                +{{ $uniqueColors->count() - 1 }}
-                                            </span>
-                                        @endif
-                                    @else
-                                        -
-                                    @endif                                    
-                                </td>
+                                </td>                                                                     
                                 <td class="text-end">
                                     <h5 class="mt-2 mb-0">₹{{ round($order->grandtotal) }}</h5>     
                                     <p class="tiny-font text-muted mt-0">
@@ -138,9 +112,9 @@
                                             {{ ucfirst(str_replace('_',' ',$status)) }}
                                         </span>
                                         
-                                        @if($order->latestStatus->cancel_comments)
+                                        {{-- @if($order->latestStatus->cancel_comments)
                                             <p class="tiny-font text-muted">{{ $order->latestStatus->cancel_comments }}</p>
-                                        @endif 
+                                        @endif  --}}
                                     </a>                                                       
                                 </td>                       
                             </tr>                    

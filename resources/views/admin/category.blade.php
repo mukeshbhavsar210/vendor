@@ -13,7 +13,7 @@
             </div>
             <div class="col-sm-9 col-12 float-end">
                 <div class="flexContainer">
-                    <a class="btn btn-primary" href="#" onclick="createCategoryModal()" data-bs-toggle="modal" data-bs-target="#categoryModal" >Create Category</a>                    
+                    <a class="btn btn-primary" href="#" onclick="createCategoryModal()" data-bs-toggle="modal" data-bs-target="#categoryModal" >Create Category</a>
 
                     <form action="" method="get" >
                         <div class="d-flex">

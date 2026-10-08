@@ -572,12 +572,21 @@
                     <img src="{{ asset('uploads/subcategory/' . $item->subCategory->image) }}" class="rounded" alt="{{ $item->subCategory->name }}">
                 @else
                     <img src="{{ asset('admin-assets/img/default-150x150.png') }}" class="rounded" alt="Default image">
-                @endif
+                @endif                
             </a>
+
+            <h6>{{ Str::limit($item->subCategory->sub_category_name, $title_limit, '...')  }}</h6>
+            <p class="price tiny-font mb-2">{{ $item->subCategory->price }}</p>
             
-            <button class="btn btn-outline-primary w-100 move-to-cart" data-wishlist-id="{{ $item->id }}" data-service-id="{{ $service->id }}" type="button">
-                Move to Cart 
-            </button>
+            @if ($qty < 1)
+                <button onclick="notifyMe({{ $item->service->id }})" class="btn btn-outline-primary">
+                    Notify Me
+                </button>
+            @else
+                <button class="btn btn-outline-primary w-100 move-to-cart" data-wishlist-id="{{ $item->id }}" data-service-id="{{ $service->id }}" type="button">
+                    Move to Cart 
+                </button>
+            @endif
         
         @if($servicetitle)
             <div class="product-info">            

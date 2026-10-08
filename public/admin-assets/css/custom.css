@@ -170,15 +170,159 @@ ul,li { padding: 0; margin: 0;}
   height: 1.5rem;
 }
 
+#product-gallery { display: flex; gap: 15px; flex-wrap: wrap; }
+#product-gallery .thumb { width: 30%; }
+#product-gallery .thumb .hover-card { position: relative; overflow: hidden; width: 100%; margin-bottom: 8px; }
+#product-gallery .thumb .hover-card:hover .overlay-new { opacity: 1; visibility: visible;}
+#product-gallery .thumb .hover-card img { width: 100%; border-radius: 6px; }
+#product-gallery .thumb .hover-card .overlay-new {
+  position: absolute;
+  inset: 0;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+}
+#product-gallery .thumb .hover-card .overlay-new a {
+  background-color: #fff;
+  padding: 5px;
+  border-radius: 3px;
+}
+
 .dropzone {
-  background: white;
-  border-radius: 5px; padding:30px;
+  border-radius: 5px; padding:30px 10px; text-align: center;
   border: 2px dashed rgb(0, 135, 247);
   border-image: none;
-  max-width: 100%;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 100%;  
 }
+
+.dropzone .needsclick { text-align: center; }
+
+/* Dropzone Preview Container */
+.dropzone .dz-preview {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    width: 100px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Image Area */
+.dropzone .dz-preview .dz-image {
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    border-radius: 8px 8px 0 0;
+    background: #f5f5f5;
+}
+
+/* Actual Image */
+.dropzone .dz-preview .dz-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* File Details */
+.dropzone .dz-preview .dz-details {
+    padding: 7px 8px;
+    text-align: center;
+    background: #fff;
+}
+
+/* File Name */
+.dropzone .dz-preview .dz-filename {
+    font-size: 12px;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* File Size */
+.dropzone .dz-preview .dz-size {
+    font-size: 11px;
+    color: #888;
+    margin-top: 3px;
+}
+
+/* Remove Button */
+.dropzone .dz-preview .dz-remove {
+    display: block; text-align: center;
+    padding: 5px 8px;
+    font-size: 12px;
+    color: #dc3545;
+    text-decoration: none;
+    border-top: 1px solid #eee;
+    background: #fff;
+    cursor: pointer;
+}
+
+.dropzone .dz-preview .dz-remove:hover {
+    color: #fff;
+    background: #dc3545;
+}
+
+/* Upload Progress */
+.dropzone .dz-preview .dz-progress {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    top: 45px;
+    height: 6px;
+    border-radius: 5px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.dropzone .dz-preview .dz-upload {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: #0d6efd;
+    transition: width 0.3s ease;
+}
+
+/* Hide progress after upload */
+.dropzone .dz-preview.dz-complete .dz-progress {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Success Check */
+.dropzone .dz-preview .dz-success-mark,
+.dropzone .dz-preview .dz-error-mark {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 5;
+}
+
+/* Error */
+.dropzone .dz-preview.dz-error {
+    border-color: #dc3545;
+}
+
+.dropzone .dz-preview .dz-error-message {
+    font-size: 11px;
+    color: #dc3545;
+    padding: 5px;
+}
+
+.service-card { position: relative;}
+.service-card .inside { position: absolute; bottom:0; left:0; z-index: 9; padding:15px 15px 10px 10px; width: 100%; display: flex; justify-content: space-between;}
+.service-card .inside .left { display: flex; column-gap: 5px; padding:5px 7px;}
+.service-card .inside .left a { padding:3px; background-color: var(--black); border-radius: 4px; }
 
 .select2-container { width:100% !important;}
 .select2-container--default .select2-selection--multiple .select2-selection__choice { background-color: #fffefa !important; color:#000 !important; font-size:13px !important; padding:5px 10px !important;}
@@ -565,10 +709,6 @@ input:checked + .slider { box-shadow:0 0 0 2px #007bff,0 0 2px #007bff; }
 }
 
 .form-group.active .floating-label { top: -11px; }
-
-
-.dropzone { text-align: center; cursor: pointer; }
-.dropzone:hover { border-color: var(--black); background-color: #e5e5e5;}
 
 
 .uploaded-images { position: relative; }

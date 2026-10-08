@@ -21,15 +21,15 @@
                         <div class="col-4">                            
                             <div class="float-end">
                                 @if(request()->has('status') || request()->has('time'))
-                                    <a href="{{ route('account.orders') }}" class="btn btn-outline-dark">Clear Filter</a>
+                                    <a href="{{ route('account.orders') }}" class="btn btn-outline-dark">Clear</a>
                                 @endif                                
                                 <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#filterOrdersModal">                                    
-                                    Filter
+                                    Filters
                                 </button>
                             </div>
                             
                             <div class="modal fade" id="filterOrdersModal" tabindex="-1" aria-labelledby="filterOrdersModalLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered modal-custom">
+                                <div class="modal-dialog modal-dialog-centered modal-sm">
                                     <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="filterOrdersModalLabel">Filter Orders</h5>
@@ -37,34 +37,38 @@
                                     </div>
                                     <form method="GET" action="{{ route('account.orders') }}">
                                         <div class="modal-body">
-                                            <div class="modal-scroll">                                                
-                                                <h6 class="mb-2">Status</h6>
-                                                @foreach($statuses as $value => $label)
-                                                    <label class="custom-radio">
-                                                        <input type="radio" name="status" value="{{ $value }}"
-                                                        {{ request('status','') == $value ? 'checked' : '' }}>
-                                                        <span class="radio-mark"></span>
-                                                        {{ $label }}
-                                                    </label>
-                                                @endforeach                                                                                        
-                                            
-                                                <h6 class="mb-2 mt-3">Time</h6>
-                                                @foreach($time as $value => $label)
-                                                    <label class="custom-radio">
-                                                        <input type="radio" name="time" value="{{ $value }}"
-                                                        {{ request('status','') == $value ? 'checked' : '' }}>
-                                                        <span class="radio-mark"></span>
-                                                        {{ $label }}
-                                                    </label>
-                                                @endforeach
+                                            <div class="filters">
+                                                <div class="left">                                                
+                                                    <h6 class="mb-2">Status</h6>
+                                                    @foreach($statuses as $value => $label)
+                                                        <label class="custom-radio">
+                                                            <input type="radio" name="status" value="{{ $value }}"
+                                                            {{ request('status','') == $value ? 'checked' : '' }}>
+                                                            <span class="radio-mark"></span>
+                                                            {{ $label }}
+                                                        </label>
+                                                    @endforeach
+                                                </div>
+
+                                                <div class="right">
+                                                    <h6 class="mb-2 mt-3">Time</h6>
+                                                    @foreach($time as $value => $label)
+                                                        <label class="custom-radio">
+                                                            <input type="radio" name="time" value="{{ $value }}"
+                                                            {{ request('status','') == $value ? 'checked' : '' }}>
+                                                            <span class="radio-mark"></span>
+                                                            {{ $label }}
+                                                        </label>
+                                                    @endforeach
                                                 </div>
                                             </div>
-                                            <div class="modal-footer">
+                                        </div>
+                                        <div class="modal-footer">
                                                 <div>
-                                                    <a href="{{ route('account.orders') }}" class="btn btn-outline-dark">Clear Filter</a>                                                    
+                                                    <a href="{{ route('account.orders') }}" class="btn btn-outline-dark">Clear</a>                                                    
                                                 </div>
                                                 <div>                                                
-                                                    <button type="submit" class="btn btn-primary">Apply Filter</button>
+                                                    <button type="submit" class="btn btn-primary">Apply</button>
                                                 </div>
                                             </div>
                                         </form>

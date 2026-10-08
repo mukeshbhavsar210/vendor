@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Flash;
 use App\Models\Category;
+use App\Models\Process;
 use App\Models\SubCategory;
 use App\Models\SubSubCategory;
 use App\Models\TempImage;
@@ -19,12 +20,8 @@ use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller {
     public function index(Request $request) {        
-        $categories = Category::withCount('subCategories')->orderBy('menu_order', 'ASC')->where('status', 1)
-            ->with(['subCategories' => function ($q) {
-                $q->withCount('subSubCategories')
-                ->with('subSubCategories');
-            }])
-            ->paginate(20);        
+        $categories = Category::withCount('subCategories')->orderBy('menu_order', 'ASC')->where('status', 1)->paginate(20);
+        $processes = Process::get();
 
         if ($request->filled('keyword')) {
             $categories->where('category_name', 'like', '%' . $request->keyword . '%');
@@ -99,6 +96,18 @@ class CategoryController extends Controller {
                             ],
                             [
                                 'type' => 'select',
+                                'name' => 'open_to',
+                                'label' => 'Open to',
+                                'options' => [
+                                    'modal' => 'Modal',
+                                    'link' => 'Link'
+                                ],
+                                'value' => 'yes',
+                                'default' => 'yes',
+                                'col' => 'col-5'
+                            ],
+                            [
+                                'type' => 'select',
                                 'name' => 'showHome',
                                 'label' => 'Show on Home',
                                 'options' => [
@@ -107,8 +116,8 @@ class CategoryController extends Controller {
                                 ],
                                 'value' => 'yes',
                                 'default' => 'yes',
-                                'col' => 'col-6'
-                            ],
+                                'col' => 'col-4'
+                            ],                            
                             [
                                 'type' => 'select',
                                 'name' => 'menu_order',
@@ -123,7 +132,7 @@ class CategoryController extends Controller {
                                 ],
                                 'value' => 1,
                                 'default' => 1,
-                                'col' => 'col-6'
+                                'col' => 'col-3'
                             ]                            
                         ]
                     ]
@@ -154,8 +163,9 @@ class CategoryController extends Controller {
                                                 'name' => 'category_id',
                                                 'label' => 'Select Parent Category',
                                                 'options' => $categories->pluck('category_name','id')->toArray(),
-                                                'col' => 'col-12'
-                                            ],                             
+                                                'col' => 'col-12',
+                                                
+                                            ],
                                             [
                                                 'type' => 'text',
                                                 'name' => 'sub_category_name',
@@ -167,7 +177,8 @@ class CategoryController extends Controller {
                                                 'data'  => [
                                                     'target' => '#slug_2'
                                                 ],
-                                                'col' => 'col-12'
+                                                'col' => 'col-12',
+                                                
                                             ],
                                             [
                                                 'type' => 'text',
@@ -175,13 +186,15 @@ class CategoryController extends Controller {
                                                 'label' => 'Category slug',
                                                 'placeholder' => 'Enter Category name',                                
                                                 'id'    => 'slug_2',
-                                                'col' => 'col-12 d-none'
+                                                'col' => 'col-12 d-none',
+                                                
                                             ],
                                             [
                                                 'type' => 'file',
                                                 'name' => 'image',
                                                 'label' => 'Sub Category Image',
-                                                'col' => 'col-12'
+                                                'col' => 'col-12',
+                                                
                                             ],                            
                                             [
                                                 'type' => 'select',
@@ -191,15 +204,30 @@ class CategoryController extends Controller {
                                                     1 => 'Active',
                                                     0 => 'Block'
                                                 ],
-                                                'col' => 'col-12 d-none'
+                                                'col' => 'col-12 d-none',
+                                                
                                             ],
                                             [
                                                 'type' => 'text',
                                                 'name' => 'price',
                                                 'label' => 'Price',
                                                 'placeholder' => 'Price',
-                                                'col' => 'col-8'
+                                                'col' => 'col-5',
+                                                
                                             ],
+                                            [
+                                                'type' => 'select',
+                                                'name' => 'price_type',
+                                                'label' => 'Price Type',
+                                                'options' => [
+                                                    'fixed' => 'Fixed',
+                                                    'hourly' => 'Hourly',                                                                                                        
+                                                ],
+                                                'value' => 'fixed',
+                                                'default' => 'fixed',
+                                                'col' => 'col-4',
+                                                
+                                            ], 
                                             [
                                                 'type' => 'select',
                                                 'name' => 'instant',
@@ -210,8 +238,17 @@ class CategoryController extends Controller {
                                                 ],
                                                 'value' => 'yes',
                                                 'default' => 'yes',
-                                                'col' => 'col-4'
+                                                'col' => 'col-3',
+                                                
                                             ], 
+                                            [
+                                                'type' => 'select',
+                                                'name' => 'process_id',
+                                                'label' => 'Select Process',
+                                                'options' => $processes->pluck('title','id')->toArray(),
+                                                'col' => 'col-12',
+                                                
+                                            ],
                                         ],
                                     ],
                                     [
@@ -222,7 +259,8 @@ class CategoryController extends Controller {
                                                 'name' => 'banner_title',
                                                 'label' => 'Banner Title',
                                                 'placeholder' => 'Banner Title',
-                                                'col' => 'col-9'
+                                                'col' => 'col-9',
+                                                
                                             ],   
                                             [
                                                 'type' => 'select',
@@ -233,27 +271,31 @@ class CategoryController extends Controller {
                                                     'no' => 'No'
                                                 ],                                
                                                 'default' => 'Yes',
-                                                'col' => 'col-3'
+                                                'col' => 'col-3',
+                                                
                                             ],        
                                             [
                                                 'type' => 'file',
                                                 'name' => 'banner_image',
                                                 'label' => 'Banner Image',
-                                                'col' => 'col-12'
+                                                'col' => 'col-12',
+                                                
                                             ],                        
                                             [
                                                 'type' => 'text',
                                                 'name' => 'banner_label',
                                                 'label' => 'Banner Label',
                                                 'placeholder' => 'Banner Label',
-                                                'col' => 'col-12'
+                                                'col' => 'col-12',
+                                                
                                             ],
                                             [
                                                 'type' => 'textarea',
                                                 'name' => 'banner_details',
                                                 'label' => 'Banner Details',
                                                 'placeholder' => 'Banner Details',
-                                                'col' => 'col-12'
+                                                'col' => 'col-12',
+                                                
                                             ] 
                                         ],
                                     ],
@@ -267,7 +309,7 @@ class CategoryController extends Controller {
             'categories' => $categories
         ];          
 
-        return view('admin.category.index', $data);       
+        return view('admin.category', $data);       
     }
 
     public function category_store(Request $request){
@@ -284,6 +326,7 @@ class CategoryController extends Controller {
             $category->menu_order = $request->menu_order;
             $category->showHome = $request->showHome;            
             $category->category_modal = $request->category_modal;
+            $category->open_to = $request->open_to;
             $category->status = $request->status;
             $category->image = $request->image;            
             $category->save();
@@ -423,6 +466,7 @@ class CategoryController extends Controller {
             $subCategory = new SubCategory();
             $category = Category::find($request->category_id);
             $subCategory->category_id = $request->category_id;
+            $process = Process::find($request->process_id);            
             $subCategory->sub_category_name = $request->sub_category_name;
             $subCategory->sub_category_slug = $request->sub_category_slug;
             $subCategory->price = $request->price;
