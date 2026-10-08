@@ -7,8 +7,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class AdminRedirectIfAuthenticated
-{
+class AdminRedirectIfAuthenticated {
     /**
      * Handle an incoming request.
      *
@@ -17,8 +16,7 @@ class AdminRedirectIfAuthenticated
      * @param  string|null  ...$guards
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next, ...$guards)
-    {
+    public function handle(Request $request, Closure $next, ...$guards) {
         if (Auth::guard('admin')->check()) {
             return redirect()->route('admin.dashboard');
         }

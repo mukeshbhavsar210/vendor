@@ -8,8 +8,7 @@
     @include('front.account.common.sidebar')
 
     <div class="col-md-9 col-12 px-md-0">
-        <div class="details-accounts">
-            @include('front.account.common.message')
+        <div class="details-accounts">            
 
             @include('front.account.common.modal', [
                 'form' => $profileFormConfig,

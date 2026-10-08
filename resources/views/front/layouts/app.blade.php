@@ -342,34 +342,113 @@
             }
         });
         //$('#login').modal('show');
+    });        
+
+    $(document).on('click', '.move-to-cart', function(){
+        let wishlistId = $(this).data('wishlist-id');
+        let serviceId  = $(this).data('service-id');        
+
+        wishlistToCart(wishlistId, serviceId);
     });
 
-    $(document).on('click', '.move-to-cart', function () {
+    function wishlistToCart(wishlistId, serviceId) {        
+        $.ajax({
+            url: '{{ route("front.wishlistToCart") }}',
+            type: 'POST',
+            data: {
+                wishlist_id: wishlistId,
+                service_id: serviceId,                
+                _token: '{{ csrf_token() }}'
+            },
+            success:function(response){
+                if(response.status){
+                    location.reload();
 
-    let wishlistId = $(this).data('wishlist-id');
-    let serviceId = $(this).data('service-id');
+                    $("#wishlist-item-"+wishlistId).fadeOut(300,function(){
+                        $(this).remove();
+                    });
+                    $(".cart-count").text(response.cartCount);
+                    $(".wishlist-count").text(response.wishlistCount);
 
-    $.ajax({
-        url: '{{ route("front.wishlistToCart") }}',
-        type: 'POST',
-        data: {
-            _token: '{{ csrf_token() }}',
-            wishlist_id: wishlistId,
-            service_id: serviceId
-        },
-        success: function(response) {
+                    showAlert(response.message,'success');
 
-            if (response.status) {
-                location.reload();
-            } else {
-                showAlert(response.message, 'error');
+                     // Reload after UI update
+                    setTimeout(function () {
+                        location.reload();
+                    }, 500);
+                    
+                }else{
+                    showAlert(response.message,'error');
+                }
+            },
+
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                showAlert('Something went wrong.', 'error');
             }
-        },
-        error: function(xhr) {
-            console.log(xhr.responseText);
-        }
-    });
-});
+        });
+    }
+
+
+    function removeProduct(id) {
+        $.ajax({
+            url: '{{ route("account.removeProductFromWishlist") }}',
+            type: 'POST',
+            data: {
+                id: id,
+                _token: '{{ csrf_token() }}'
+            },
+            dataType: 'json',
+
+            success: function(response) {
+                if (response.status === true) {
+                    // Remove item visually
+                    $("#wishlist-item-" + id).fadeOut(300, function() {
+                        $(this).remove();
+                    });
+
+                    // Update wishlist count
+                    $(".wishlist-count").text(response.wishlistCount);
+
+                    // Reload so Laravel session message is displayed
+                    setTimeout(function() {
+                        location.reload();
+                    }, 300);
+                }
+            },
+
+            error: function(xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+    }
+
+
+    // $(document).on('click', '.move-to-cart', function () {
+    //     let wishlistId = $(this).data('wishlist-id');
+    //     let serviceId = $(this).data('service-id');
+
+    //     $.ajax({
+    //         url: '{{ route("front.wishlistToCart") }}',
+    //         type: 'POST',
+    //         data: {
+    //             _token: '{{ csrf_token() }}',
+    //             wishlist_id: wishlistId,
+    //             service_id: serviceId
+    //         },
+    //         success: function(response) {
+
+    //             if (response.status) {
+    //                 location.reload();
+    //             } else {
+    //                 showAlert(response.message, 'error');
+    //             }
+    //         },
+    //         error: function(xhr) {
+    //             console.log(xhr.responseText);
+    //         }
+    //     });
+    // });
 
     function showAlert(message, type = 'success'){
         let toastEl = $('#commonToast');

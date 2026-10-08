@@ -349,6 +349,88 @@
             });
         }
     });
+
+
+     $(document).on('change', '[name="category_id"]', function () {        
+        let categoryId = $(this).val();
+        let $subCategory = $('[name="sub_category_id"]');
+
+        $subCategory.html('<option value="">Loading...</option>');
+
+        if (!categoryId) {
+            $subCategory.html('<option value="">Select Sub Category</option>');
+            return;
+        }
+
+        let url = "{{ route('categories.subCategories', ':id') }}"
+            .replace(':id', categoryId);
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (response) {
+                $subCategory.html(
+                    '<option value="">Select Sub Category</option>'
+                );
+
+                if (response.status && response.data.length) {
+                    $.each(response.data, function (index, item) {
+                        $subCategory.append(
+                            $('<option>', {value: item.id, text: item.name })
+                        );
+                    });
+                } else {
+                    $subCategory.html(
+                        '<option value="">No Sub Category Found</option>'
+                    );
+                }
+            },
+            error: function () {
+                $subCategory.html(
+                    '<option value="">Unable to load Sub Categories</option>'
+                );
+            }
+        });
+    });
+
+
+
+    Dropzone.autoDiscover = false;
+        const dropzone = $("#image").dropzone({
+            url:  "{{ route('temp-images.create') }}",
+            maxFiles: 10,
+            paramName: 'image',
+            addRemoveLinks: true,
+            acceptedFiles: "image/jpeg,image/png,image/gif",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }, success: function(file, response){
+                $("#image_id").val(response.image_id);
+                console.log(response)
+
+               var html = `<div class="thumb" id="image-row-${response.image_id}">                    
+                    <div class="hover-card">
+                        <div class="overlay-new">                            
+                            <a href="javascript:void(0)" onclick="deleteImage(${response.image_id})" class="deleteCardImg">
+                                <i class="las la-trash-alt text-secondary fs-18"></i>
+                            </a>                    
+                        </div>
+
+                        <input type="hidden" name="image_array[]" value="${response.image_id}" >
+                        <img src="${response.ImagePath}" />                        
+                    </div>
+                </div>`;
+
+                $("#product-gallery").append(html);
+            },
+            complete: function(file){
+                this.removeFile(file);
+            }
+        });
+
+        function deleteImage(id){
+            $("#image-row-"+id).remove();
+        }
 </script>
 
 @yield('customJs')

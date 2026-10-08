@@ -5,7 +5,7 @@ use App\Http\Controllers\admin\AdminLoginController;
 use App\Http\Controllers\admin\HomeController;
 use App\Http\Controllers\admin\CategoryController;
 use App\Http\Controllers\admin\OrderController;
-use App\Http\Controllers\admin\ProductController;
+use App\Http\Controllers\admin\ServiceController;
 use App\Http\Controllers\admin\AffiliateProductController;
 use App\Http\Controllers\admin\ProductImageController;
 use App\Http\Controllers\admin\ProductSubCategoryController;
@@ -227,17 +227,19 @@ Route::group(['prefix' => 'admin'], function(){
             Route::delete('/subsubcategory/{subsubcategory}', 'subSubCategory_destroy')->name('sub_sub_category.delete');
 
             Route::get('/get-subcategories/{id}', 'getSubCategories')->name('get.subcategories');
-        });       
+        });
         
         //Services Route
-        Route::controller(ProductController::class)->group(function() {
+        Route::controller(ServiceController::class)->group(function() {
             Route::get('/services', 'index')->name('services.index');
             Route::get('/services/create', 'create')->name('services.create');
             Route::post('/services', 'store')->name('services.store');
             Route::get('/services/{service}/edit', 'edit')->name('services.edit');
             Route::put('/services/{service}', 'update')->name('services.update');
             Route::delete('/services/{service}', 'destroy')->name('services.delete');
-            Route::get('/get-services','getServices')->name('services.getServices');            
+            Route::get('/get-services','getServices')->name('services.getServices');   
+            
+            Route::get('/categories/{category}/sub-categories','subCategories')->name('categories.subCategories');            
         });
 
         //Sub Categories Connect to main Categories
@@ -326,8 +328,7 @@ Route::group(['prefix' => 'admin'], function(){
             Route::get('/settings/review/approve/{id}', 'approve')->name('review.approve');
             Route::get('/settings/review/rejecte/{id}', 'reject')->name('review.reject');
             Route::delete('/settings/review/delete/{id}', 'review_delete')->name('review.delete');
-        });  
-           
+        });             
 
         Route::get('/getSlug', function(Request $request){
             $slug = '';
@@ -341,3 +342,4 @@ Route::group(['prefix' => 'admin'], function(){
         })->name('getSlug');
     });
 });
+

@@ -776,76 +776,24 @@ class AuthController extends Controller {
     }
 
 
-    public function removeProductFromWishlist(Request $request) {
-        if (!Auth::check()) {
-            return response()->json(['status' => false]);
-        }
+    public function removeProductFromWishlist(Request $request){
+        $wishlist = Wishlist::where('user_id',Auth::user()->id)->where('service_id',$request->id)->first();
 
-        $wishlist = Wishlist::where('user_id', Auth::id())
-            ->where('product_id', $request->id)
-            ->first();
+        if($wishlist == null){
+            session()->flash('error','Service already removed.');
+            return response()->json([
+                'status' => true,
+            ]);
+        } else {
+            Wishlist::where('user_id',Auth::user()->id)->where('service_id',$request->id)->delete();
 
-        if ($wishlist) {
-            $wishlist->delete();
+            session()->flash('success','Service removed successfully.');
 
             return response()->json([
                 'status' => true,
-                'message' => 'Item removed from wishlist',
-                'wishlistCount' => Wishlist::where('user_id', Auth::id())->count()
             ]);
         }
-
-        return response()->json([
-            'status' => false,
-            'message' => 'Item removed from wishlist'
-        ]);
-    }
-
-
-    public function removeProductFromDealsWishlist(Request $request) {
-        if (!Auth::check()) {
-            return response()->json(['status' => false, 'message' => 'Unauthorized']);
-        }
-
-        AffiliateWishlist::firstOrCreate([
-            'user_id' => Auth::id(),
-            'affiliate_product_id' => $request->id
-        ]);
-
-        $deleted = AffiliateWishlist::where('user_id', Auth::id())
-            ->where('affiliate_product_id', $request->id)
-            ->delete();
-
-        if ($deleted) {
-            return response()->json([
-                'status' => true,
-                'message' => 'Item removed from deals',
-                'dealCount' => AffiliateWishlist::where('user_id', Auth::id())->count()
-            ]);
-        }
-
-        return response()->json([
-            'status' => false,
-            'message' => 'Item not found in deals'
-        ]);
-    }
-
-    // public function removeProductFromWishlist(Request $request){
-    //     $wishlist = Wishlist::where('user_id',Auth::user()->id)->where('product_id',$request->id)->first();
-
-    //     if($wishlist == null){
-    //         session()->flash('error','Product already removed.');
-    //         return response()->json([
-    //             'status' => true,
-    //         ]);
-    //     } else {
-    //         Wishlist::where('user_id',Auth::user()->id)->where('product_id',$request->id)->delete();
-    //         session()->flash('success','Product removed successfully.');
-    //         return response()->json([
-    //             'status' => true,
-    //         ]);
-    //     }
-    // }   
+    }   
 
     public function changePassword(Request $request){
         $validator = Validator::make($request->all(),[

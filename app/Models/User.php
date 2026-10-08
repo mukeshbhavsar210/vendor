@@ -58,5 +58,8 @@ class User extends Authenticatable
         return asset('admin-assets/img/default-150x150.png');
     }
 
+    public function vendor() {
+        return $this->hasOne(Vendor::class, 'user_id');
+    }
 
 }

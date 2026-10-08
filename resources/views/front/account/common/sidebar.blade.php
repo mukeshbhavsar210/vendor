@@ -15,12 +15,12 @@
                         <li class="li-title">Orders</li>
                         <li><a href="{{ route('account.orders') }}" class="{{ request()->routeIs(['account.orders', 'account.orderDetail', 'account.order.view', 'account.orders.cancelled']) ? 'active' : '' }}">Orders & Returns</a></li>
                         <hr />
-                        <li class="li-title">Account</li>
-                        <li><a href="{{ route('account.profile') }}" class="{{ request()->routeIs(['account.profile', 'account.profile.edit', 'account.changePassword']) ? 'active' : '' }}">Profile</a></li>
+                        <li class="li-title">Account</li>                        
                         <li><a href="{{ route('account.wishlist') }}" class="{{ request()->routeIs(['account.wishlist']) ? 'active' : '' }}">Wishlist</a></li>
                         <li><a href="{{ route('account.cards') }}" class="{{ request()->routeIs('account.cards') ? 'active' : '' }}">Saved Cards</a></li>
                         <li><a href="{{ route('account.address') }}" class="{{ request()->routeIs('account.address') ? 'active' : '' }}">Addresses</a></li>
                         <li><a href="{{ route('account.notifications') }}" class="{{ request()->routeIs('account.notifications') ? 'active' : '' }}" >Notifications</a></li>
+                        <li><a href="{{ route('account.profile') }}" class="{{ request()->routeIs(['account.profile', 'account.profile.edit', 'account.changePassword']) ? 'active' : '' }}">Profile</a></li>
                         <li><a href="{{ route('account.delete_account') }}" class="{{ request()->routeIs('account.delete_account') ? 'active' : '' }}" >Delete Account</a></li>
                         <hr />
                         <li class="li-title">Credit</li>
