@@ -5,9 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model {
-    protected $fillable = ['vendor_id','category_id','sub_category_id','title','slug','description','price','price_type','city','state','pincode',
-        'is_featured','admin_note','approved_at','views','search_count','rating','total_reviews','meta_title','meta_description','sort_order','status',
-    ];
+    protected $fillable = ['vendor_id','category_id','sub_category_id','short_description','description','status','is_featured','admin_note','approved_at' ];
 
     protected $casts = [
         'price' => 'decimal:2',
@@ -28,9 +26,9 @@ class Service extends Model {
         return $this->hasMany(Rating::class, 'service_id', 'id'); 
     }
 
-    public function service_images(){
-        return $this->hasMany(ServiceImage::class);
-    }        
+    public function serviceImages() {
+        return $this->hasMany(ServiceImage::class, 'service_id');
+    }
 
     public function discounts() {
         return $this->hasMany(Discount::class, 'sub_category_id');

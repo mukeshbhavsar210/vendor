@@ -212,13 +212,11 @@ Route::group(['prefix' => 'admin'], function(){
 
             //Category
             Route::post('/category/cat', 'category_store')->name('category.store');
-            Route::put('/category/{category}', 'category_update')->name('category.update');
+            Route::put('/update_category/{category}', 'category_update')->name('category.update');
             Route::delete('/category/cat/{category}', 'category_destroy')->name('category.delete');
             
             //Sub category
-            Route::post('/subcategory/subcat', 'subCategory_store')->name('subCategory.store');
-            Route::put('/subcategory/{subcategory}', 'subCategory_update')->name('sub_category.update');
-            //Route::put('/category/subcategory/{subCategory}', 'sub_category_update')->name('sub_category.update');
+            Route::post('/subcategory/subcat', 'subCategory_store')->name('subCategory.store');            
             Route::delete('/category/subcategory/{subCategory}', 'subCategory_destroy')->name('sub_category.delete');
             
             //Sub2 category
@@ -230,13 +228,17 @@ Route::group(['prefix' => 'admin'], function(){
         });
         
         //Services Route
-        Route::controller(ServiceController::class)->group(function() {
+        Route::controller(ServiceController::class)->group(function() {                        
+            Route::post('/service/ser', 'service_store')->name('services.store');
+            Route::put('/update_service/{service}', 'service_update')->name('services.update');
+            Route::delete('/service/ser/{service}', 'service_destroy')->name('services.delete');            
+
             Route::get('/services', 'index')->name('services.index');
             Route::get('/services/create', 'create')->name('services.create');
-            Route::post('/services', 'store')->name('services.store');
+            //Route::post('/services', 'store')->name('services.store');
             Route::get('/services/{service}/edit', 'edit')->name('services.edit');
-            Route::put('/services/{service}', 'update')->name('services.update');
-            Route::delete('/services/{service}', 'destroy')->name('services.delete');
+            //Route::put('/services/{service}', 'update')->name('services.update');
+            //Route::delete('/services/{service}', 'destroy')->name('services.delete');
             Route::get('/get-services','getServices')->name('services.getServices');   
             
             Route::get('/categories/{category}/sub-categories','subCategories')->name('categories.subCategories');            
@@ -283,12 +285,7 @@ Route::group(['prefix' => 'admin'], function(){
             Route::get('/settings/brands', 'brand_index')->name('brands.index');
             Route::post('/settings/brands', 'brand_store')->name('brands.store');            
             Route::delete('/settings/brands/{brand}', 'brand_destroy')->name('brands.delete');
-
-            //Colors
-            Route::get('/settings/colors', 'color_index')->name('colors.index');            
-            Route::post('/settings/colors', 'color_store')->name('colors.store');            
-            Route::delete('/settings/colors/{color}', 'color_destroy')->name('colors.delete');
-
+           
             //Discount coupon
             Route::get('/settings/coupons', 'coupon_index')->name('coupons.index');            
             Route::post('/settings/coupons', 'coupon_store')->name('coupons.store');
@@ -317,6 +314,8 @@ Route::group(['prefix' => 'admin'], function(){
             Route::get('/settings/vendors/{vendor}/edit', 'vendors_edit')->name('vendors.edit');
             Route::put('/settings/vendors/{vendor}', 'vendors_update')->name('vendors.update');
             Route::delete('/settings/vendors/{vendor}', 'vendors_destroy')->name('vendors.delete');
+
+            Route::get('/vendor_categories/{category}/subcategories','getSubCategories')->name('vendors.subcategories');
 
             //Shipping
             Route::get('/settings/shipping/index', 'shipping_index')->name('shipping.index');

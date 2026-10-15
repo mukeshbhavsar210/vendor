@@ -13,7 +13,7 @@
             </div>
             <div class="col-sm-9 col-12 float-end">
                 <div class="flexContainer">
-                    <a class="btn btn-primary" href="#" onclick="createCategoryModal()" data-bs-toggle="modal" data-bs-target="#categoryModal" >Create Category</a>
+                    <a class="btn btn-primary" href="#" onclick="createCategory()" data-bs-toggle="modal" data-bs-target="#categoryModal" >Create Category</a>
 
                     <form action="" method="get" >
                         <div class="d-flex">
@@ -49,16 +49,48 @@
             @foreach ($categories as $category)                                                     
                 <div class="accordion-item">                                
                     <div class="accordion-header" id="cat{{ $category->id }}">
-                        <div class="accordion-button collapsed p-2" data-bs-toggle="collapse" data-bs-target="#catCollapse{{ $category->id }}">
+                        <div class="accordion-button collapsed " data-bs-toggle="collapse" data-bs-target="#catCollapse{{ $category->id }}">
                             <div class="category-card">
                                 <div class="icon-head">
-                                    <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}" class="thumb" >                                    
+                                    <div class="tick-overlap">
+                                        <div class="tick-category">
+                                            @if ($category->status == 1)
+                                                <span class="sprites green-tick-icon"></span>
+                                            @else
+                                                <span class="sprites red-tick-icon"></span>
+                                            @endif
+                                        </div>
+                                        @if ($category->image)
+                                            <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}" class="thumb" >    
+                                        @else
+                                            <img src="{{ asset('admin-assets/img/default-150x150.png') }}" height="70" class="me-3 align-self-center rounded">
+                                        @endif                                        
+                                    </div>
+
                                     <h5>{{ $category->category_name }}</h5>
+                                    
+                                    @if ($category->sub_categories_count > 0)
+                                        <span class="counts">{{ $category->sub_categories_count }}</span>
+                                    @endif
                                 </div>
-                                
-                                @if ($category->sub_categories_count > 0)
-                                    <span class="counts">{{ $category->sub_categories_count }}</span>
-                                @endif
+
+                                <div class="flex-end">
+                                    <a href="javascript:void"
+                                        data-id="{{ $category->id }}"
+                                        data-category-modal="{{ $category->category_modal }}"
+                                        data-category-name="{{ $category->category_name }}"
+                                        data-home="{{ $category->showHome }}"
+                                        data-order="{{ $category->menu_order }}"
+                                        data-status="{{ $category->status }}"
+                                        onclick="editCategory(this)"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#categoryModal" >
+                                        <i class="las la-pen text-secondary fs-18"></i>
+                                    </a>
+                                    <a href="#" onclick="deleteCategory({{ $category->id }})">
+                                        <i class="las la-trash-alt text-secondary fs-18"></i>
+                                    </a>
+                                </div>                                                                
                             </div>
                         </div>
                     </div>
@@ -67,28 +99,11 @@
                         <div class="accordion-body"> 
                             <div class="row">
                                 <div class="col-md-8">
-                                    <a href="#" class="open-modal btn btn-sm btn-outline-primary"
-                                        data-category-id="{{ $category->id }}" data-bs-toggle="modal"
-                                        data-bs-target="#subCategoryModal"
-                                        onclick="createSubCategoryModal(this)">Create Sub-Category</a>
-                                </div>
-                                <div class="col-md-4 ">
-                                    <div class="flex-end">
-                                        <a href="javascript:void"
-                                            data-id="{{ $category->id }}"
-                                            data-category-modal="{{ $category->category_modal }}"
-                                            data-category-name="{{ $category->category_name }}"
-                                            data-show-home="{{ $category->showHome }}"
-                                            data-menu-order="{{ $category->menu_order }}"
-                                            data-status="{{ $category->status }}"
-                                            onclick="editCategoryModal(this)"
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#categoryModal"
-                                            class="btn btn-sm btn-outline-secondary">
-                                            Edit Category
-                                        </a>
-                                        <a href="#" onclick="deleteCategory({{ $category->id }})" class="btn btn-sm btn-outline-danger">Delete Category</a>
-                                    </div>
+                                    <a href="#" class="open-modal btn btn-sm btn-outline-primary" data-category-id="{{ $category->id }}" 
+                                        data-bs-toggle="modal" data-bs-target="#subCategoryModal" 
+                                        onclick="createSubCategory(this)">
+                                        Create Sub-Category
+                                    </a>
                                 </div>
                             </div>
 
@@ -113,28 +128,25 @@
                                 </div>
                             @else
                                 <p>No Sub-Category</p>
-                            @endif                            
-                            
-                            
+                            @endif
                         </div>
                     </div>
                 </div>                                                    
             @endforeach                
         </div>
-    </div>                                                                                           
-                    
+    </div>
     {{ $categories->links() }}    
 </div>   
 
-@foreach($modals as $key => $modal)
-    @include('admin.layouts.common', 
-        [
-            'modal_id' => $modal['modal_id'],
-            'form_id' => $modal['form_id'],
-            'method_id' => $modal['method_id'],
-            'formConfig' => $modal['formConfig'],
-            'title' => $modal['title'] ?? 'Modal'
-        ])
-@endforeach
+    @foreach($modals as $key => $modal)
+        @include('admin.layouts.common', 
+            [
+                'modal_id' => $modal['modal_id'],
+                'form_id' => $modal['form_id'],
+                'method_id' => $modal['method_id'],
+                'formConfig' => $modal['formConfig'],
+                'title' => $modal['title'] ?? 'Modal'
+            ])
+    @endforeach
 
 @endsection

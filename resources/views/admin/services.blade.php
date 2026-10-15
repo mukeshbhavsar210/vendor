@@ -37,8 +37,7 @@
                                 </div>
                             </form>
 
-                            <a class="btn btn-primary" href="#" onclick="createServiceModal()" data-bs-toggle="modal" data-bs-target="#serviceModal" >Create</a>
-                            {{-- <a href="{{ route('services.create') }}" class="btn btn-primary ">Create</a> --}}
+                            <a class="btn btn-primary" href="#" onclick="createService()" data-bs-toggle="modal" data-bs-target="#serviceModal" >Create</a>                            
                         </div>
                     </div>
                 </div>                        
@@ -83,86 +82,95 @@
                                             <tr>
                                                 <th class="border-top-0" width="30">Image</th>
                                                 <th class="border-top-0">Services</th>
-                                                <th class="border-top-0" width="200">Vendor</th>
-                                                <th class="border-top-0 text-end" width="100">Price</th>                                                
-                                                <th class="border-top-0 text-end" width="80">Action</th>
+                                                <th class="border-top-0" width="250">Service Images</th>
+                                                <th class="border-top-0" width="180">Vendor</th>                                                
+                                                <th class="border-top-0" width="80">Action</th>
                                             </tr>
                                         </thead>  
                                         <tbody>
                                             @foreach($categoryServices as $service)
-                                                @php
-                                                    $serviceImage = $service->service_images->first();
-                                                @endphp
                                                 <tr>
                                                     <td>
-                                                        <img class="me-3 align-self-center rounded" height="80" src="{{ asset('uploads/subcategory/' . $service->subCategory->image) }}" alt="{{ $service->subCategory->sub_category_name }}" />
+                                                        <a href="{{ route('services.edit', $service->id) }}" class="tick-overlap">
+                                                            <div class="tick">
+                                                                @if ($service->status == 'approved')
+                                                                    <span class="sprites green-tick-icon"></span>
+                                                                @else
+                                                                    <span class="sprites red-tick-icon"></span>
+                                                                @endif
+                                                            </div>
+                                                            @if (isset($service->subCategory->image))
+                                                                <img class="me-3 align-self-center rounded" height="80" src="{{ asset('uploads/subcategory/' . $service->subCategory->image) }}" alt="{{ $service->subCategory->sub_category_name }}" />
+                                                            @endif
+                                                        </a>
                                                     </td>
                                                     <td>
                                                         <div class="d-flex align-items-center">
                                                             <div class="flex-grow-1 text-truncate"> 
                                                                 <h5 class="m-0">{{ Str::limit($service->subCategory?->sub_category_name, 100, '...') }}</h5>                                                               
+                                                                
                                                                 <p class="text-muted tiny-font">
                                                                     {{ Str::limit($service->short_description, 60, '...') }}
                                                                 </p>
+                                                                <div class="price">
+                                                                    @php
+                                                                        $price = $service->subCategory?->price ?? $service->price;
+                                                                        $discount = $service->subCategory?->discounts?->first();
+                                                                        $discountPercent = $discount?->discountPercentage?->percentage ?? 0;
+                                                                        $discountPrice = $price - ($price * $discountPercent / 100);
+                                                                    @endphp
+
+                                                                    @if($discountPercent > 0)
+                                                                        <p>
+                                                                            ₹{{ round($discountPrice) }}
+                                                                            <del class="text-muted tiny-font">₹{{ number_format($price, 2) }}</del>                                                                            
+                                                                            <span class="discount text-muted tiny-font">{{ $discountPercent }}% OFF</span>
+                                                                        </p>
+                                                                    @else
+                                                                        ₹{{ number_format($price, 2) }}
+                                                                    @endif
+                                                                </div>
                                                                 <a href="{{ route('services.edit', $service->id) }}" class="fs-12 text-primary">ID: {{ $service->id }}</a>
                                                             </div>
                                                         </div>
                                                     </td>
                                                     <td>
+                                                        <div class="img-group d-flex">
+                                                            @foreach($service->serviceImages as $serviceImage)
+                                                                <a class="user-avatar position-relative d-inline-block" href="#">
+                                                                    <img src="{{ asset('uploads/services/small/' . $serviceImage->image) }}"
+                                                                        alt="{{ $service->title }}" class="thumb-md shadow-sm rounded-circle" />
+                                                                </a>
+                                                            @endforeach                                                                                                                            
+                                                        </div>
+                                                    </td>                                                    
+                                                    <td>
                                                         <div class="flex-grow-1 text-truncate"> 
                                                             <h6 class="m-0">{{ $service->vendor->user->name }}</h6>
                                                             <p class="text-muted tiny-font">
                                                                 {{ Str::limit($service->vendor->business_name, 80, '...') }}                                                            
-                                                            </p>
-                                                            <a href="#" class="fs-12 text-primary">ID: {{ $service->vendor->id }}</a>
+                                                            </p>                                                            
                                                         </div>
-                                                    </td>
+                                                    </td>                                                                                                        
                                                     <td class="text-end">
-                                                        <div class="price">
-                                                            @php
-                                                                $price = $service->subCategory?->price ?? $service->price;
-                                                                $discount = $service->subCategory?->discounts?->first();
-                                                                $discountPercent = $discount?->discountPercentage?->percentage ?? 0;
-                                                                $discountPrice = $price - ($price * $discountPercent / 100);
-                                                            @endphp
-
-                                                            @if($discountPercent > 0)                                                                
-                                                                <p>₹{{ round($discountPrice) }}</p>                                                                    
-                                                                <p class="text-muted tiny-font">
-                                                                    <del >₹{{ number_format($price, 2) }}</del>
-                                                                    <br>
-                                                                    <span class="discount text-muted tiny-font">{{ $discountPercent }}% OFF</span>
-                                                                </p>
-                                                            @else
-                                                                ₹{{ number_format($price, 2) }}
-                                                            @endif
-                                                        </div>
-                                                    </td>
-                                                    
-                                                    <td class="text-end">
-                                                        <div class="dropdown d-inline-block">
-                                                            <a class="dropdown-toggle arrow-none" id="dLabel11" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                                                                <i class="las la-ellipsis-v fs-20 text-muted"></i>
+                                                        <div class="flex">
+                                                            <a href="javascript:void"
+                                                                data-id="{{ $service->id }}"
+                                                                data-category="{{ $service->category_id }}"
+                                                                data-sub-category="{{ $service->sub_category_id }}"
+                                                                data-short-description="{{ $service->short_description }}"
+                                                                data-description="{{ $service->description }}"
+                                                                data-featured="{{ $service->is_featured }}"
+                                                                data-status="{{ $service->status }}"
+                                                                onclick="editService(this)"
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#serviceModal">
+                                                                <i class="las la-pen text-secondary fs-18"></i>
                                                             </a>
-                                                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dLabel11" style="">
-                                                                @if ($service->status == 'approved')
-                                                                    <p class="dropdown-item">
-                                                                        <span class="badge bg-success">Approved</span>
-                                                                    </p>
-                                                                @else
-                                                                    <p class="dropdown-item">
-                                                                        <span class="badge bg-danger">Rejected</span>
-                                                                    </p>
-                                                                @endif
-
-                                                                <a href="{{ route('services.edit', $service->id) }}" class="dropdown-item">
-                                                                    Edit
-                                                                </a>
-
-                                                                <a href="#" onclick="deleteService({{ $service->id }})" class="dropdown-item">
-                                                                    Delete
-                                                                </a>                                                                
-                                                            </div>
+                                                            
+                                                            <a href="#" onclick="deleteService({{ $service->id }})">
+                                                                <i class="las la-trash-alt text-secondary fs-18"></i>
+                                                            </a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -258,25 +266,6 @@
 
 @section('customJs')
 <script>
-    function deleteService(id){
-        var url = '{{ route("services.delete","ID") }}'
-        var newUrl = url.replace("ID",id)
-
-        if(confirm("Are you sure you want to delete?")){
-            $.ajax({
-                url: newUrl,
-                type: 'delete',
-                data: {},
-                dataType: 'json',
-                success: function(response){
-                    if(response["status"]){
-                        window.location.href="{{ route('services.index') }}"
-                    } else {
-                        window.location.href="{{ route('services.index') }}"
-                    }
-                }
-            });
-        }
-    }
+    
 </script>
 @endsection

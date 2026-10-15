@@ -19,11 +19,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\ImageManager;
+use Illuminate\Support\Str;
 use Intervention\Image\Drivers\Gd\Driver;
 use Carbon\Carbon;
 
 class ServiceController extends Controller {
-    
     public function index(Request $request){
         $categories = Category::withCount('subCategories')->orderBy('menu_order', 'ASC')->where('status', 1)->paginate(20);
         $discounts = DiscountPercentage::get();
@@ -36,12 +36,12 @@ class ServiceController extends Controller {
             $vendorId = $user->vendor?->id;
         }
 
-        $services = Service::with(['service_images'])
+        $services = Service::with(['serviceImages'])
             ->when($vendorId, function ($query) use ($vendorId) {
                 $query->where('vendor_id', $vendorId);
             })->latest('id')->get();
 
-        $vendorServices = Service::with(['service_images'])
+        $vendorServices = Service::with(['serviceImages'])
             ->when($vendorId, function ($query) use ($vendorId) {
                 $query->where('vendor_id', $vendorId);
             })->latest('id')->get();
@@ -55,145 +55,118 @@ class ServiceController extends Controller {
                 $query->where('vendor_id', $vendorId);
             })->count();
                           
-        $data = [                                 
-            'refresh'       => route('categories.index'),
-            'total'         => $serviceTotal,            
-            'modals' => [
-                'category' => [
-                    'title'      => 'Create Service',
-                    'modal_id'   => 'serviceModal',
-                    'form_id'    => 'serviceForm',
-                    'method_id'  => 'service_method',                    
-                    'formConfig' => [
-                        'action' => '',
-                        'method' => 'POST',
-                        'button' => 'Submit',
-                        'fields' => [                            
-                            [
-                                'type' => 'accordion',
-                                'name' => '',
-                                'label' => '',
-                                'class' => '',
-                                'items' => [
-                                    [
-                                        'title' => 'Service Details',
-                                        'fields' => [                                           
-                                            [
-                                                'type' => 'select',
-                                                'name' => 'vendor_id',
-                                                'label' => 'Vendor',
-                                                'options' => [
-                                                    $vendor->id => $vendor->business_name
+            $data = [                                 
+                'refresh'       => route('categories.index'),
+                'total'         => $serviceTotal,            
+                'modals' => [
+                    'category' => [
+                        'title'      => 'Create Service',
+                        'modal_id'   => 'serviceModal',
+                        'form_id'    => 'serviceForm',
+                        'method_id'  => 'service_method',                    
+                        'formConfig' => [
+                            'action' => '',
+                            'method' => 'POST',
+                            'button' => 'Add',
+                            'fields' => [
+                                [
+                                    'type' => 'accordion',
+                                    'name' => '',
+                                    'label' => '',
+                                    'class' => '',
+                                    'items' => [
+                                        [
+                                            'title' => 'Service Details',
+                                            'fields' => [   
+                                                [
+                                                    'type' => 'dropzone',
+                                                    'name' => 'images',
+                                                    'label' => 'Service Images',
+                                                    'col' => 'col-12',
+                                                    'maxFiles' => 5,
+                                                    'acceptedFiles' => 'image/*',
+                                                    'multiple' => true,
+                                                ],                                                
+                                                [
+                                                    'type' => 'select',
+                                                    'name' => 'vendor_id',
+                                                    'label' => 'Vendor',
+                                                    'options' => [
+                                                        $vendor->id => $vendor->business_name
+                                                    ],
+                                                    'value' => $vendor->id,
+                                                    'col' => 'col-12 d-none',
                                                 ],
-                                                'value' => $vendor->id,
-                                                'col' => 'col-12 d-none',
-                                            ],
-                                            [
-                                                'type' => 'select',
-                                                'name' => 'category_id',
-                                                'label' => 'Select Category',
-                                                'options' => $categories->pluck('category_name','id')->toArray(),
-                                                'col' => 'col-12',
-                                                'id' => 'category_id',
-                                            ],
-                                            [
-                                                'type' => 'select',
-                                                'name' => 'sub_category_id',
-                                                'label' => 'Select Sub Category',
-                                                'options' => [],
-                                                'col' => 'col-12',
-                                                'id' => 'sub_category_id',
-                                            ],
-                                            [
-                                                'type' => 'text',
-                                                'name' => 'title',
-                                                'id' => 'title', 
-                                                'label' => 'Service Title',
-                                                'placeholder' => 'Enter Service Title',
-                                                'slug_create' => 'slug-source',
-                                                'class' => 'slug-source',
-                                                'data'  => [
-                                                    'target' => '#slug'
+                                                [
+                                                    'type' => 'select',
+                                                    'name' => 'category_id',
+                                                    'label' => 'Select Category',
+                                                    'options' => $categories->pluck('category_name','id')->toArray(),
+                                                    'col' => 'col-12',
+                                                    'id' => 'category_id',
                                                 ],
-                                                'col' => 'col-12',
-                                            ], 
-                                            [
-                                                'type' => 'text',
-                                                'name' => 'slug',
-                                                'label' => 'slug',
-                                                'placeholder' => '',
-                                                'id'    => 'slug',
-                                                'col' => 'col-12 d-none',
-                                            ],                                                                                        
-                                            [
-                                                'type' => 'select',
-                                                'name' => 'status',
-                                                'label' => 'Status',
-                                                'options' => [
-                                                    'approved' => 'Approved',
-                                                    'pending' => 'Pending'
+                                                [
+                                                    'type' => 'select',
+                                                    'name' => 'sub_category_id',
+                                                    'label' => 'Select Sub Category',
+                                                    'options' => [],
+                                                    'col' => 'col-12',
+                                                    'id' => 'sub_category_id',
+                                                ],                                                
+                                                [
+                                                    'type' => 'select',
+                                                    'name' => 'status',
+                                                    'label' => 'Status',
+                                                    'options' => [
+                                                        'approved' => 'Approved',
+                                                        'pending' => 'Pending'
+                                                    ],
+                                                    'value' => auth()->user()?->role === 'admin' ? 'approved' : 'pending',
+                                                    'default' => auth()->user()?->role === 'admin' ? 'approved' : 'pending',
+                                                    'col' => auth()->user()?->role === 'admin' ? 'col-6' : 'col-6 d-none'
+                                                ],   
+                                                [
+                                                    'type' => 'select',
+                                                    'name' => 'is_featured',
+                                                    'label' => 'Featured',                                                    
+                                                    'options' => [
+                                                        0 => 'No',
+                                                        1 => 'Yes'
+                                                    ],
+                                                    'value' => 1,
+                                                    'default' => 1,
+                                                    'col' => 'col-6'
                                                 ],
-                                                'value' => 'pending',
-                                                'default' => 'pending',
-                                                'col' => 'col-6'
                                             ],
-                                            [
-                                                'type' => 'select',
-                                                'name' => 'discount_percentage_id',
-                                                'label' => 'Discount',
-                                                'options' => $discounts->pluck('percentage','id')->toArray(),
-                                                'col' => 'col-3',
-                                            ],
-                                            [
-                                                'type' => 'select',
-                                                'name' => 'is_featured',
-                                                'label' => 'Featured',
-                                                'options' => [
-                                                    'yes' => 'Yes',
-                                                    'no' => 'No'
+                                        ],
+                                        [
+                                            'title' => 'Discriptions',
+                                            'fields' => [
+                                                
+                                                [
+                                                    'type' => 'textarea',
+                                                    'name' => 'short_description',
+                                                    'label' => 'Short Description',                                                    
+                                                    'placeholder' => 'Short Description',
+                                                    'rows' => '2',
+                                                    'col' => 'col-12'
                                                 ],
-                                                'value' => 'yes',
-                                                'default' => 'yes',
-                                                'col' => 'col-3'
-                                            ],    
-                                            [
-                                                'type' => 'dropzone',
-                                                'name' => 'images',
-                                                'label' => 'Service Images',
-                                                'col' => 'col-12',
-                                                'maxFiles' => 5,
-                                                'acceptedFiles' => 'image/*',
-                                                'multiple' => true,
-                                            ],                                       
+                                                [
+                                                    'type' => 'textarea',
+                                                    'name' => 'description',
+                                                    'label' => 'Description',                                                    
+                                                    'placeholder' => 'Description',
+                                                    'rows' => '4',
+                                                    'col' => 'col-12'
+                                                ],
+                                            ],
                                         ],
                                     ],
-                                    [
-                                        'title' => 'Other Details',
-                                        'fields' => [
-                                            
-                                            [
-                                                'type' => 'textarea',
-                                                'name' => 'short_description',
-                                                'label' => 'Short Description',
-                                                'placeholder' => 'Short Description',
-                                                'col' => 'col-12'
-                                            ],
-                                            [
-                                                'type' => 'textarea',
-                                                'name' => 'description',
-                                                'label' => 'Description',
-                                                'placeholder' => 'Description',
-                                                'col' => 'col-12'
-                                            ],   
-                                            
-                                        ],
-                                    ],
-                                ],
-                            ],                                                                                    
-                        ]                        
-                    ]
-                ],
-            ],     
+                                ],                                                                                    
+                            ]                        
+                        ]
+                    ],
+                ],     
                                    
             'services' => $services,
             'vendorServices' => $vendorServices
@@ -203,7 +176,6 @@ class ServiceController extends Controller {
 
         return view ('admin.services', $data);
     }
-
 
     public function subCategories($categoryId) {
         $subCategories = SubCategory::where('category_id', $categoryId)
@@ -222,403 +194,183 @@ class ServiceController extends Controller {
         ]);
     }
 
-    public function create(){
-        $data = [];
-        $categories = Category::orderBy('category_name','ASC')->get();        
-        $subcategories = collect();
-        $subsubcategories = collect();        
-
-        $selected_discount = $product->discount_percentage_id ?? '';
-        $discount_percentages = DiscountPercentage::all();
-
-        $data['categories'] = $categories;        
-        $data['subcategories'] = $subcategories;
-        $data['subsubcategories'] = $subsubcategories;
-        $data['selected_discount'] = $selected_discount;
-        $data['discount_percentages'] = $discount_percentages;        
-
-        return view('admin.services.create', $data);
-    }
-
-    public function store(Request $request){
-        $rules = [
-            'name' => 'required',
-            // 'slug' => 'required|unique:products',
-            // 'price' => 'required|numeric',                        
-            // 'category' => 'required|numeric',
-            // 'is_featured' => 'required|in:Yes,No',
-        ];        
-
-        $validator = Validator::make($request->all(),$rules);
+    public function service_store(Request $request){
+        $validator = Validator::make($request->all(), [
+            
+        ]);
 
         if ($validator->passes()) {
-            $service = new Service;
-            $service->name = $request->name;
-            $service->slug = $request->slug;
-            // $service->description = $request->description;
-            // $service->short_description = $request->short_description;$service->shipping_returns = $request->shipping_returns;
-            // $service->related_products = (!empty($request->related_products)) ? implode(',',$request->related_products) : '';
-            // $service->price = $request->price;            
-            // $service->category_id = $request->category;
-            // $service->sub_category_id = $request->sub_category;                                          
-            // $service->average_rating = $request->average_rating;            
+            $service = new Service();
+            $service->vendor_id = $request->vendor_id;
+            $service->category_id = $request->category_id;
+            $service->sub_category_id = $request->sub_category_id;
+            $service->short_description = $request->short_description;            
+            $service->description = $request->description;
+            $service->is_featured = $request->is_featured;
             $service->status = $request->status;
             $service->save();
-            
+
             if (!empty($request->image_array)) {
-                $color_id = $request->color_id; 
-                foreach ($request->image_array as $temp_image_id) {  
+                $categoryName = Str::slug($service->category?->category_name ?? 'category');
+                $subCategoryName = Str::slug($service->subCategory?->sub_category_name ?? 'sub-category');
+                $vendorId = $service->vendor_id;
+
+                foreach ($request->image_array as $temp_image_id) {
                     $tempImageInfo = TempImage::find($temp_image_id);
+
                     if (!$tempImageInfo) {
                         continue;
                     }
 
                     $ext = pathinfo($tempImageInfo->name, PATHINFO_EXTENSION);
 
+                    // Create service image record first
                     $serviceImage = new ServiceImage();
-                    $serviceImage->service_id = $service->id;                    
+                    $serviceImage->service_id = $service->id;
                     $serviceImage->image = "NULL";
                     $serviceImage->save();
 
-                    $imageName = $service->id. '-' .$service->title. '-' .$serviceImage->id.'.'.$ext;                    
+                    // Create image name
+                    $imageName = $vendorId                        
+                        . '-' . $categoryName
+                        . '-' . $subCategoryName
+                        . '-' . $serviceImage->id                        
+                        . '.' . $ext;
+
                     $serviceImage->image = $imageName;
                     $serviceImage->save();
 
-                    //Large Image
-                    $sourcePath = public_path().'/temp/'.$tempImageInfo->name;
-                    $destPath = public_path().'/uploads/services/large/'.$imageName;
+                    // Source image
+                    $sourcePath = public_path('temp/' . $tempImageInfo->name);
+
+                    // Large Image
+                    $destPath = public_path('uploads/services/large/' . $imageName);
+
                     $manager = new ImageManager(new Driver());
+
                     $image = $manager->read($sourcePath);
-                    $image->cover(540,720);
+                    $image->cover(700, 700);
                     $image->save($destPath);
 
-                    //Generate Thumnail
-                    $destPath = public_path().'/uploads/services/thumb/'.$imageName;
+                    // Thumbnail
+                    $destPath = public_path('uploads/services/small/' . $imageName);
+
                     $manager = new ImageManager(new Driver());
+
                     $image = $manager->read($sourcePath);
-                    $image->cover(144,144);
+                    $image->cover(144, 144);
                     $image->save($destPath);
                 }
             }
+                 
+            $request->session()->flash('success', 'Service added successfully');
 
-        $request->session()->flash('success','Service added successfully');
-
-        // return redirect()
-        //     ->route('services.index')
-        //     ->with('success', 'Product updated successfully');
-        // }
-        
-        return response()->json([
-            'status' => true,
-            'message' => 'Service added successfully'
-        ]);
-
+            return response()->json([
+                'status' => true,
+                'message' => 'Service added successfully'
+            ]);
         } else {
             return response()->json([
                 'status' => false,
                 'errors' => $validator->errors()
             ]);
         }
-    }
+    }  
 
-    public function edit($id, Request $request){
-        $product = Product::with(['colors','sizes','discount'])->find($id);        
-        $subcategories = SubCategory::where('category_id', $product->category_id)->get();
-        $selected_subcategory = $product->sub_category_id;
-        $selected_subsubcategory = $product->sub_sub_category_id;
-        $productimages = ProductImage::where('product_id',$product->id)->get();
-        //$subcategories = SubCategory::where('category_id',$product->category_id)->get();        
-        $subsubcategories = SubSubCategory::where('sub_category_id', $product->sub_category_id)->get();        
-        $selected_discount = $product->discount_percentage_id ?? '';
-        //$product->load('variants');
-        
-        if (empty($product)) {
-            return redirect()->route('services.index')->with('error','Product not found');
-        }        
+    public function service_update($serviceId, Request $request) {
+        $service = Service::find($serviceId);
 
-        //Fetch Related products
-        $relatedProducts = [];
-        if ($product->related_products != '') {
-            $productArray = explode(',',$product->related_products);
-            $relatedProducts = Product::whereIn('id',$productArray)->get();
+        if (!$service) {
+            return response()->json([
+                'status' => false,
+                'notFound' => true,
+                'message' => 'Service not found'
+            ]);
         }
 
-        $data = [];
-        $categories = Category::orderBy('category_name','ASC')->get();
-        $brands = Brand::orderBy('name','ASC')->get();
-        $colors = Color::orderBy('id','ASC')->get();
-        $sizes  = Size::orderBy('id','ASC')->get();
-        $discounts = Discount::orderBy('id','ASC')->get();
-        $discount_percentages = DiscountPercentage::orderBy('percentage','ASC')->get();
+        $validator = Validator::make($request->all(), [
+            'is_featured' => 'required|in:0,1',
+            'status' => 'required',
+        ]);
 
-        $data['categories'] = $categories;
-        $data['subcategories'] = $subcategories;
-        $data['subsubcategories'] = $subsubcategories;
-        $data['selected_subcategory'] = $selected_subcategory;
-        $data['selected_subsubcategory'] = $selected_subsubcategory;
-        $data['product'] = $product;                
-        $data['productimages'] = $productimages;
-        $data['relatedProducts'] = $relatedProducts;        
-        $data['brands'] = $brands;
-        $data['colors'] = $colors;
-        $data['sizes'] = $sizes;
-        $data['discounts'] = $discounts;
-        $data['discount_percentages'] = $discount_percentages;
-        $data['selected_discount'] = $selected_discount;               
-        
-        return view('admin.services.edit',$data);
-    }
-
-    public function update($id, Request $request){
-        $product = Product::with('sizes','colors')->find($id);
-
-        $rules = [
-            'title' => 'required',
-            'slug' => 'required|unique:products,slug,'.$product->id.',id',
-            'price' => 'required|numeric',
-            //'sku' => 'required|unique:products,sku,'.$product->id.',id',
-            'track_qty' => 'required|in:Yes,No',
-            'category' => 'required|numeric',
-            'is_featured' => 'required|in:Yes,No',
-        ];
-
-        if (!empty($request->track_qty) && $request->track_qty == 'Yes') {
-            $rules['qty'] = 'required|numeric';
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ]);
         }
 
-        $validator = Validator::make($request->all(),$rules);
+        $service->category_id = $request->category_id;
+        $service->sub_category_id = $request->sub_category_id;
+        $service->short_description = $request->short_description;
+        $service->description = $request->description;
+        $service->is_featured = $request->is_featured;
+        $service->status = $request->status;
+        $service->save();
 
-        if ($validator->passes()) {
-            $product->title = $request->title;
-            $product->slug = $request->slug;
-            $product->description = $request->description;
-            $product->short_description = $request->short_description;$product->shipping_returns = $request->shipping_returns;
-            $product->related_products = (!empty($request->related_products)) ? implode(',',$request->related_products) : '';
-            $product->price = $request->price;            
-            $product->category_id = $request->category;
-            $product->sub_category_id = $request->sub_category;
-            $product->sub_sub_category_id = $request->sub_sub_category;
-            $product->brand_id = $request->brand;            
-            $product->is_featured = $request->is_featured;
-            $product->sku = $request->sku;
-            $product->barcode = $request->barcode;
-            $product->track_qty = $request->track_qty;
-            $product->qty = $request->qty;
-            $product->recommended = $request->recommended;
-            $product->discount_percentage_id = $request->discount_percent;            
-            $product->average_rating = $request->average_rating;
-            $product->cod = $request->cod;
-            $product->is_returnable = $request->is_returnable;
-            $product->return_days = $request->return_days;
-            $product->delivery_min_days = Carbon::now();
-            $product->delivery_max_days = Carbon::now()->addDays(7);
-            $product->status = $request->status;
-            $product->save();
+        $request->session()->flash('success', 'Service updated successfully');
 
-            // attach multiple IDs
-            $product->colors()->sync($request->colors);
-            $product->sizes()->sync($request->sizes);
-
-            if($request->discount_percent > 0){
-                Discount::updateOrCreate(
-                    ['product_id' => $product->id],
-                    [
-                        'discount_percentages_id' => $request->discount_percent,
-                        'start_date' => Carbon::now(),
-                        'end_date' => Carbon::now()->addDays(30),
-                    ]
-                );
-            } else {
-                Discount::where('product_id', $product->id)->delete(); // remove discount
-            }
-
-            // 3️⃣ Save Variants with color_id
-            if ($request->filled('existing_variant_images')) {
-                foreach ($request->existing_variant_images as $variantData) {
-
-                    if (!empty($variantData['id'])) {
-                        ProductVariant::where('id', $variantData['id'])
-                            ->update([
-                                'color_id' => $variantData['color_id']
-                            ]);
-                    }
-                }
-            }
-
-            if ($request->filled('variant_image_array') && is_array($request->variant_image_array)) {
-                foreach ($request->variant_image_array as $variant) {
-                    $temp_image_id = $variant['image_id'] ?? null;
-                    $color_id = $variant['color_id'] ?? null;
-
-                    if (!$temp_image_id || !$color_id) {
-                        continue;
-                    }
-
-                    $tempImageInfo = TempImage::find($temp_image_id);
-
-                    if (!$tempImageInfo) {
-                        continue;
-                    }
-
-                    $ext = pathinfo($tempImageInfo->name, PATHINFO_EXTENSION);
-
-                    // Create variant record
-                    $productVariant = new ProductVariant();
-                    $productVariant->product_id = $product->id;
-                    $productVariant->color_id = $color_id; // ✅ SAVE COLOR
-                    $productVariant->image = 'temp.jpg';
-                    $productVariant->save();
-
-                    $imageName = $product->slug . '_' . $product->id . '_' . $productVariant->id . '.' . $ext;
-
-                    $productVariant->image = $imageName;
-                    $productVariant->save();
-
-                    $sourcePath = public_path('/temp/' . $tempImageInfo->name);
-
-                    if (!file_exists($sourcePath)) {
-                        continue;
-                    }
-
-                    $manager = new ImageManager(new Driver());
-
-                    // LARGE IMAGE
-                    $largePath = public_path('/uploads/product/large/' . $imageName);
-                    $image = $manager->read($sourcePath);
-                    $image->cover(540, 720);
-                    $image->save($largePath, quality: 100);
-
-                    // SMALL IMAGE
-                    $smallPath = public_path('/uploads/product/small/' . $imageName);
-                    $image = $manager->read($sourcePath);
-                    $image->cover(300, 300);
-                    $image->save($smallPath, quality: 100);
-
-                    File::delete($sourcePath);
-                }
-            }
-
-            if ($request->filled('image_array') && is_array($request->image_array)) {
-                foreach ($request->image_array as $imageData) {
-
-                 if ($request->filled('color_id')) {
-                    ProductImage::where('product_id', $product->id)
-                        ->update([
-                            'color_id' => $request->color_id
-                        ]);
-                }   
-                
-                    $temp_image_id = $imageData['image_id'] ?? null;
-                    $image_id = $imageData['image_id'] ?? null;
-                    $color_id = $imageData['color_id'] ?? null;
-                    
-                    if (!$temp_image_id) { continue; }
-
-                    if (!$image_id) {
-                        continue;
-                    }
-
-                    // ✅ UPDATE existing image
-                    ProductImage::where('id', $image_id)
-                        ->update([
-                            'color_id' => $color_id
-                        ]);
-
-                    $tempImageInfo = TempImage::find($temp_image_id);
-
-                    if (!$tempImageInfo) {
-                        continue;
-                    }
-
-                    $ext = pathinfo($tempImageInfo->name, PATHINFO_EXTENSION);
-
-                    // Create record
-                    $productImage = new ProductImage();
-                    $productImage->product_id = $product->id;
-                    $productImage->color_id = $color_id; 
-                    $productImage->image = 'temp.jpg';
-                    $productImage->save();
-
-                    $imageName = $product->id . '-' . $product->title . '-' . $productImage->id . '.' . $ext;
-
-                    $productImage->image = $imageName;
-                    $productImage->save();
-
-                    $sourcePath = public_path('/temp/' . $tempImageInfo->name);
-
-                    if (!file_exists($sourcePath)) {
-                        continue;
-                    }
-
-                    $manager = new ImageManager(new Driver());
-
-                    // Large
-                    $largePath = public_path('/uploads/product/large/' . $imageName);
-                    $image = $manager->read($sourcePath);
-                    $image->cover(540, 720);
-                    $image->save($largePath, quality: 100);
-
-                    // Small
-                    $smallPath = public_path('/uploads/product/small/' . $imageName);
-                    $image = $manager->read($sourcePath);
-                    $image->cover(300, 400);
-                    $image->save($smallPath, quality: 100);
-
-                    File::delete($sourcePath);
-                }
-            }
-
-
-        $users = StockNotification::where('product_id', $product->id)
-        ->where('notified', 0)
-        ->get();
-
-        foreach ($users as $notify) {
-            // send email / notification
-            // Mail::to($notify->user->email)->send(...);
-
-            $notify->update(['notified' => 1]);
-        }
-        
-        $request->session()->flash('success','Product updated successfully');
-
-        return redirect()
-            ->route('services.index')
-            ->with('success', 'Product updated successfully');
-         }
+        return response()->json([
+            'status' => true,
+            'message' => 'Service updated successfully'
+        ]);
     }
 
-    public function destroy($id, Request $request){
+
+          
+    public function service_destroy($id, Request $request) {
         $service = Service::find($id);
 
-        if (empty($service)) {
-            $request->session()->flash('error','Service not found');
+        if (!$service) {
+            $request->session()->flash('error', 'Service not found');
             return response()->json([
                 'status' => false,
                 'notFound' => true,
             ]);
         }
 
-        $serviceImages = ServiceImage::where('service_id',$id)->get();
+        // Get service images
+        $serviceImages = ServiceImage::where('service_id', $service->id)->get();
 
-        if (!empty($serviceImages)) {
+        if ($serviceImages->isNotEmpty()) {
             foreach ($serviceImages as $serviceImage) {
-                File::delete(public_path('uploads/services/large/'.$serviceImage->image));
-                File::delete(public_path('uploads/services/thumb/'.$serviceImage->image));
+                // Delete large image
+                $largePath = public_path(
+                    'uploads/services/large/' . $serviceImage->image
+                );
+
+                if (File::exists($largePath)) {
+                    File::delete($largePath);
+                }
+
+                // Delete small image
+                $smallPath = public_path(
+                    'uploads/services/small/' . $serviceImage->image
+                );
+
+                if (File::exists($smallPath)) {
+                    File::delete($smallPath);
+                }
             }
 
-            ServiceImage::where('service_id',$id)->delete();
+            // Delete service image records
+            ServiceImage::where('service_id', $service->id)->delete();
         }
 
+        // Delete service
         $service->delete();
 
-        $request->session()->flash('success','Service deleted successfully');
+        $request->session()->flash(
+            'success',
+            'Service deleted successfully'
+        );
 
         return response()->json([
             'status' => true,
             'message' => 'Service deleted successfully',
         ]);
     }
+
 
     public function getServices(Request $request){
         $tempProduct = [];

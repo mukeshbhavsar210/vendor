@@ -44,7 +44,7 @@
     </div>
     
     @php
-        $homeServiceSections = [
+        $homeServiceSections = [            
             [
                 'title' => 'Most booked services',
                 'text' => '',

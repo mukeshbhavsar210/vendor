@@ -52,37 +52,37 @@
             
             <div class="services">                        
                 <div class="service-listings">
-                    @if($category)                                                        
-                        <h2>{{ $category->category_name }}</h2>
-                    @endif
-
                     @if($services->isNotEmpty())
+                        @if($category->banner == 'yes')
+                            <div class="category-banner">
+                                <div class="details">
+                                    <div class="left">
+                                        @if ($category->banner_label)
+                                            <p class="label">{{ $category->banner_label }}</p>    
+                                        @endif                                        
+                                        <div class="text">
+                                            <h3>{{ $category->category_name }}</h3>                                            
+                                            <p>{{ $category->banner_details }}</p>
+                                        </div>
+                                    </div>
+
+                                    @if($category->banner_image)
+                                        <div class="right">
+                                            <img src="{{ asset('uploads/category/' . $category->banner_image) }}" alt="{{ $category->banner_title }}" />
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @else                            
+                            <h2 class="main-title">{{ $category->category_name }}</h2>
+                        @endif
+
                         @foreach($services as $subCategoryId => $subCategoryServices)                            
                             @php
                                 $subCategory = $subCategoryServices->first()?->subCategory;
                             @endphp
 
                             <div class="subcategory-right" id="{{ $subCategory->sub_category_slug }}" data-id="{{ $subCategory->id }}" >
-                                @if($subCategory->banner == 'yes')
-                                    <div class="category-banner">
-                                        <div class="details">
-                                            <div class="left">
-                                                <p class="label">{{ $subCategory->banner_label }}</p>
-                                                <div class="text">
-                                                    <h3>{{ $subCategory->banner_title }}</h3>
-                                                    <p>{{ $subCategory->banner_details }}</p>
-                                                </div>
-                                            </div>
-
-                                            @if($subCategory->banner_image)
-                                                <div class="right">
-                                                    <img src="{{ asset('uploads/category/' . $subCategory->banner_image) }}" alt="{{ $subCategory->banner_title }}" />
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                @endif
-                                                        
                                 <div class="services-list"> 
                                     @foreach($subCategoryServices as $value)
                                         <x-services                                            
