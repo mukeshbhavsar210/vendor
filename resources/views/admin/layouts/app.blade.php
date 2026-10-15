@@ -18,6 +18,23 @@
 </head>
 
 <body data-sidebar-size="collapsed">
+
+<div id="alert-area">
+    @if (Session::has('error'))
+        <div class="alert alert-danger alert-dismissible fade show">
+            {{ Session::get('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if (Session::has('success'))
+        <div class="alert alert-success alert-dismissible fade show">
+            {{ Session::get('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+</div>
+    
 <div class="topbar d-print-none">
     <div class="container-xxl">
         <nav class="topbar-custom d-flex justify-content-between nav-sticky" id="topbar-custom">    
@@ -112,21 +129,11 @@
     <div class="page-content">
         <div class="container-xxl">
             @yield('content')
-        </div>                
-        
-        <footer class="footer text-center text-sm-start d-print-none">
-            <div class="container-xxl">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card mb-0 rounded-bottom-0">
-                            <div class="card-body">
-                                <p class="text-muted mb-0"> © <script> document.write(new Date().getFullYear()) </script> Online Shopping </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </footer>
+                
+            <footer class="footer p-2">
+                <p class="text-muted mb-0">© <script> document.write(new Date().getFullYear()) </script> Urban Clap</p>            
+            </footer>
+        </div>
     </div>
 </div>
 
@@ -176,6 +183,27 @@
         });
     });
 
+
+    function deleteService(id){
+        var url = '{{ route("services.delete","ID") }}'
+        var newUrl = url.replace("ID",id)
+
+        if(confirm("Are you sure you want to delete?")){
+            $.ajax({
+                url: newUrl,
+                type: 'delete',
+                data: {},
+                dataType: 'json',
+                success: function(response){
+                    if(response["status"]){
+                        window.location.href="{{ route('services.index') }}"
+                    } else {
+                        window.location.href="{{ route('services.index') }}"
+                    }
+                }
+            });
+        }
+    }
     
     function deleteCategory(id){        
         var url = '{{ route("category.delete","ID") }}'
@@ -220,9 +248,9 @@
         }
     }
 
-    function deleteSub2Category(id){
-        var url = '{{ route("sub_sub_category.delete","ID") }}'
-        var newUrl = url.replace("ID",id)
+    function deleteVendor(id){
+        var url = '{{ route("vendors.delete","ID") }}'
+        var newUrl = url.replace("ID",id);
 
         if(confirm("Are you sure you want to delete?")){
             $.ajax({
@@ -234,11 +262,15 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(response){
-                    window.location.href="{{ route('categories.index') }}"                    
+                    if(response["status"]){
+                        window.location.href="{{ route('vendors.index') }}"
+                    }
                 }
             });
         }
-    } 
+    }
+
+    
 
     function deletePage(id){        
         var url = '{{ route("pages.delete","ID") }}'
@@ -431,6 +463,59 @@
         function deleteImage(id){
             $("#image-row-"+id).remove();
         }
+
+
+
+       $(document).on('change', '#vendor_category_id', function () {
+            let categoryId = $(this).val();
+            let container = $('#sub_category_id');
+
+            container.empty();
+
+            if (!categoryId) {
+                container.html('Please select a category first.');
+                return;
+            }
+
+            let url = @json(route('vendors.subcategories', ['category' => '__ID__']));
+            url = url.replace('__ID__', encodeURIComponent(categoryId));
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+
+                success: function (subCategories) {
+                    if (!subCategories.length) {
+                        container.html(
+                            '<div class="col-12">No subcategories found.</div>'
+                        );
+                        return;
+                    }
+
+                    $.each(subCategories, function (index, item) {
+                        container.append(`
+                            <p class="m-0">
+                                <label class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="services[]" value="${item.id}" >
+                                    <span class="form-check-label">${$('<div>').text(item.name).html()}</span>
+                                </label>
+                            </p>
+                        `);
+                    });
+                },
+
+                error: function (xhr) {
+                    console.error('URL:', url);
+                    console.error('Status:', xhr.status);
+                    console.error('Response:', xhr.responseText);
+
+                    container.html(
+                        '<div class="col-12 text-danger">Unable to load subcategories.</div>'
+                    );
+                }
+            });
+        });
 </script>
 
 @yield('customJs')

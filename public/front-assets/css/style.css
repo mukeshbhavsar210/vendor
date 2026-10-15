@@ -483,7 +483,7 @@ body.active .menu-overlay{
 
 .services { border-top: 1px solid rgb(237, 237, 237); border-left: 1px solid rgb(237, 237, 237); display: flex; gap: 40px; flex-wrap: wrap; margin-top: 30px; }
 .services .service-listings { padding: 20px 30px 30px 30px; border-right: 1px solid rgb(237, 237, 237); width: 60%;}
-.services .service-listings h2 { margin-bottom: 30px; font-size: 22px; border-bottom: 1px solid rgb(237, 237, 237); padding-bottom: 15px; }
+.services .service-listings .main-title { margin-bottom: 30px; font-size: 22px; border-bottom: 1px solid rgb(237, 237, 237); padding-bottom: 15px; }
 .services .service-listings .category-banner { background-color: #ededed; border-radius: 10px; margin: 20px 0; padding: 0; }
 .services .service-listings .category-banner .details { display: flex; border-radius: 10px; }
 .services .service-listings .category-banner .details .left {  width: 50%;}
@@ -497,7 +497,7 @@ body.active .menu-overlay{
 .card-custom { border: 1px solid rgb(237, 237, 237); border-radius: 10px; padding: 15px; position: relative; }
 
 
-.subcategory-right.anchor-active { padding-top:70px;}
+/* .subcategory-right.anchor-active { padding-top:70px;} */
 
 .cart { border: 1px solid rgb(237, 237, 237); border-radius: 10px; position: relative; }
 .cart .cart-body { padding: 15px 15px 5px 15px; }
@@ -644,6 +644,8 @@ body.active .menu-overlay{
 .filter-group h5 { font-weight: bold; margin-bottom: 10px; font-size: 13px; text-transform: uppercase;}
 .filter-group h5 .text-muted { text-transform:capitalize; font-weight: normal;}
 
+.modal-large { max-width: 600px !important;}
+
 .service-card { border-bottom:1px solid rgb(237, 237, 237); display: flex; column-gap: 10px; justify-content: space-between; padding: 0 0 30px 0; margin-bottom: 25px;} 
 .product-image-wrapper .gallery-icon { position: absolute; display: none; z-index: 1; bottom:150px; left:0; width: 100%; padding: 5px 15px; }
 .product-image-wrapper .gallery-icon .color-details { padding:8px 25px; background-color: rgba(0, 0, 0, 0.4); border-radius: 3px; }
@@ -660,7 +662,7 @@ body.active .menu-overlay{
 .service-card .left { width: 70%; }
 .service-card .left .view { font-weight: bold;}
 .service-card .left .text-details { margin-top: 10px; padding:10px 0; border-top: 1px solid rgb(237, 237, 237); font-size: 11px; }
-.service-card .left h3 { font-size: 18px; font-weight: bold; margin-bottom: 6px; line-height: 22px; }
+.service-card .left h3 { font-size:20px; font-weight: bold; margin-bottom: 6px; line-height: 24px; }
 .service-card .left .ratings { font-size: 11px; display: flex; column-gap: 5px; margin: 3px 0; }
 .service-card .left .ratings .svg { height: 15px; width: 15px; margin-top: 1px;}
 .service-card .left .short { font-size: 13px; color: var(--gray); margin: 2px 0;}

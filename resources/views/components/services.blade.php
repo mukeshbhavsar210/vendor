@@ -111,7 +111,7 @@
     @endif
 
     <div class="modal fade" id="modal_{{ $category->category_slug }}" tabindex="-1" aria-labelledby="categoryLabel_{{ $category->category_modal }}" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-custom">
+        <div class="modal-dialog modal-dialog-centered modal-custom modal-large">
             <div class="modal-content">
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
@@ -123,7 +123,13 @@
 
                 <div class="modal-body">                                                                                                                                        
                     @if ($categories->isNotEmpty())
-                        @if ($modalType === 'ac-appliance-repair' || $modalType === 'electrician-plumber-carpenter')
+                        @if (
+                                $modalType === 'pop-work' ||
+                                $modalType === 'carpenter-work' ||
+                                $modalType === 'plumber-work' ||
+                                $modalType === 'electrician-work' ||
+                                $modalType === 'ac-appliance-repair'
+                            )
                             @foreach ($categories->groupBy('appliance_types') as $applianceType => $items)
                                 <h5 class="mb-2">{{ $applianceType }}</h5>
                                 <div class="modal-card">
@@ -164,7 +170,7 @@
                                 @endphp
 
                                 @if ($section)
-                                    <h5 class="mb-3">{{ $section->category_name }}</h5>
+                                    <h4 class="mb-3">{{ $section->category_name }}</h4>
                                 @endif
 
                                 @if ($insideItems->isNotEmpty())
@@ -239,14 +245,18 @@
                     <div class="modal-dialog modal-dialog-centered modal-custom">
                         <div class="modal-content">
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
                             <div class="modal-scroll">
-                                @if($process)                                    
-                                    <img src="{{ asset('uploads/process/' . $process->banner) }}"  />
+                                @if($process)                               
+                                    @if ($process->banner)
+                                        <img src="{{ asset('uploads/process/' . $process->banner) }}" />
+                                    @endif
                                 @endif                          
                                                         
                                 <div class="modal-body-wrapper">
                                     <div class="left">
-                                        <h3>{{ isset($title_limit) ? Str::limit($title, $title_limit, '...') : $title }}</h3>
+                                        <h3>{{ $item->subCategory->sub_category_name }}</h3>
+                                        {{-- <h3>{{ isset($title_limit) ? Str::limit($title, $title_limit, '...') : $title }}</h3> --}}
 
                                         @if($ratings->count())
                                             <div class="ratings">
@@ -292,18 +302,20 @@
                                 </div>
 
                                 @if($process)
-                                    <div class="sections">
-                                        <h5 class="mb-3">Highlights</h5>
-                                        <p>{{ $process->highlights }}</p>
-                                    </div>
+                                    @if ($process->highlights)
+                                        <div class="sections">
+                                            <h5 class="mb-3">Highlights</h5>
+                                            <p>{{ $process->highlights }}</p>
+                                        </div>
+                                    @endif
                                                                     
                                     @if(!empty($process->details))   
                                         <div class="sections">
-                                            <h2 class="mb-3">How it works</h2>                                        
+                                            <h3 class="mb-3">How it works</h3>
                                             <ol class="process-list">
                                                 @foreach($process->details as $detail)                                            
                                                     <li class="process-item">
-                                                        <h5>{{ $detail['name'] }}</h5>
+                                                        <h6>{{ $detail['name'] }}</h6>
                                                         <p>{{ $detail['description'] }}</p>
                                                         
                                                         @if(!empty($detail['image']))

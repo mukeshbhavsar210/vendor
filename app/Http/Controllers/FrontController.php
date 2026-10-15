@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Validator;
 class FrontController extends Controller {
     public function index(){
         
-        $getCategories = Category::with(['subCategories'])->where('showHome', 'outside')->orderBy('menu_order', 'ASC')->take(20)->get();
+        $getCategories = Category::with(['subCategories'])->where('status', 1)->where('showHome', 'outside')->orderBy('menu_order', 'ASC')->take(20)->get();
         $modalCategories = Category::where('showHome', 'inside')->where('status', 1)->orderBy('menu_order', 'ASC')->get()->groupBy('category_modal');
         $modalCategories2 = Category::where('status', 1)->orderBy('menu_order', 'ASC')->get();
         $allServices = Category::where('category_modal', '!=', 'services')->orderBy('menu_order', 'ASC')->where('status', 1)->get();        

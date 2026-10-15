@@ -1,32 +1,16 @@
-<div id="alert-area">
-    @if (Session::has('error'))
-        <div class="alert alert-danger alert-dismissible fade show">
-            {{ Session::get('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    @if (Session::has('success'))
-        <div class="alert alert-success alert-dismissible fade show">
-            {{ Session::get('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-</div>
-
 <div class="modal right-modal" id="{{ $modal_id }}" tabindex="-1" aria-labelledby="{{ $modal_id }}Label" aria-hidden="true" data-bs-keyboard="true">
     <div class="modal-dialog {{ $formConfig['modal_size'] ?? '' }}">
-        <div class="modal-content">            
-            <form action="{{ $formConfig['action'] }}" method="POST" class="ajax-form" enctype="multipart/form-data" id="{{ $form_id }}">
-                @csrf                
-                
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ $title }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ $title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="{{ $form_id }}" action="{{ $formConfig['action'] }}" method="POST" class="ajax-form" enctype="multipart/form-data" >
+                @csrf                                            
 
                 <div class="modal-body">
-                    <input type="hidden" name="_method" id="{{ $method_id }}" value="POST" class="form-control">
+                    <input type="hidden" name="_method" id="{{ $method_id }}" value="{{ $formConfig['method'] ?? 'POST' }}" class="form-control">
                     
                     <div class="row">
                         @foreach($formConfig['fields'] as $field)                                                    
@@ -138,24 +122,25 @@
                                                                                 @endforeach
                                                                             @endif
                                                                         >
+
+                                                                        @elseif($innerField['type'] == 'subcategory_checkboxes')
+                                                                            <div class="{{ $innerField['col'] ?? 'col-12' }}">
+                                                                                <div id="sub_category_id">Please select a category first.</div>
+                                                                            </div>
+                                                                        
                                                                     @elseif($innerField['type'] == 'textarea')
-                                                                        <textarea name="{{ $innerField['name'] }}" class="form-control" rows="3" >
-                                                                            {{ old(
-                                                                                $innerField['name'],
-                                                                                $model->{$innerField['name']} ?? ''
-                                                                            ) }}
+                                                                        <textarea name="{{ $innerField['name'] }}" class="form-control" rows="{{ $innerField['rows'] }}" id="{{ $innerField['name'] }}" >
+                                                                            {{ old($innerField['name'], $model->{$innerField['name']} ?? '' ) }}
                                                                         </textarea>
+
                                                                     @elseif($innerField['type'] == 'file')
                                                                         <input type="file" name="{{ $innerField['name'] }}" class="form-control" id="{{ $innerField['name'] }}"
                                                                             accept="{{ $innerField['accept'] ?? '*/*' }}" >
 
                                                                     @elseif($innerField['type'] == 'select')
                                                                         @php
-                                                                            $selectedValue = old(
-                                                                                $innerField['name'],
-                                                                                $model->{$innerField['name']} ?? ($innerField['default'] ?? null)
-                                                                            );
-                                                                        @endphp                                                                                        
+                                                                            $selectedValue = old($innerField['name'], $model->{$innerField['name']} ?? ($innerField['default'] ?? null) );
+                                                                        @endphp
 
                                                                         <select name="{{ $innerField['name'] }}" class="form-select" id="{{ $innerField['name'] }}">
                                                                             @foreach($innerField['options'] as $value => $label)
@@ -168,30 +153,18 @@
                                                                         
                                                                     @elseif($innerField['type'] == 'dropzone')
                                                                         <input type="hidden" id="{{ $innerField['name'] }}_id" name="{{ $innerField['name'] }}_id" value=" ">
-
                                                                         <div id="image" id="{{ $innerField['name'] }}" data-input="{{ $innerField['name'] }}_id"
                                                                             data-max-files="{{ $innerField['maxFiles'] ?? 1 }}"
-                                                                            data-accepted-files="{{ $innerField['acceptedFiles'] ?? 'image/*' }}" 
-                                                                            class="dropzone dz-clickable">
+                                                                            data-accepted-files="{{ $innerField['acceptedFiles'] ?? 'image/*' }}"  class="dropzone dz-clickable">
                                                                             <div class="dz-message needsclick">Drop files here or click to upload.</div>
-                                                                        </div> 
-                                                                        
-                                                                        {{-- <div
-                                                                            id="{{ $innerField['name'] }}"
-                                                                            data-input="{{ $innerField['name'] }}_id"
-                                                                            data-max-files="{{ $innerField['maxFiles'] ?? 1 }}"
-                                                                            data-accepted-files="{{ $innerField['acceptedFiles'] ?? 'image/*' }}"
-                                                                            class="dropzone dz-clickable"
-                                                                        >
-                                                                            <div class="dz-message needsclick">Drop files here or click to upload.</div>
-                                                                        </div> --}}
+                                                                        </div>                                                                                                                                            
                                                                                                                                                     
                                                                         @if(isset($service) && $service->images->isNotEmpty())                        
                                                                             <div id="product-gallery" class="row">                                    
                                                                                 @foreach ($service->images as $index => $image)
                                                                                     <div class="col-3 uploaded-images" id="image-row-{{ $image->id }}">                                        
                                                                                         <input type="hidden" name="image_array[{{ $index }}][image_id]" value="{{ $image->id }}">
-                                                                                        <img src="{{ asset('uploads/service/'.$image->image) }}" class="rounded" />
+                                                                                        <img src="{{ asset('uploads/service/large/'.$image->image) }}" class="rounded" />
 
                                                                                         <a href="javascript:void(0)" class="deleteProductImg delete-icon-edit" data-id="{{ $image->id }}">
                                                                                             <span class="sprites"></span>
@@ -214,12 +187,14 @@
                                 </div>
                             @endif                                                                                                                                                            
                         </div>
-                        @endforeach
+                        @endforeach                        
+                    </div>                
+
+                    <div class="modal-footer">                        
+                        <button type="submit" class="btn btn-primary" id="form_submit_btn">
+                            Add Service
+                        </button>
                     </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">
-                        {{ $formConfig['button'] }}
-                    </button>
                 </div>
             </form>
         </div>
@@ -316,7 +291,7 @@
         });
     });
 
-   $(document).ready(function () {        
+   $(document).ready(function () {  
         $(document).on('change', '#category_id', function () {            
             var categoryID = $(this).val();
 
@@ -348,18 +323,24 @@
 
     //Store
     const store_category        = "{{ route('category.store') }}";
-    const store_subcategory     = "{{ route('subCategory.store') }}";
-    const store_subsubcategory  = "{{ route('subSubCategory.store') }}";
-    const store_discount        = "{{ route('coupons.store') }}";
+    const update_category       = "{{ url('admin/update_category') }}";
 
-    //Update    
-    const update_category       = "{{ url('admin/category') }}";
+    const store_subcategory     = "{{ route('subCategory.store') }}";
     const update_subCategory    = "{{ url('admin/subcategory/') }}";
+
+    const store_subsubcategory  = "{{ route('subSubCategory.store') }}";
     const update_subSubCategory = "{{ url('admin/subsubcategory/') }}";
+    
+    const store_service         = "{{ route('services.store') }}";    
+    const update_service        = "{{ url('admin/update_service') }}";
+
+    const store_discount        = "{{ route('coupons.store') }}";
     const update_discount       = "{{ url('admin/settings/coupons/{coupon}') }}";
 
-    function createCategoryModal() {
-        document.querySelector('#categoryModal .modal-title').innerText = 'Create Category';
+
+    //Category
+    function createCategory() {
+        document.querySelector('.modal-title').innerText = 'Create Category';
         let form = document.getElementById('categoryForm');
         form.reset();
         form.action = store_category;
@@ -367,49 +348,35 @@
         document.getElementById('form_submit_btn').innerText = 'Create Category';
     }
 
-    //Create SubCategory Modal
-    function createSubCategoryModal(button) {
-        let categoryId = $(button).data('category-id');
-        let form = document.getElementById('subCategoryForm');
+    function editCategory(button) {
+        let id = button.dataset.id;        
+        let category_modal = button.dataset.categoryModal;
+        let category_name = button.dataset.categoryName;
+        let home = button.dataset.home;
+        let order = button.dataset.order;
+        let status = button.dataset.status;
 
-        // Reset form first
-        form.reset();
+        let form = document.getElementById('categoryForm');        
 
-        // Set create mode
-        form.action = store_subcategory;        
+        // Modal title (corrected selector)
+        document.querySelector('.modal-title').innerText = 'Edit Category';
+        document.querySelector('#form_submit_btn').innerText = 'Update Category';        
 
-        // Auto-select category
-        document.getElementById('category_id').value = categoryId;
+        // Set form action and method
+        form.action = `${update_category}/${id}`;
+        document.getElementById('category_method').value = 'PUT';
 
-        $('#category_id').trigger('change');        
-    }   
-   
-    // function editCategoryModal(button) {
-    //     let id = button.dataset.id;
-    //     let category_modal = button.dataset.category_modal;
-    //     let category_name = button.dataset.category_name;
-    //     let showHome = button.dataset.showHome;
-    //     let status = button.dataset.status;        
+        // Fill form values        
+        document.getElementById('category_modal').value = category_modal;
+        document.getElementById('category_name').value = category_name;
+        document.getElementById('order').value = order;
 
-    //     document.querySelector('#categoryModal .modal-title').innerText = 'Edit Category';
-    //     let form = document.getElementById('categoryForm');
+        // Select values
+        document.getElementById('home').value = String(home);
+        document.getElementById('status').value = String(status);
+    }
 
-    //     // Set action
-    //     form.action = `${update_category}/${id}`;
-    //     document.getElementById('category_method').value = 'PUT';
-
-    //     // Fill values
-    //     document.getElementById('category_modal').value = category_modal;
-    //     document.getElementById('category_name').value = category_name;
-    //     document.getElementById('menu_order').value = menu_order;
-    //     document.getElementById('showHome').value = showHome;
-    //     document.getElementById('status').value = (status == 'Active') ? 1 : 0;        
-    //     document.getElementById('form_submit_btn').innerText = 'Update Category';
-    // }
-
-
-
-    function editCategoryModal(button) {
+    function editCategory2(button) {
         let id = button.dataset.id;
         let category_modal = button.dataset.categoryModal;
         let category_name = button.dataset.categoryName;
@@ -417,7 +384,8 @@
         let menu_order = button.dataset.menuOrder;
         let status = button.dataset.status;
 
-        document.querySelector('#categoryModal .modal-title').innerText = 'Edit Category';
+        document.querySelector('.modal-title').innerText = 'Edit Category';
+        document.querySelector('$form_submit_btn').innerText = 'Update Category';
 
         let form = document.getElementById('categoryForm');
 
@@ -432,38 +400,83 @@
 
         // Select values
         document.getElementById('showHome').value = String(showHome);
-        document.getElementById('status').value = String(status);
-
-        document.getElementById('form_submit_btn').innerText = 'Update Category';
+        document.getElementById('status').value = String(status);        
     }
+    
 
-    document.getElementById('editCategoryModal').addEventListener('hidden.bs.modal', function () {
+    //Create SubCategory Modal
+    function createSubCategory(button) {
+        let categoryId = $(button).data('category-id');
+        let form = document.getElementById('subCategoryForm');
+
+        // Reset form first
+        form.reset();
+
+        // Set create mode
+        form.action = store_subcategory;        
+
+        // Auto-select category
+        document.getElementById('category_id').value = categoryId;
+
+        $('#category_id').trigger('change');        
+    }   
+       
+    document.getElementById('editCategory').addEventListener('hidden.bs.modal', function () {
         document.getElementById('categoryForm').reset();
     });    
 
-    function editSubCategoryModal(button) {
-        let id = button.dataset.id;
 
-        let form = document.getElementById('subCategoryForm');
+    //Create Service
+    function createService() {
+        document.querySelector('.modal-title').innerText = 'Create Service';
+        document.querySelector('#form_submit_btn').innerText = 'Add Service';
 
-        form.action = `${update_subCategory}/${id}`;
-        document.getElementById('subcategory_method').value = 'PUT';
-
-        // Fill values
-        document.getElementById('sub_category_name').value = button.dataset.sub_category_name;                    
-
-        document.querySelector('#subCategoryModal .modal-title').innerText = 'Edit Sub Category';
-        document.getElementById('form_submit_btn').innerText = 'Update Category';
+        let form = document.getElementById('serviceForm');
+        form.reset();
+        form.action = store_service;
+        document.getElementById('form_method').value = 'POST';        
     }
 
-    document.getElementById('subCategoryModal').addEventListener('hidden.bs.modal', function () {
-        document.getElementById('subCategoryForm').reset();
-    });
+    function editService(button) {
+        let id = button.dataset.id;
+        let category = button.dataset.category;
+        let subCategory = button.dataset.subCategory;
+        let description = button.dataset.description;
+        let shortDescription = button.dataset.shortDescription;
+        let featured = button.dataset.featured;
+        let status = button.dataset.status;
 
+        let form = document.getElementById('serviceForm');        
+
+        // Modal title (corrected selector)
+        document.querySelector('.modal-title').innerText = 'Edit Service';
+        document.querySelector('#form_submit_btn').innerText = 'Update Service';        
+
+        // Set form action and method
+        form.action = `${update_service}/${id}`;
+        document.getElementById('service_method').value = 'PUT';
+
+        // Fill form values
+        document.getElementById('description').value = description || '';        
+        document.getElementById('shortDescription').value = button.dataset.shortDescription || '';
+
+        document.getElementById('category').value = String(category);
+        document.getElementById('subCategory').value = String(subCategory);
+        document.getElementById('featured').value = String(featured);
+        //document.getElementById('status').value = String(status);
+        //document.getElementById('status').value = (status == 'Active') ? 1 : 0;
+
+        document.getElementById('status').value = (status == 'Approved') ? 'approved' : 'pending';
+    }
+
+    document.getElementById('editServicesModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('serviceForm').reset();
+    }); 
+    
 
     //Discount
     function createDiscountModal() {
-        document.querySelector('#discountModal .modal-title').innerText = 'Create Discount';
+        document.querySelector('.modal-title').innerText = 'Create Discount';
         let form = document.getElementById('discountForm');
         form.reset();
         form.action = store_discount;
@@ -480,12 +493,16 @@
 
         // Fill values
         document.getElementById('code').value = button.dataset.code;        
-        document.querySelector('#discountModal .modal-title').innerText = 'Edit Discount';
+        document.querySelector('.modal-title').innerText = 'Edit Discount';
         document.getElementById('form_submit_btn').innerText = 'Update Discount';
     }
 
     document.getElementById('discountModal').addEventListener('hidden.bs.modal', function () {
         document.getElementById('discountForm').reset();
-    });    
+    });
+
+
+
+    
 </script>
 @endsection

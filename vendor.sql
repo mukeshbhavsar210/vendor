@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 08, 2026 at 10:02 AM
+-- Generation Time: Oct 15, 2026 at 03:34 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -58,6 +58,11 @@ CREATE TABLE `categories` (
   `appliance_types` varchar(20) DEFAULT NULL,
   `menu_order` int(1) DEFAULT NULL,
   `open_to` enum('modal','link','all') NOT NULL DEFAULT 'modal',
+  `banner` enum('yes','no') NOT NULL DEFAULT 'no',
+  `banner_title` varchar(50) DEFAULT NULL,
+  `banner_label` varchar(50) DEFAULT NULL,
+  `banner_details` varchar(50) DEFAULT NULL,
+  `banner_image` varchar(50) DEFAULT NULL,
   `status` int(5) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -67,40 +72,73 @@ CREATE TABLE `categories` (
 -- Dumping data for table `categories`
 --
 
-INSERT INTO `categories` (`id`, `category_name`, `category_slug`, `image`, `showHome`, `category_modal`, `appliance_types`, `menu_order`, `open_to`, `status`, `created_at`, `updated_at`) VALUES
-(183, 'Women\'s Salon & Spa', 'womens-salon-spa', '183_womens-salon-spa.jpeg', 'outside', 'womens-salon-spa', NULL, 2, 'modal', 1, '2026-09-08 01:22:59', '2026-09-08 06:25:57'),
-(184, 'Men\'s Salon & Massage', 'mens-salon-massage', '184_mens-salon-massage.jpeg', 'outside', 'mens-salon-massage', NULL, 3, 'modal', 1, '2026-09-08 01:24:42', '2026-09-08 01:24:42'),
-(185, 'Cleaning', 'cleaning', '185_cleaning.jpeg', 'outside', 'cleaning', NULL, 4, 'modal', 1, '2026-09-08 01:25:09', '2026-09-08 01:25:09'),
-(186, 'Home Painting', 'home-painting', '186_home-painting.jpeg', 'outside', 'home-painting', NULL, 5, 'link', 1, '2026-09-08 01:40:29', '2026-09-08 06:24:39'),
-(187, 'AC & Appliance Repair', 'ac-appliance-repair', '187_ac-appliance-repair.jpeg', 'outside', 'ac-appliance-repair', 'Large Appliances', 6, 'modal', 1, '2026-09-08 01:40:47', '2026-09-08 06:25:29'),
-(188, 'Electrician, Plumber & Carpenter', 'electrician-plumber-carpenter', '188_electrician-plumber-carpenter.jpeg', 'outside', 'electrician-plumber-carpenter', 'Home repairs', 7, 'modal', 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
-(189, 'Washing Machine', 'washing-machine', '189_washing-machine.jpeg', 'inside', 'ac-appliance-repair', 'Large Appliances', 5, '', 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
-(190, 'Refrigerator', 'refrigerator', '190_refrigerator.jpeg', 'inside', 'ac-appliance-repair', 'Large Appliances', 5, '', 1, '2026-09-08 06:55:14', '2026-09-08 06:55:16'),
-(191, 'Television', 'television', '191_television.jpeg', 'inside', 'ac-appliance-repair', 'Large Appliances', 5, 'modal', 1, '2026-09-08 06:55:48', '2026-09-08 06:55:48'),
-(192, 'AC', 'ac', '192_ac.jpeg', 'inside', 'ac-appliance-repair', 'Large Appliances', 5, 'modal', 1, '2026-09-08 07:06:16', '2026-09-08 07:06:16'),
-(193, 'Chimney', 'chimney', '193_chimney.jpeg', 'inside', 'ac-appliance-repair', 'Other Appliances', 5, 'modal', 1, '2026-09-08 07:12:23', '2026-09-08 07:12:23'),
-(194, 'Microwave', 'microwave', '194_microwave.jpeg', 'inside', 'ac-appliance-repair', 'Other Appliances', 5, 'modal', 1, '2026-09-08 07:19:34', '2026-09-08 07:19:34'),
-(195, 'RO/Water Purifier', 'rowater-purifier', '195_rowater-purifier.jpeg', 'inside', 'ac-appliance-repair', 'Other Appliances', 5, 'modal', 1, '2026-09-08 07:19:56', '2026-09-08 07:19:56'),
-(196, 'Geyser', 'geyser', '196_geyser.jpeg', 'inside', 'ac-appliance-repair', 'Other Appliances', 5, 'modal', 1, '2026-09-08 07:20:14', '2026-09-08 07:20:14'),
-(197, 'Air Cooler', 'air-cooler', '197_air-cooler.jpeg', 'inside', 'ac-appliance-repair', 'Other Appliances', 5, 'modal', 1, '2026-09-08 07:20:33', '2026-09-08 07:20:33'),
-(199, 'Home repair & installation', 'home-repair-&-installation', '199_home-repair-&-installation.jpeg', 'inside', '', NULL, 5, 'modal', 1, '2026-09-08 07:20:33', '2026-09-08 07:20:33'),
-(200, 'InstaHelp', 'insta-help', '200_insta-help.jpeg', 'outside', 'insta-help', NULL, 1, 'link', 1, '2026-09-08 07:20:33', '2026-09-08 07:20:33'),
-(201, 'All Services', 'all-services', '201_all-services.jpeg', 'outside', 'services', NULL, 8, 'all', 1, '2026-09-08 07:20:33', '2026-09-08 07:20:33'),
-(202, 'New and Noteworthy', 'new_and_noteworthy', '202_new_and_noteworthy.png', 'inside', 'new_and_noteworthy', NULL, 8, 'modal', 1, '2026-09-08 07:20:33', '2026-09-08 07:20:33'),
-(203, 'Salon for Women', 'salon-for-women', '183_womens-salon-spa.jpeg', 'inside', 'womens-salon-spa', NULL, 2, 'link', 1, '2026-09-08 01:22:59', '2026-09-08 06:25:57'),
-(204, 'Hair Studio for Women', 'hair-studio-for-women', '204_hair-studio-for-women.jpeg', 'inside', 'womens-salon-spa', NULL, 2, 'link', 1, '2026-09-08 01:22:59', '2026-09-08 06:25:57'),
-(205, 'Salon for Men', 'salon-for-men', '184_mens-salon-massage.jpeg', 'inside', 'mens-salon-massage', NULL, 3, 'link', 1, '2026-09-08 01:24:42', '2026-09-08 01:24:42'),
-(206, 'Massage for Men', 'massage-for-men', '206_massage-for-men.jpeg', 'inside', 'mens-salon-massage', NULL, 3, 'link', 1, '2026-09-08 01:24:42', '2026-09-08 01:24:42'),
-(207, 'Bathroom & Kitchen Cleaning', 'bathroom-&-kitchen-cleaning', '207_bathroom-&-kitchen-cleaning.jpeg', 'inside', 'cleaning', NULL, 4, 'link', 1, '2026-09-08 01:25:09', '2026-09-08 01:25:09'),
-(208, 'Full Home/ By Room Cleaning', 'full-home-by-room-cleaning', '208_full-home-by-room-cleaning.jpeg', 'inside', 'cleaning', NULL, 4, 'link', 1, '2026-09-08 01:25:09', '2026-09-08 01:25:09'),
-(209, 'Electrician', 'electrician', '209_electrician.jpeg', 'inside', 'electrician-plumber-carpenter', 'Home repairs', 7, 'modal', 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
-(210, 'Carpenter', 'carpenter', '211_carpenter.jpeg', 'inside', 'electrician-plumber-carpenter', 'Home repairs', 7, 'modal', 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
-(211, 'Fan Installation', 'fan-installation', '212_fan-installation.jpeg', 'inside', 'electrician-plumber-carpenter', 'Home installation', 7, 'modal', 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
-(212, 'Furniture Assembly', 'furniture-assembly', '213_furniture-assembly.jpeg', 'inside', 'electrician-plumber-carpenter', 'Home installation', 7, 'modal', 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
-(213, 'Geyser Service & Repair', 'geyser-service-&-repair', '214_geyser-service-&-repair.jpeg', 'inside', 'electrician-plumber-carpenter', 'Home installation', 7, 'modal', 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
-(214, 'Sofa & Carpet Cleaning', 'sofa-&-carpet-cleaning', '214_sofa-&-carpet-cleaning.jpeg', 'inside', 'cleaning', NULL, 4, 'link', 1, '2026-09-08 01:25:09', '2026-09-08 01:25:09'),
-(215, 'Spa for Women', 'spa-for-women', '215_spa-for-women.jpeg', 'inside', 'womens-salon-spa', NULL, 2, 'link', 1, '2026-09-08 01:22:59', '2026-09-08 06:25:57'),
-(216, 'Plumber', 'plumber', '216_plumber.jpeg', 'inside', 'electrician-plumber-carpenter', 'Home repairs', 7, 'modal', 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01');
+INSERT INTO `categories` (`id`, `category_name`, `category_slug`, `image`, `showHome`, `category_modal`, `appliance_types`, `menu_order`, `open_to`, `banner`, `banner_title`, `banner_label`, `banner_details`, `banner_image`, `status`, `created_at`, `updated_at`) VALUES
+(183, 'Women\'s Salon & Spa', NULL, '183_womens-salon-spa.jpeg', 'outside', NULL, NULL, 1, 'modal', 'no', NULL, NULL, NULL, NULL, 0, '2026-09-08 01:22:59', '2026-10-15 02:00:25'),
+(184, 'Men\'s Salon & Massage', NULL, '184_mens-salon-massage.jpeg', 'outside', NULL, NULL, 1, 'modal', 'no', NULL, NULL, NULL, NULL, 0, '2026-09-08 01:24:42', '2026-10-15 02:23:48'),
+(185, 'Cleaning', 'cleaning', '185_cleaning.jpeg', 'outside', 'cleaning', NULL, 4, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:25:09', '2026-09-08 01:25:09'),
+(186, 'Home Painting', 'home-painting', '186_home-painting.jpeg', 'outside', 'home-painting', NULL, 5, 'link', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:40:29', '2026-09-08 06:24:39'),
+(187, 'AC & Appliance Repair', 'ac-appliance-repair', '187_ac-appliance-repair.jpeg', 'outside', 'ac-appliance-repair', 'Large Appliances', 6, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:40:47', '2026-09-08 06:25:29'),
+(188, 'Electrician', 'electrician', '188_electrician.jpeg', 'outside', 'electrician-work', 'Home repairs', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(189, 'Washing Machine', 'washing-machine', '189_washing-machine.jpeg', 'inside', 'ac-appliance-repair', 'Large Appliances', 5, '', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(190, 'Refrigerator', 'refrigerator', '190_refrigerator.jpeg', 'inside', 'ac-appliance-repair', 'Large Appliances', 5, '', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 06:55:14', '2026-09-08 06:55:16'),
+(191, 'Television', 'television', '191_television.jpeg', 'inside', 'ac-appliance-repair', 'Large Appliances', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 06:55:48', '2026-09-08 06:55:48'),
+(192, 'AC', 'ac', '192_ac.jpeg', 'inside', 'ac-appliance-repair', 'Large Appliances', 5, 'modal', 'yes', 'Foam-jet AC Service', 'Free gas check', 'Deep clean AC vents for efficient cooling', '17_banner.jpeg', 1, '2026-09-08 07:06:16', '2026-09-08 07:06:16'),
+(193, 'Chimney', 'chimney', '193_chimney.jpeg', 'inside', 'ac-appliance-repair', 'Other Appliances', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 07:12:23', '2026-09-08 07:12:23'),
+(194, 'Microwave', 'microwave', '194_microwave.jpeg', 'inside', 'ac-appliance-repair', 'Other Appliances', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 07:19:34', '2026-09-08 07:19:34'),
+(195, 'RO/Water Purifier', 'rowater-purifier', '195_rowater-purifier.jpeg', 'inside', 'ac-appliance-repair', 'Other Appliances', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 07:19:56', '2026-09-08 07:19:56'),
+(196, 'Geyser', 'geyser', '196_geyser.jpeg', 'inside', 'ac-appliance-repair', 'Other Appliances', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 07:20:14', '2026-09-08 07:20:14'),
+(197, 'Air Cooler', 'air-cooler', '197_air-cooler.jpeg', 'inside', 'ac-appliance-repair', 'Other Appliances', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 07:20:33', '2026-09-08 07:20:33'),
+(199, 'Home repair & installation', 'home-repair-&-installation', '199_home-repair-&-installation.jpeg', 'inside', '', NULL, 5, 'modal', 'no', NULL, NULL, NULL, NULL, 0, '2026-09-08 07:20:33', '2026-09-08 07:20:33'),
+(200, 'InstaHelp', NULL, '200_insta-help.jpeg', 'outside', NULL, NULL, 1, 'link', 'no', NULL, NULL, NULL, NULL, 0, '2026-09-08 07:20:33', '2026-10-15 02:01:08'),
+(201, 'All Services', 'all-services', '201_all-services.jpeg', 'outside', 'services', NULL, 8, 'all', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 07:20:33', '2026-09-08 07:20:33'),
+(202, 'New and Noteworthy', 'new_and_noteworthy', '202_new_and_noteworthy.png', 'inside', 'new_and_noteworthy', NULL, 8, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 07:20:33', '2026-09-08 07:20:33'),
+(203, 'Salon for Women', 'salon-for-women', '183_womens-salon-spa.jpeg', 'inside', 'womens-salon-spa', NULL, 2, 'link', 'no', NULL, NULL, NULL, NULL, 0, '2026-09-08 01:22:59', '2026-09-08 06:25:57'),
+(204, 'Hair Studio for Women', 'hair-studio-for-women', '204_hair-studio-for-women.jpeg', 'inside', 'womens-salon-spa', NULL, 2, 'link', 'no', NULL, NULL, NULL, NULL, 0, '2026-09-08 01:22:59', '2026-09-08 06:25:57'),
+(205, 'Salon for Men', 'salon-for-men', '184_mens-salon-massage.jpeg', 'inside', 'mens-salon-massage', NULL, 3, 'link', 'no', NULL, NULL, NULL, NULL, 0, '2026-09-08 01:24:42', '2026-09-08 01:24:42'),
+(206, 'Massage for Men', 'massage-for-men', '206_massage-for-men.jpeg', 'inside', 'mens-salon-massage', NULL, 3, 'link', 'no', NULL, NULL, NULL, NULL, 0, '2026-09-08 01:24:42', '2026-09-08 01:24:42'),
+(207, 'Bathroom & Kitchen Cleaning', 'bathroom-&-kitchen-cleaning', '207_bathroom-&-kitchen-cleaning.jpeg', 'inside', 'cleaning', NULL, 4, 'link', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:25:09', '2026-09-08 01:25:09'),
+(208, 'Full Home/ By Room Cleaning', 'full-home-by-room-cleaning', '208_full-home-by-room-cleaning.jpeg', 'inside', 'cleaning', NULL, 4, 'link', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:25:09', '2026-09-08 01:25:09'),
+(209, 'Electrician', 'electrician', '209_electrician.jpeg', 'inside', 'electrician-plumber-carpenter', 'Home repairs', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(210, 'Carpenter', 'carpenter', '211_carpenter.jpeg', 'inside', 'electrician-plumber-carpenter', 'Home repairs', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(211, 'Fan Installation', 'fan-installation', '212_fan-installation.jpeg', 'inside', 'electrician-plumber-carpenter', 'Home installation', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(212, 'Furniture Assembly', 'furniture-assembly', '213_furniture-assembly.jpeg', 'inside', 'electrician-plumber-carpenter', 'Home installation', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(213, 'Geyser Service & Repair', 'geyser-service-&-repair', '214_geyser-service-&-repair.jpeg', 'inside', 'electrician-plumber-carpenter', 'Home installation', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(214, 'Sofa & Carpet Cleaning', 'sofa-&-carpet-cleaning', '214_sofa-&-carpet-cleaning.jpeg', 'inside', 'cleaning', NULL, 4, 'link', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:25:09', '2026-09-08 01:25:09'),
+(215, 'Spa for Women', 'spa-for-women', '215_spa-for-women.jpeg', 'inside', 'womens-salon-spa', NULL, 2, 'link', 'no', NULL, NULL, NULL, NULL, 0, '2026-09-08 01:22:59', '2026-09-08 06:25:57'),
+(216, 'Plumber', 'plumber', '216_plumber.jpeg', 'inside', 'electrician-plumber-carpenter', 'Home repairs', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(217, 'POP Work', 'pop-work', '217_pop-work.jpeg', 'outside', 'pop-work', 'Large Appliances', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:40:29', '2026-09-08 06:24:39'),
+(218, 'Carpenter Work', 'carpenter-work', '218_carpenter-work.jpeg', 'outside', 'carpenter-work', NULL, 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:40:29', '2026-09-08 06:24:39'),
+(219, 'False Ceiling', 'false-ceiling', '189_false-ceiling.jpeg', 'inside', 'pop-work', 'Installation', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(220, 'Wall Design', 'wall-design', '189_wall-design.jpeg', 'inside', 'pop-work', 'Installation', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(221, 'POP Cornice & Border Work', 'pop-cornice-&-border-work', '189_pop-cornice-&-border-work.jpeg', 'inside', 'pop-work', 'Installation', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(222, 'Gypsum Board Ceiling', 'gypsum-board-ceiling', '189_gypsum-board-ceiling.jpeg', 'inside', 'pop-work', 'Installation', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(223, 'TV Unit POP Design', 'tv-unit-pop-design', '189_tv-unit-pop-design.jpeg', 'inside', 'pop-work', 'Repair work', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(224, 'Partition Work', 'partition-work', '189_partition-work.jpeg', 'inside', 'pop-work', 'Repair work', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(225, 'Interior Work', 'interior-work', '189_interior-work.jpeg', 'inside', 'carpenter-work', 'Installation', 5, 'modal', 'no', 'Interior Work', NULL, NULL, NULL, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(226, 'Wardrobe Repair & Installation', 'wardrobe-repair-&-installation', '189_wardrobe-repair-&-installation.jpeg', 'inside', 'carpenter-work', 'Repair work', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(227, 'Modular Kitchen Installation', 'modular-kitchen-installation', '189_modular-kitchen-installation.jpeg', 'inside', 'carpenter-work', 'Installation', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(228, 'Drawer & Cabinet Repair', 'drawer-&-cabinet-repair', '189_drawer-&-cabinet-repair.jpeg', 'inside', 'carpenter-work', 'Repair work', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(229, 'Wooden Partition Work', 'wooden-partition-work', '189_wooden-partition-work.jpeg', 'inside', 'carpenter-work', 'Installation', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(230, 'Curtain Rod Installation', 'curtain-rod-installation', '189_curtain-rod-installation.jpeg', 'inside', 'carpenter-work', 'Installation', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(231, 'Hinges & Handle Replacement', 'hinges-&-handle-replacement', '189_hinges-&-handle-replacement.jpeg', 'inside', 'carpenter-work', 'Installation', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(232, 'Bed & Sofa Frame Repair', 'bed-&-sofa-frame-repair', '189_bed-&-sofa-frame-repair.jpeg', 'inside', 'carpenter-work', 'Repair work', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(233, 'Office Furniture Repair', 'office-furniture-repair', '189_office-furniture-repair.jpeg', 'inside', 'carpenter-work', 'Repair work', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(234, 'Carpenter for Small Repairs', 'carpenter-for-small-repairs', '189_carpenter-for-small-repairs.jpeg', 'inside', 'carpenter-work', 'Repair work', 5, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:46:00', '2026-09-08 06:54:11'),
+(235, 'Plumber', 'plumber', '235_plumber.jpeg', 'outside', 'plumber-work', 'Home repairs', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(236, 'Tap Repair & Installation', 'tap-repair-&-installation', '188_tap-repair-&-installation.jpeg', 'inside', 'plumber-work', 'Installation', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(237, 'Wash Basin Installation', 'wash-basin-installation', '188_wash-basin-installation.jpeg', 'inside', 'plumber-work', 'Installation', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(238, 'Toilet Repair & Installation', 'toilet-repair-&-installation', '188_toilet-repair-&-installation.jpeg', 'inside', 'plumber-work', 'Installation', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(239, 'Water Tank Installation', 'water-tank-installation', '188_water-tank-installation.jpeg', 'inside', 'plumber-work', 'Installation', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(240, 'Water Pipe Installation', 'water-pipe-installation', '188_water-pipe-installation.jpeg', 'inside', 'plumber-work', 'Installation', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(241, 'Water Motor Installation', 'water-motor-installation', '188_water-motor-installation.jpeg', 'inside', 'plumber-work', 'Installation', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(242, 'Pipe Leakage Repair', 'pipe-leakage-repair', '188_pipe-leakage-repair.jpeg', 'inside', 'plumber-work', 'Repair work', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(243, 'Plumber on Demand', 'plumber-on-demand', '188_plumber-on-demand.jpeg', 'inside', 'plumber-work', 'Repair work', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(244, 'Electrical Wiring', 'electrical-wiring', '188_electrical-wiring.jpeg', 'inside', 'electrician-work', 'Installation', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(245, 'Fan Installation & Repair', 'fan-installation-&-repair', '188_fan-installation-&-repair.jpeg', 'inside', 'electrician-work', 'Installation', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(246, 'Light Installation & Repair', 'light-installation-&-repair', '188_light-installation-&-repair.jpeg', 'inside', 'electrician-work', 'Installation', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(247, 'Inverter Installation & Repair', 'inverter-installation-&-repair', '188_inverter-installation-&-repair.jpeg', 'inside', 'electrician-work', 'Installation', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(248, 'New Electrical Connections', 'new-electrical-connections', '188_new-electrical-connections.jpeg', 'inside', 'electrician-work', 'Installation', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01'),
+(249, 'Geyser Electrical Connection', 'geyser-electrical-connection', '188_geyser-electrical-connection.jpeg', 'inside', 'electrician-work', 'Installation', 7, 'modal', 'no', NULL, NULL, NULL, NULL, 1, '2026-09-08 01:41:01', '2026-09-08 01:41:01');
 
 -- --------------------------------------------------------
 
@@ -826,7 +864,13 @@ INSERT INTO `services` (`id`, `vendor_id`, `category_id`, `sub_category_id`, `sh
 (35, 2, 187, 37, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
 (36, 2, 199, 38, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
 (37, 4, 199, 39, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
-(38, 2, 199, 40, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL);
+(38, 2, 199, 40, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(45, 5, 186, 60, 'test', 'test', 'approved', 1, NULL, NULL, '2026-10-08 07:10:21', '2026-10-08 07:10:21'),
+(46, 5, 200, NULL, NULL, NULL, 'approved', 1, NULL, NULL, '2026-10-08 07:21:50', '2026-10-15 01:25:30'),
+(47, 4, 225, 72, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(48, 4, 225, 73, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(49, 4, 225, 74, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL),
+(50, 4, 227, 74, 'Applicable for both window or split ACs\r\nIndoor unit deep cleaning with foam & jet spray', NULL, 'approved', 0, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -841,6 +885,22 @@ CREATE TABLE `service_images` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `service_images`
+--
+
+INSERT INTO `service_images` (`id`, `service_id`, `image`, `created_at`, `updated_at`) VALUES
+(22, 45, '5-home-painting-bpl-tv-22.JPG', '2026-10-08 07:10:21', '2026-10-08 07:10:21'),
+(23, 45, '5-home-painting-bpl-tv-23.JPG', '2026-10-08 07:10:22', '2026-10-08 07:10:22'),
+(24, 45, '5-home-painting-bpl-tv-24.JPG', '2026-10-08 07:10:23', '2026-10-08 07:10:23'),
+(25, 45, '5-home-painting-bpl-tv-25.JPG', '2026-10-08 07:10:24', '2026-10-08 07:10:24'),
+(26, 45, '5-home-painting-bpl-tv-26.JPG', '2026-10-08 07:10:26', '2026-10-08 07:10:26'),
+(27, 46, '5-cleaning-intense-bathroom-cleaning-27.JPG', '2026-10-08 07:21:50', '2026-10-08 07:21:50'),
+(28, 46, '5-cleaning-intense-bathroom-cleaning-28.JPG', '2026-10-08 07:21:51', '2026-10-08 07:21:51'),
+(29, 46, '5-cleaning-intense-bathroom-cleaning-29.JPG', '2026-10-08 07:21:51', '2026-10-08 07:21:51'),
+(30, 46, '5-cleaning-intense-bathroom-cleaning-30.JPG', '2026-10-08 07:21:52', '2026-10-08 07:21:52'),
+(31, 46, '5-cleaning-intense-bathroom-cleaning-31.JPG', '2026-10-08 07:21:52', '2026-10-08 07:21:52');
 
 -- --------------------------------------------------------
 
@@ -971,11 +1031,6 @@ CREATE TABLE `sub_categories` (
   `price_type` enum('fixed','hourly','starting_from','quote') NOT NULL DEFAULT 'fixed',
   `time` varchar(10) DEFAULT NULL,
   `instant` enum('yes','no') DEFAULT 'no',
-  `banner` enum('yes','no') DEFAULT 'no',
-  `banner_title` varchar(50) DEFAULT NULL,
-  `banner_label` varchar(50) DEFAULT NULL,
-  `banner_details` varchar(50) DEFAULT NULL,
-  `banner_image` varchar(50) DEFAULT NULL,
   `sort_order` int(5) DEFAULT NULL,
   `status` tinyint(3) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -986,43 +1041,47 @@ CREATE TABLE `sub_categories` (
 -- Dumping data for table `sub_categories`
 --
 
-INSERT INTO `sub_categories` (`id`, `category_id`, `process_id`, `sub_category_name`, `sub_category_slug`, `image`, `price`, `price_type`, `time`, `instant`, `banner`, `banner_title`, `banner_label`, `banner_details`, `banner_image`, `sort_order`, `status`, `created_at`, `updated_at`) VALUES
-(14, 192, NULL, 'Service', 'service', '14_service.jpeg', NULL, 'fixed', NULL, 'no', 'yes', 'Foam-jet AC Service', 'Free gas check', 'Deep clean AC vents for efficient cooling', '17_banner.jpeg', 2, 1, NULL, NULL),
-(15, 192, 1, 'Repair & gas refill', 'repair_&_gas_refill', '15_repair_&_gas_refill.jpeg', 999.00, 'fixed', '2 hrs', 'no', 'no', NULL, NULL, NULL, NULL, 3, 1, NULL, NULL),
-(16, 192, NULL, 'Installation/Uninstallation', 'installation_uninstallation', '16_installation_uninstallation.jpeg', 299.00, 'fixed', '2 hrs', 'no', 'no', NULL, NULL, NULL, NULL, 4, 1, NULL, NULL),
-(17, 192, NULL, 'Super Saver Packages', 'super_saver_packages', '17_super_saver_packages.jpeg', NULL, 'fixed', NULL, 'no', 'yes', 'Foam-jet AC Service', 'Free gas check', 'Deep clean AC vents for efficient cooling', '17_banner.jpeg', 1, 1, NULL, NULL),
-(18, 183, NULL, 'Women Salon Spa', 'women-salon-spa', '18_womens-salon-spa.jpeg', NULL, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(19, 184, 2, 'Haircut for men', 'haircut-for-men', '19_haircut-for-men.jpeg', 279.00, 'fixed', '30 mins', 'yes', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(20, 184, 3, 'Haircut for boys', 'haircut-for-boys', '20_haircut-for-boys.jpeg', 259.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(21, 184, NULL, 'Head, neck & shoulder massage', 'head-neck-&-shoulder-massage', '21_head-neck-&-shoulder-massage.jpeg', 299.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(22, 184, NULL, 'Brightening lemon deep cleanse pedicure ', 'brightening-lemon-deep-cleanse-pedicure', '22_brightening-lemon-deep-cleanse-pedicure.jpeg', 799.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(23, 183, NULL, 'Stress relief Swedish massage', 'stress-relief-swedish-massage', '23_stress-relief-swedish-massage.jpeg', 1319.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(24, 183, NULL, 'Deep tissue massage', 'deep-tissue-massage', '24_deep-tissue-massage.jpeg', 1469.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(25, 183, NULL, 'Quick comfort therapy', 'quick-comfort-therapy', '25_quick-comfort-therapy.jpeg', 1469.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(26, 183, NULL, 'Top-to-toe stress relief massage', 'top-to-toe-stress-relief-massage', '26_top-to-toe-stress-relief-massage.jpeg', 1469.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(27, 183, NULL, 'Full body massage & scrub', 'full-body-massage-&-scrub', '27_full-body-massage-&-scrub.jpeg', 1699.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(28, 183, NULL, 'Leg relief massage', 'leg-relief-massage', '28_leg-relief-massage.jpeg', 929.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(29, 187, NULL, 'Foam-jet AC service', 'foam-jet-ac-service', '29_foam-jet-ac-service.jpeg', 599.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(30, 187, NULL, 'AC Repair', 'ac-repair', '30_ac-repair.png', 299.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(31, 187, NULL, 'Water Purifier Service & Installation', 'water-purifier-service-&-installation', '31_water-purifier-service-&-installation.jpeg', 299.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(32, 187, NULL, 'AC uninstallation', 'ac-uninstallation', '32_ac-uninstallation.png', 649.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(33, 187, NULL, 'TV check-up', 'tv-check-up', '33_tv-check-up.jpeg', 249.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(34, 187, NULL, 'Geyser check-up', 'geyser-check-up', '34_geyser-check-up.jpeg', 249.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(35, 187, NULL, 'Microwave check-up', 'microwave-check-up', '35_microwave-check-up.jpeg', 199.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(36, 187, NULL, 'Deep chimney service', 'deep-chimney-service', '36_deep-chimney-service.jpeg', 1199.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(37, 187, NULL, 'AC installation', 'ac-installation', '37_ac-installation.png', 799.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(38, 199, NULL, 'Drill & hang (wall decor)', 'drill-&-hang-wall-decor', '38_drill-&-hang-wall-decor.jpeg', 129.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(39, 199, NULL, 'Tap repair', 'tap-repair', '39_tap-repair.png', 139.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(40, 199, NULL, 'Switchboard/switchbox repair', 'switchboard-switchbox-repair', '40_switchboard-switchbox-repair.jpeg', 110.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(41, 199, NULL, 'Jet spray installation', 'jet-spray-installation', '41_jet-spray-installation.png', NULL, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, NULL, 1, '2026-09-23 07:35:30', '2026-09-23 07:35:30'),
-(48, 199, NULL, 'Fan repair (ceiling/exhaust/wall)2', 'fan-repair-ceilingexhaustwall2', '48_fan-repair-ceilingexhaustwall2.jpeg', NULL, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, NULL, 1, '2026-09-24 00:16:08', '2026-09-24 00:16:10'),
-(60, 186, NULL, 'BPL TV', 'bpl-tv', '60_bpl-tv.jpeg', 999.00, 'fixed', NULL, 'yes', 'no', NULL, NULL, NULL, NULL, NULL, 1, '2026-09-24 06:58:42', '2026-09-24 06:58:42'),
-(65, 202, NULL, 'Full Home/ By Room Cleaning', 'full-home-by-room-cleaning', '65_full-home-by-room-cleaning.png', 249.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(66, 202, NULL, 'Home Painting', 'home-painting', '66_home-painting.jpeg', 249.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(67, 202, NULL, 'Native Water Purifier', 'native-water-purifier', '67_native-water-purifier.jpeg', 249.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(68, 202, NULL, 'Bathroom & Kitchen Cleaning', 'bathroom-&-kitchen-cleaning', '69_bathroom-&-kitchen-cleaning.jpeg', 249.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(69, 202, NULL, 'Hair Studio for Women', 'hair-studio-for-women', '70_hair-studio-for-women.jpeg', 249.00, 'fixed', NULL, 'no', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL),
-(70, 185, NULL, 'Intense bathroom cleaning', 'intense-bathroom-cleaning', '71_intense-bathroom-cleaning.jpeg', 499.00, 'fixed', NULL, 'yes', 'no', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL);
+INSERT INTO `sub_categories` (`id`, `category_id`, `process_id`, `sub_category_name`, `sub_category_slug`, `image`, `price`, `price_type`, `time`, `instant`, `sort_order`, `status`, `created_at`, `updated_at`) VALUES
+(14, 192, 1, 'Service', 'service', '14_service.jpeg', 399.00, 'fixed', '2 hrs', 'yes', 2, 1, NULL, NULL),
+(15, 192, 1, 'Repair & gas refill', 'repair_&_gas_refill', '15_repair_&_gas_refill.jpeg', 999.00, 'fixed', '2 hrs', 'no', 3, 1, NULL, NULL),
+(16, 192, 1, 'Installation/Uninstallation', 'installation_uninstallation', '16_installation_uninstallation.jpeg', 299.00, 'fixed', '2 hrs', 'no', 4, 1, NULL, NULL),
+(17, 192, 1, 'Super Saver Packages', 'super_saver_packages', '17_super_saver_packages.jpeg', 799.00, 'fixed', '2 hrs', 'no', 1, 1, NULL, NULL),
+(18, 183, NULL, 'Women Salon Spa', 'women-salon-spa', '18_womens-salon-spa.jpeg', NULL, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(19, 184, 2, 'Haircut for men', 'haircut-for-men', '19_haircut-for-men.jpeg', 279.00, 'fixed', '30 mins', 'yes', 0, 1, NULL, NULL),
+(20, 184, 3, 'Haircut for boys', 'haircut-for-boys', '20_haircut-for-boys.jpeg', 259.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(21, 184, NULL, 'Head, neck & shoulder massage', 'head-neck-&-shoulder-massage', '21_head-neck-&-shoulder-massage.jpeg', 299.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(22, 184, NULL, 'Brightening lemon deep cleanse pedicure ', 'brightening-lemon-deep-cleanse-pedicure', '22_brightening-lemon-deep-cleanse-pedicure.jpeg', 799.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(23, 183, NULL, 'Stress relief Swedish massage', 'stress-relief-swedish-massage', '23_stress-relief-swedish-massage.jpeg', 1319.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(24, 183, NULL, 'Deep tissue massage', 'deep-tissue-massage', '24_deep-tissue-massage.jpeg', 1469.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(25, 183, NULL, 'Quick comfort therapy', 'quick-comfort-therapy', '25_quick-comfort-therapy.jpeg', 1469.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(26, 183, NULL, 'Top-to-toe stress relief massage', 'top-to-toe-stress-relief-massage', '26_top-to-toe-stress-relief-massage.jpeg', 1469.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(27, 183, NULL, 'Full body massage & scrub', 'full-body-massage-&-scrub', '27_full-body-massage-&-scrub.jpeg', 1699.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(28, 183, NULL, 'Leg relief massage', 'leg-relief-massage', '28_leg-relief-massage.jpeg', 929.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(29, 187, NULL, 'Foam-jet AC service', 'foam-jet-ac-service', '29_foam-jet-ac-service.jpeg', 599.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(30, 187, NULL, 'AC Repair', 'ac-repair', '30_ac-repair.png', 299.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(31, 187, NULL, 'Water Purifier Service & Installation', 'water-purifier-service-&-installation', '31_water-purifier-service-&-installation.jpeg', 299.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(32, 187, NULL, 'AC uninstallation', 'ac-uninstallation', '32_ac-uninstallation.png', 649.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(33, 187, NULL, 'TV check-up', 'tv-check-up', '33_tv-check-up.jpeg', 249.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(34, 187, NULL, 'Geyser check-up', 'geyser-check-up', '34_geyser-check-up.jpeg', 249.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(35, 187, NULL, 'Microwave check-up', 'microwave-check-up', '35_microwave-check-up.jpeg', 199.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(36, 187, NULL, 'Deep chimney service', 'deep-chimney-service', '36_deep-chimney-service.jpeg', 1199.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(37, 187, NULL, 'AC installation', 'ac-installation', '37_ac-installation.png', 799.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(38, 199, NULL, 'Drill & hang (wall decor)', 'drill-&-hang-wall-decor', '38_drill-&-hang-wall-decor.jpeg', 129.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(39, 199, NULL, 'Tap repair', 'tap-repair', '39_tap-repair.png', 139.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(40, 199, NULL, 'Switchboard/switchbox repair', 'switchboard-switchbox-repair', '40_switchboard-switchbox-repair.jpeg', 110.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(41, 199, NULL, 'Jet spray installation', 'jet-spray-installation', '41_jet-spray-installation.png', NULL, 'fixed', NULL, 'no', NULL, 1, '2026-09-23 07:35:30', '2026-09-23 07:35:30'),
+(48, 199, NULL, 'Fan repair (ceiling/exhaust/wall)2', 'fan-repair-ceilingexhaustwall2', '48_fan-repair-ceilingexhaustwall2.jpeg', NULL, 'fixed', NULL, 'no', NULL, 1, '2026-09-24 00:16:08', '2026-09-24 00:16:10'),
+(60, 186, NULL, 'BPL TV', 'bpl-tv', '60_bpl-tv.jpeg', 999.00, 'fixed', NULL, 'yes', NULL, 1, '2026-09-24 06:58:42', '2026-09-24 06:58:42'),
+(65, 202, NULL, 'Full Home/ By Room Cleaning', 'full-home-by-room-cleaning', '65_full-home-by-room-cleaning.png', 249.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(66, 202, NULL, 'Home Painting', 'home-painting', '66_home-painting.jpeg', 249.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(67, 202, NULL, 'Native Water Purifier', 'native-water-purifier', '67_native-water-purifier.jpeg', 249.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(68, 202, NULL, 'Bathroom & Kitchen Cleaning', 'bathroom-&-kitchen-cleaning', '69_bathroom-&-kitchen-cleaning.jpeg', 249.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(69, 202, NULL, 'Hair Studio for Women', 'hair-studio-for-women', '70_hair-studio-for-women.jpeg', 249.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(70, 185, NULL, 'Intense bathroom cleaning', 'intense-bathroom-cleaning', '71_intense-bathroom-cleaning.jpeg', 499.00, 'fixed', NULL, 'yes', 0, 1, NULL, NULL),
+(71, 217, NULL, 'Flat / Plain POP Ceilings', 'flat-plain-pop-ceilings', '39_flat-plain-pop-ceilings.jpeg', 129.00, 'fixed', NULL, 'no', 0, 1, NULL, NULL),
+(72, 225, 1, 'Carpenter Service', 'carpenter-service', '218_carpenter-work.png', 299.00, 'fixed', '2 hrs', 'yes', 2, 1, NULL, NULL),
+(73, 225, 1, 'Modular Kitchen', 'modular-kitchen', '218_carpenter-work.png', 299.00, 'fixed', '2 hrs', 'yes', 2, 1, NULL, NULL),
+(74, 225, 1, 'Wooden Partition', 'wooden-partition', '218_carpenter-work.png', 2299.00, 'fixed', '2 hrs', 'yes', 2, 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1192,7 +1251,72 @@ INSERT INTO `temp_images` (`id`, `name`, `created_at`, `updated_at`) VALUES
 (554, '1791374537.jpg', '2026-10-07 06:32:17', '2026-10-07 06:32:17'),
 (555, '1791374537.jpg', '2026-10-07 06:32:17', '2026-10-07 06:32:17'),
 (556, '1791374538.jpg', '2026-10-07 06:32:18', '2026-10-07 06:32:18'),
-(557, '1791374539.jpg', '2026-10-07 06:32:19', '2026-10-07 06:32:19');
+(557, '1791374539.jpg', '2026-10-07 06:32:19', '2026-10-07 06:32:19'),
+(558, '1791458938.JPG', '2026-10-08 05:58:58', '2026-10-08 05:58:58'),
+(559, '1791458946.JPG', '2026-10-08 05:59:06', '2026-10-08 05:59:06'),
+(560, '1791458947.JPG', '2026-10-08 05:59:07', '2026-10-08 05:59:07'),
+(561, '1791458950.JPG', '2026-10-08 05:59:10', '2026-10-08 05:59:10'),
+(562, '1791458952.JPG', '2026-10-08 05:59:12', '2026-10-08 05:59:12'),
+(563, '1791458954.JPG', '2026-10-08 05:59:14', '2026-10-08 05:59:14'),
+(564, '1791459046.JPG', '2026-10-08 06:00:46', '2026-10-08 06:00:46'),
+(565, '1791459136.JPG', '2026-10-08 06:02:16', '2026-10-08 06:02:16'),
+(566, '1791459605.JPG', '2026-10-08 06:10:05', '2026-10-08 06:10:05'),
+(567, '1791460566.JPG', '2026-10-08 06:26:06', '2026-10-08 06:26:06'),
+(568, '1791460617.JPG', '2026-10-08 06:26:57', '2026-10-08 06:26:57'),
+(569, '1791460619.JPG', '2026-10-08 06:26:59', '2026-10-08 06:26:59'),
+(570, '1791460621.JPG', '2026-10-08 06:27:01', '2026-10-08 06:27:01'),
+(571, '1791460625.JPG', '2026-10-08 06:27:05', '2026-10-08 06:27:05'),
+(572, '1791460626.JPG', '2026-10-08 06:27:06', '2026-10-08 06:27:06'),
+(573, '1791460718.JPG', '2026-10-08 06:28:38', '2026-10-08 06:28:38'),
+(574, '1791460720.JPG', '2026-10-08 06:28:40', '2026-10-08 06:28:40'),
+(575, '1791460723.JPG', '2026-10-08 06:28:43', '2026-10-08 06:28:43'),
+(576, '1791460725.JPG', '2026-10-08 06:28:45', '2026-10-08 06:28:45'),
+(577, '1791460727.JPG', '2026-10-08 06:28:47', '2026-10-08 06:28:47'),
+(578, '1791461119.JPG', '2026-10-08 06:35:19', '2026-10-08 06:35:19'),
+(579, '1791461121.JPG', '2026-10-08 06:35:21', '2026-10-08 06:35:21'),
+(580, '1791461123.JPG', '2026-10-08 06:35:23', '2026-10-08 06:35:23'),
+(581, '1791461125.JPG', '2026-10-08 06:35:25', '2026-10-08 06:35:25'),
+(582, '1791461127.JPG', '2026-10-08 06:35:27', '2026-10-08 06:35:27'),
+(583, '1791461224.JPG', '2026-10-08 06:37:04', '2026-10-08 06:37:04'),
+(584, '1791461638.JPG', '2026-10-08 06:43:58', '2026-10-08 06:43:58'),
+(585, '1791461639.JPG', '2026-10-08 06:43:59', '2026-10-08 06:43:59'),
+(586, '1791461639.JPG', '2026-10-08 06:43:59', '2026-10-08 06:43:59'),
+(587, '1791461640.JPG', '2026-10-08 06:44:00', '2026-10-08 06:44:00'),
+(588, '1791461640.JPG', '2026-10-08 06:44:00', '2026-10-08 06:44:00'),
+(589, '1791461765.JPG', '2026-10-08 06:46:05', '2026-10-08 06:46:05'),
+(590, '1791461767.JPG', '2026-10-08 06:46:07', '2026-10-08 06:46:07'),
+(591, '1791461770.JPG', '2026-10-08 06:46:10', '2026-10-08 06:46:10'),
+(592, '1791461924.JPG', '2026-10-08 06:48:44', '2026-10-08 06:48:44'),
+(593, '1791461925.JPG', '2026-10-08 06:48:45', '2026-10-08 06:48:45'),
+(594, '1791461926.JPG', '2026-10-08 06:48:46', '2026-10-08 06:48:46'),
+(595, '1791461926.JPG', '2026-10-08 06:48:46', '2026-10-08 06:48:46'),
+(596, '1791462051.JPG', '2026-10-08 06:50:51', '2026-10-08 06:50:51'),
+(597, '1791462052.JPG', '2026-10-08 06:50:52', '2026-10-08 06:50:52'),
+(598, '1791462052.JPG', '2026-10-08 06:50:52', '2026-10-08 06:50:52'),
+(599, '1791463019.JPG', '2026-10-08 07:06:59', '2026-10-08 07:06:59'),
+(600, '1791463022.JPG', '2026-10-08 07:07:02', '2026-10-08 07:07:02'),
+(601, '1791463024.JPG', '2026-10-08 07:07:04', '2026-10-08 07:07:04'),
+(602, '1791463026.JPG', '2026-10-08 07:07:06', '2026-10-08 07:07:06'),
+(603, '1791463028.JPG', '2026-10-08 07:07:08', '2026-10-08 07:07:08'),
+(604, '1791463200.JPG', '2026-10-08 07:10:00', '2026-10-08 07:10:00'),
+(605, '1791463203.JPG', '2026-10-08 07:10:03', '2026-10-08 07:10:03'),
+(606, '1791463204.JPG', '2026-10-08 07:10:04', '2026-10-08 07:10:04'),
+(607, '1791463207.JPG', '2026-10-08 07:10:07', '2026-10-08 07:10:07'),
+(608, '1791463208.JPG', '2026-10-08 07:10:08', '2026-10-08 07:10:08'),
+(609, '1791463883.JPG', '2026-10-08 07:21:23', '2026-10-08 07:21:23'),
+(610, '1791463884.JPG', '2026-10-08 07:21:24', '2026-10-08 07:21:24'),
+(611, '1791463884.JPG', '2026-10-08 07:21:24', '2026-10-08 07:21:24'),
+(612, '1791463885.JPG', '2026-10-08 07:21:25', '2026-10-08 07:21:25'),
+(613, '1791463885.JPG', '2026-10-08 07:21:25', '2026-10-08 07:21:25'),
+(614, '1791547353.JPG', '2026-10-09 06:32:33', '2026-10-09 06:32:33'),
+(615, '1791547576.JPG', '2026-10-09 06:36:16', '2026-10-09 06:36:16'),
+(616, '1791547860.JPG', '2026-10-09 06:41:00', '2026-10-09 06:41:00'),
+(617, '1791547891.JPG', '2026-10-09 06:41:31', '2026-10-09 06:41:31'),
+(618, '1791549986.JPG', '2026-10-09 07:16:26', '2026-10-09 07:16:26'),
+(619, '1791551719.JPG', '2026-10-09 07:45:19', '2026-10-09 07:45:19'),
+(620, '1791551731.JPG', '2026-10-09 07:45:31', '2026-10-09 07:45:31'),
+(621, '1791551837.JPG', '2026-10-09 07:47:17', '2026-10-09 07:47:17'),
+(622, '1791551978.JPG', '2026-10-09 07:49:38', '2026-10-09 07:49:38');
 
 -- --------------------------------------------------------
 
@@ -1241,11 +1365,11 @@ CREATE TABLE `vendors` (
   `user_id` bigint(20) UNSIGNED DEFAULT NULL,
   `business_name` varchar(255) NOT NULL,
   `slug` varchar(255) NOT NULL,
-  `phone` varchar(255) DEFAULT NULL,
+  `services` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`services`)),
+  `phone` varchar(12) DEFAULT NULL,
+  `mobile` varchar(12) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
-  `description` text DEFAULT NULL,
   `logo` varchar(255) DEFAULT NULL,
-  `cover_image` varchar(255) DEFAULT NULL,
   `address` text DEFAULT NULL,
   `city` varchar(255) DEFAULT NULL,
   `state` varchar(255) DEFAULT NULL,
@@ -1253,7 +1377,6 @@ CREATE TABLE `vendors` (
   `latitude` decimal(10,7) DEFAULT NULL,
   `longitude` decimal(10,7) DEFAULT NULL,
   `status` enum('pending','approved','rejected','blocked') NOT NULL DEFAULT 'pending',
-  `is_verified` tinyint(1) NOT NULL DEFAULT 0,
   `admin_note` text DEFAULT NULL,
   `approved_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -1264,10 +1387,11 @@ CREATE TABLE `vendors` (
 -- Dumping data for table `vendors`
 --
 
-INSERT INTO `vendors` (`id`, `user_id`, `business_name`, `slug`, `phone`, `email`, `description`, `logo`, `cover_image`, `address`, `city`, `state`, `pincode`, `latitude`, `longitude`, `status`, `is_verified`, `admin_note`, `approved_at`, `created_at`, `updated_at`) VALUES
-(2, 7, 'Hitachi AC Services Pvt. Ltd.', 'hitachi_ac_services_pvt_ltd', '9999999999', 'test@gmail.com', 't', 'vendors/logos/hitachi-ac-services-pvt-ltd.JPG', 'vendors/covers/hitachi-ac-services-pvt-ltd_cover.JPG', 'te', 'Sabarmati', 'te', 'te', 1.0000000, 1.0000000, 'approved', 1, NULL, NULL, '2026-08-24 05:27:38', '2026-08-24 05:56:54'),
-(4, 3, 'Samsung Pvt. Ltd.', 'samsung', '9999999999', 'test@gmail.com', 't', 'vendors/logos/hitachi-ac-services-pvt-ltd.JPG', 'vendors/covers/hitachi-ac-services-pvt-ltd_cover.JPG', 'te', 'Sabarmati', 'te', 'te', 1.0000000, 1.0000000, 'approved', 1, NULL, NULL, '2026-08-24 05:27:38', '2026-08-24 05:56:54'),
-(5, 1, 'Sony Pvt. Ltd.', 'sony', '9999999999', 'test@gmail.com', 't', 'vendors/logos/hitachi-ac-services-pvt-ltd.JPG', 'vendors/covers/hitachi-ac-services-pvt-ltd_cover.JPG', 'te', 'Sabarmati', 'te', 'te', 1.0000000, 1.0000000, 'approved', 1, NULL, NULL, '2026-08-24 05:27:38', '2026-08-24 05:56:54');
+INSERT INTO `vendors` (`id`, `user_id`, `business_name`, `slug`, `services`, `phone`, `mobile`, `email`, `logo`, `address`, `city`, `state`, `pincode`, `latitude`, `longitude`, `status`, `admin_note`, `approved_at`, `created_at`, `updated_at`) VALUES
+(2, 7, 'Hitachi AC Services Pvt. Ltd.', 'hitachi_ac_services_pvt_ltd', NULL, '9999999999', NULL, 'test@gmail.com', 'vendors/logos/hitachi-ac-services-pvt-ltd.JPG', 'te', 'Sabarmati', 'te', 'te', 1.0000000, 1.0000000, 'approved', NULL, NULL, '2026-08-24 05:27:38', '2026-08-24 05:56:54'),
+(4, 3, 'Samsung Pvt. Ltd.', 'samsung', NULL, '9999999999', NULL, 'test@gmail.com', 'vendors/logos/hitachi-ac-services-pvt-ltd.JPG', 'te', 'Sabarmati', 'te', 'te', 1.0000000, 1.0000000, 'approved', NULL, NULL, '2026-08-24 05:27:38', '2026-08-24 05:56:54'),
+(5, 1, 'Sony Pvt. Ltd.', 'sony', NULL, '9999999999', NULL, 'test@gmail.com', 'vendors/logos/hitachi-ac-services-pvt-ltd.JPG', 'te', 'Sabarmati', 'te', 'te', 1.0000000, 1.0000000, 'approved', NULL, NULL, '2026-08-24 05:27:38', '2026-08-24 05:56:54'),
+(10, 7, 'Dobariya', 'dobariya', '[\"18\",\"23\",\"24\",\"25\",\"26\"]', '1', '1', 'dobariya@gmail.com', NULL, '1', '1', 'Gujarat', '1', 1.0000000, 1.0000000, 'pending', NULL, NULL, '2026-10-09 07:49:53', '2026-10-09 07:49:53');
 
 -- --------------------------------------------------------
 
@@ -1624,7 +1748,7 @@ ALTER TABLE `brands`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=217;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=250;
 
 --
 -- AUTO_INCREMENT for table `coupon_product`
@@ -1780,13 +1904,13 @@ ALTER TABLE `reviews`
 -- AUTO_INCREMENT for table `services`
 --
 ALTER TABLE `services`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `service_images`
 --
 ALTER TABLE `service_images`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `shipping_charges`
@@ -1810,13 +1934,13 @@ ALTER TABLE `stock_notifications`
 -- AUTO_INCREMENT for table `sub_categories`
 --
 ALTER TABLE `sub_categories`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=75;
 
 --
 -- AUTO_INCREMENT for table `temp_images`
 --
 ALTER TABLE `temp_images`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=558;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=623;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -1828,7 +1952,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `vendors`
 --
 ALTER TABLE `vendors`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `warantees`

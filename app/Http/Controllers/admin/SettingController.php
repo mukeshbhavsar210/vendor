@@ -5,7 +5,6 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\AffiliateProduct;
 use App\Models\Brand;
-use App\Models\Color;
 use App\Models\DiscountCoupon;
 use App\Models\Page;
 use App\Models\Rating;
@@ -13,6 +12,8 @@ use App\Models\Review;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\State;
+use App\Models\Category;
+use App\Models\SubCategory;
 use App\Models\ShippingCharge;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -338,93 +339,6 @@ class SettingController extends Controller {
 
     }
 
-    //Colors
-    public function color_index(Request $request){
-        $colors = Color::latest('id');
-      
-        $colorsTotal = Color::count();
-        $colors = $colors->paginate(10);
-
-        $data = [
-            'title'         => 'Colors',
-            'button_name'   => 'Create Color',
-            'form_id'       => 'Colors',
-            'method_id'     => '',
-            'modal_id'      => 'createColorModal',
-            'refresh'       => route('colors.index'),
-            'button_route'  => null,
-            'colors'        => $colors,
-            'total'         => $colorsTotal,
-
-            'formConfig' => [
-                'action' => route('colors.store'),
-                'modal_size' => null,
-                'method' => 'POST',
-                'button' => 'Create Color',
-                'fields' => [
-                    [
-                        'type' => 'text',
-                        'name' => 'name',
-                        'label' => 'Color Name',
-                        'placeholder' => 'Enter Color name',
-                        'col' => 'col-md-12 col-12'
-                    ],
-                    [
-                        'type' => 'color',
-                        'name' => 'code',
-                        'label' => 'Code',
-                        'placeholder' => 'Drag Color code',
-                        'col' => 'col-md-12 col-12'
-                    ]
-                ]
-            ]
-        ];       
-
-        return view('admin.settings.colors', $data);
-    }
-
-    public function color_store(Request $request ){
-        $validator = Validator::make($request->all(), [
-            // 'name' => 'required',
-            // 'code' => 'required|unique:code',
-        ]);
-
-        if($validator->passes()){
-            $color = new Color();
-            $color->name = $request->name;
-            $color->code = $request->code;
-            $color->save();
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Color added successfully',
-            ]);
-
-        } else {
-            return response()->json([
-                'status' => false,
-                'errors' => $validator->errors()
-            ]);
-        }
-    }
-
-    public function color_destroy($id, Request $request){
-        $color = Color::find($id);
-        if(empty($color)){
-            $request->session()->flash('error','Record not found');
-            return response([
-                'status' => false,
-                'notFound' => true,
-            ]);
-        }
-        $color->delete();
-        $request->session()->flash('success', 'Color deleted successfully');
-
-        return response([
-            'status' => true,
-            'message' => 'Color deleted successfully',
-        ]);
-    }
 
     //Discount
     public function coupon_index(Request $request){
@@ -594,7 +508,7 @@ class SettingController extends Controller {
         }
     }
 
-     public function coupon_index2(Request $request){
+    public function coupon_index2(Request $request){
         $discountCoupons = DiscountCoupon::latest();
 
         if(!empty($request->get('keyword'))){
@@ -964,118 +878,259 @@ class SettingController extends Controller {
             ]);
     }
 
-
     //Vendors
     public function vendors_index(Request $request){
-        $vendors = Vendor::latest('id');        
+        $vendors = Vendor::latest('id');
+        $categories = Category::withCount('subCategories')->orderBy('menu_order', 'ASC')->where('status', 1)->paginate(20);     
 
         if(!empty($request->get('keyword'))){
             $vendors = $vendors->where('name','like','%'.$request->get('keyword').'%');
             $vendors = $vendors->orWhere('email','like','%'.$request->get('keyword').'%');
         }
         
+        $subCategories = SubCategory::all()->keyBy('id');
+
         $vendorsTotal = Vendor::count();
-        $vendors = $vendors->paginate(10);
+        $vendors = $vendors->paginate(10);  
+
+        $user = auth()->user();       
 
         $data = [
-            'title'         => 'Vendors',
-            'button_name'   => 'Create Vendor',
-            'form_id'       => 'Vendors',
-            'modal_id'      => 'createVendorModal',
-            'method_id'     => '',
-            'refresh'       => route('vendors.index'),
-            'button_route'  => null,
-            'vendors'       => $vendors,
-            'total'         => $vendorsTotal,
+                'refresh'       => route('vendors.index'),
+                'total'         => $vendorsTotal,
+                'modals' => [
+                    'category' => [
+                        'title'      => 'Create Vendor',
+                        'modal_id'   => 'vendorModal',
+                        'form_id'    => 'vendorForm',
+                        'method_id'  => 'vendor_method',                    
+                        'formConfig' => [
+                            'action' => '',
+                            'method' => 'POST',
+                            'button' => 'Submit',
+                            'fields' => [                            
+                                [
+                                    'type' => 'accordion',
+                                    'name' => '',
+                                    'label' => '',
+                                    'class' => '',
+                                    'items' => [
+                                        [
+                                            'title' => 'Vendor Details',
+                                            'fields' => [  
+                                                [
+                                                    'type' => 'select',
+                                                    'name' => 'user_id',
+                                                    'label' => 'User',
+                                                    'options' => [
+                                                        $user->id => $user->name
+                                                    ],
+                                                    'value' => $user->id,
+                                                    'col' => 'col-12 d-none',
+                                                ], 
+                                                [
+                                                    'type' => 'file',
+                                                    'name' => 'image',
+                                                    'label' => 'Company Logo',
+                                                    'col' => 'col-12'
+                                                ],
+                                                [
+                                                    'type' => 'text',
+                                                    'name' => 'business_name',
+                                                    'label' => 'Business Name',
+                                                    'slug_create' => 'slug-source',
+                                                    'class' => 'slug-source',
+                                                    'data'  => [
+                                                        'target' => '#slug_2'
+                                                    ],
+                                                    'col' => 'col-12'
+                                                ],
+                                                [
+                                                    'type' => 'text',
+                                                    'name' => 'slug',
+                                                    'label' => 'slug',                        
+                                                    'id'    => 'slug_2',
+                                                    'col' => 'col-12 d-none'
+                                                ],
+                                                [
+                                                    'type' => 'text',
+                                                    'name' => 'phone',
+                                                    'label' => 'Phone',                        
+                                                    'col' => 'col-6'
+                                                ],
+                                                [
+                                                    'type' => 'text',
+                                                    'name' => 'mobile',
+                                                    'label' => 'Mobile',
+                                                    'col' => 'col-6'
+                                                ],
+                                                [
+                                                    'type' => 'text',
+                                                    'name' => 'email',
+                                                    'label' => 'Email',
+                                                    'col' => 'col-12'
+                                                ],
+                                                [
+                                                    'type' => 'select',
+                                                    'name' => 'status',
+                                                    'label' => 'Status',
+                                                    'options' => [
+                                                        1 => 'Active',
+                                                        0 => 'Block',
+                                                    ],
+                                                    'col' => 'col-md-3 col-6 d-none'
+                                                ]                                                
+                                            ],
+                                        ],
+                                        [
+                                            'title' => 'Services',
+                                            'fields' => [
+                                                [
+                                                    'type' => 'select',
+                                                    'name' => 'vendor_category_id',
+                                                    'label' => 'Select Category',
+                                                    'options' => $categories->pluck('category_name','id')->toArray(),
+                                                    'col' => 'col-12',
+                                                    'id' => 'vendor_category_id',
+                                                ],
+                                                [
+                                                    'type' => 'subcategory_checkboxes',
+                                                    'name' => 'services',
+                                                    'label' => 'Select Services',
+                                                    'options' => [],
+                                                    'col' => 'col-12',
+                                                    'id' => 'sub_category_id',
+                                                ],
+                                            ],
+                                        ],
+                                        [
+                                            'title' => 'Vendor Address',
+                                            'fields' => [                                                
+                                                [
+                                                    'type' => 'textarea',
+                                                    'name' => 'address',
+                                                    'label' => 'Address',
+                                                    'placeholder' => 'Address',
+                                                    'col' => 'col-12'
+                                                ],
+                                                [
+                                                    'type' => 'text',
+                                                    'name' => 'city',
+                                                    'label' => 'City',
+                                                    'col' => 'col-6'
+                                                ],    
+                                                [
+                                                    'type' => 'select',
+                                                    'name' => 'state',
+                                                    'label' => 'State',
+                                                    'options' => [
+                                                        'Gujarat' => 'Gujarat',
+                                                        'Karnataka' => 'Karnataka'
+                                                    ],
+                                                    'value' => 'Gujarat',
+                                                    'default' => 'Gujarat',
+                                                    'col' => 'col-6'
+                                                ],
+                                                [
+                                                    'type' => 'text',
+                                                    'name' => 'pincode',
+                                                    'label' => 'Pincode',
+                                                    'col' => 'col-6'
+                                                ],
+                                                [
+                                                    'type' => 'text',
+                                                    'name' => 'latitude',
+                                                    'label' => 'Latitude',
+                                                    'col' => 'col-6'
+                                                ],
+                                                [
+                                                    'type' => 'text',
+                                                    'name' => 'longitude',
+                                                    'label' => 'Longitude',
+                                                    'col' => 'col-6'
+                                                ],
+                                            ],
+                                        ],                                        
+                                    ],
+                                ],                                                                                    
+                            ]                        
+                        ]
+                    ],
+                ],     
+                                   
+            'vendors' => $vendors,
+            'subCategories' => $subCategories,
+        ];         
 
-            'formConfig' => [
-                'action' => route('vendors.store'),
-                'modal_size' => 'modal-lg',
-                'method' => 'POST',
-                'button' => 'Create User',
-                'fields' => [                    
-                    [
-                        'type' => 'text',
-                        'name' => 'business_name',
-                        'label' => 'Business Name',
-                        'slug_create' => 'slug-source',
-                        'class' => 'slug-source',
-                        'data'  => [
-                            'target' => '#slug_2'
-                        ],
-                        'col' => 'col-md-6 col-6'
-                    ],
-                    [
-                        'type' => 'text',
-                        'name' => 'slug',
-                        'label' => 'slug',                        
-                        'id'    => 'slug_2',
-                        'col' => 'col-md-12 col-12 d-none'
-                    ],
-                    [
-                        'type' => 'text',
-                        'name' => 'phone',
-                        'label' => 'Phone',                        
-                        'col' => 'col-md-3 col-6'
-                    ],
-                    [
-                        'type' => 'text',
-                        'name' => 'mobile',
-                        'label' => 'Mobile',                        
-                        'col' => 'col-md-3 col-6'
-                    ],
-                    [
-                        'type' => 'textarea',
-                        'name' => 'description',
-                        'label' => 'Description',
-                        'summer_class' => '',
-                        'col' => 'col-md-12 col-6'
-                    ],                    
-                    [
-                        'type' => 'file',
-                        'name' => 'image',
-                        'label' => 'Company Logo',
-                        'col' => 'col-md-6 col-6'
-                    ],
-                    [
-                        'type' => 'file',
-                        'name' => 'cover_image',
-                        'label' => 'Company Logo',
-                        'col' => 'col-md-6 col-6'
-                    ],
-                    [
-                        'type' => 'select',
-                        'name' => 'status',
-                        'label' => 'Status',
-                        'options' => [
-                            1 => 'Active',
-                            0 => 'Block',
-                        ],
-                        'col' => 'col-md-3 col-6 d-none'
-                    ]
-                ]
-            ]
-        ];       
-
-        return view('admin.settings.vendors.index', $data);
+        return view('admin.settings.vendor', $data);
     }   
+    
+
+   public function getSubCategories($categoryId) {
+        $subCategories = SubCategory::where('category_id', $categoryId)
+            ->orderBy('id')
+            ->get(['id', 'sub_category_name']);
+
+        return response()->json(
+            $subCategories->map(fn ($item) => [
+                'id' => $item->id,
+                'name' => $item->sub_category_name,
+            ])
+        );
+    }
+
     
     public function vendors_store(Request $request){
         $validator = Validator::make($request->all(), [
-            'business_name' => 'required',            
+            'business_name' => 'required',
+            'services' => 'required|array|min:1',
+            'services.*' => 'integer|exists:sub_categories,id',
         ]);
 
         if($validator->passes()){
             $vendor = new Vendor;
+            $vendor->user_id = $request->user_id;
             $vendor->business_name = $request->business_name;
+            $vendor->slug = $request->slug;
+
+            $vendor->services = json_encode($request->services);
+
             $vendor->email = $request->email;
             $vendor->phone = $request->phone;
             $vendor->mobile = $request->mobile;
-            $vendor->role = $request->role;
-            $vendor->image = $request->image;            
+            $vendor->logo = $request->logo;
+            $vendor->address = $request->address;
+            $vendor->city = $request->city;
+            $vendor->state = $request->state;
+            $vendor->pincode = $request->pincode;
+            $vendor->latitude = $request->latitude;
+            $vendor->longitude = $request->longitude;
             $vendor->status = $request->status;
-            $vendor->password = Hash::make($request->password);
             $vendor->save();
+
+            $id = $vendor->id;
+            $name = Str::slug($vendor->business_name);
+
+            // Init Image Manager
+            $manager = new ImageManager(new Driver());
+
+            // Create directory if not exists
+            $path = public_path('uploads/vendor/');
+            if (!File::exists($path)) {
+                File::makeDirectory($path, 0755, true);
+            }            
+            
+            if ($request->hasFile('logo')) {
+                $logo = $request->file('logo');
+                //$imageName = $name . '.' . $image->getClientOriginalExtension();
+                $imageName = $id . '_' . $name . '.' . $logo->getClientOriginalExtension();
+                $img = $manager->read($logo->getRealPath());
+                //$img->scale(width: 300);
+                //$img->resize(200, 250);
+                $img->save($path.$imageName);
+                $vendor->logo = $imageName;
+                $vendor->save();
+            }  
 
             $message = 'Vendor added successfully';
 
