@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model {
-    protected $fillable = ['vendor_id','category_id','sub_category_id','short_description','description','status','is_featured','admin_note','approved_at' ];
+    protected $fillable = ['vendor_id','category_id','sub_category_id','short_description','description','showService','status','is_featured','admin_note','approved_at' ];
 
     protected $casts = [
         'price' => 'decimal:2',

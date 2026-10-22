@@ -6,23 +6,25 @@
 
 <div class="container">
     <div class="row mt-5">
-        <div class="col-md-5 col-12">
-            <h1>Home services at your<br /> doorstep</h1>
+        <div class="col-md-6 col-12">
+            <h1>Home services at your doorstep</h1>
+            
             <div class="card mt-3">
                 <div class="card-body">
-                    @if ($getCategories->isNotEmpty())
+                    @if ($thumbCategories->isNotEmpty())
                         <div class="category-card">
-                            @foreach ($getCategories as $category)
+                            @foreach ($thumbCategories as $category)
                                 @php
                                     $openTo = $category->open_to;
                                     $modalType = $category->category_modal;
                                     $categories = $modalCategories->get($modalType, collect());
-                                @endphp 
+                                @endphp                                 
 
                                 <x-services
                                     :item="$category"
                                     :data="$category"
                                     :category="$category"
+                                    :totalCounts="$totalCounts"
                                     :allServices="$allServices"
                                     :categories="$modalCategories->get($modalType, collect())"
                                     :modalType="$modalType"
@@ -31,14 +33,14 @@
                                     class=""
                                     :reviews="false"
                                     :price="false"
-                                />                                                                                            
+                                />
                             @endforeach
                         </div>
                     @endif                                      
                 </div>
             </div>
         </div>
-        <div class="col-md-7 col-12">
+        <div class="col-md-6 col-12">
             <img src="{{ asset('front-assets/images/home_banner.jpeg') }}" alt="Urban Clap">
         </div>
     </div>
@@ -52,20 +54,20 @@
                 'data'  => $most_booked,
                 'banner'  => '',
             ],
-            [
-                'title' => 'New and noteworthy',
-                'text' => '',
-                'modal' => '',
-                'data'  => $new_and_noteworthy,
-                'banner'  => '',
-            ],
-            [
-                'title' => 'Spa for women',
-                'text' => '',
-                'modal' => 'modal_womens-salon-spa',
-                'data'  => $women_spa,
-                'banner'  => 'home_banner2.jpeg',
-            ],
+            // [
+            //     'title' => 'New and noteworthy',
+            //     'text' => '',
+            //     'modal' => '',
+            //     'data'  => $new_and_noteworthy,
+            //     'banner'  => '',
+            // ],
+            // [
+            //     'title' => 'Spa for women',
+            //     'text' => '',
+            //     'modal' => 'modal_womens-salon-spa',
+            //     'data'  => $women_spa,
+            //     'banner'  => 'home_banner2.jpeg',
+            // ],
             [
                 'title' => 'Cleaning Essentials',
                 'text' => 'Monthly cleaning essential services',
@@ -87,13 +89,13 @@
                 'data'  => $installation,
                 'banner'  => 'home_banner3.jpeg',
             ],
-            [
-                'title' => 'Salon for men',
-                'text' => 'Grooming essentials',
-                'modal' => 'modal_mens-salon-massage',
-                'data'  => $men_spa,
-                'banner'  => '',
-            ],
+            // [
+            //     'title' => 'Salon for men',
+            //     'text' => 'Grooming essentials',
+            //     'modal' => 'modal_mens-salon-massage',
+            //     'data'  => $men_spa,
+            //     'banner'  => '',
+            // ],
         ];
     @endphp        
 
@@ -116,8 +118,9 @@
                 </div>
 
                 <div class="services-gallery mb-3">
+                    
                     @foreach($section['data'] as $categoryId => $subCategories)
-                        @foreach($subCategories as $subCategory)
+                        @foreach($subCategories as $subCategory)                                                    
                             <x-services
                                 :item="$subCategory"
                                 :data="$subCategory"

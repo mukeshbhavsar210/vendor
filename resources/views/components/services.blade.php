@@ -4,6 +4,7 @@
     'service' => null,
     'category' => null,
     'subcategory' => null,
+    'totalCounts' => null,
     'categories' => collect(),
     'ratings' => collect(),
     'allServices' => collect(),
@@ -117,40 +118,45 @@
 
                 @if($category->open_to !== 'all')
                     <div class="modal-header">
-                        <h2 id="categoryModalLabel{{ $category->category_modal }}">{{ $category->category_name }}</h2>
+                        <h2 id="categoryModalLabel{{ $category->category_modal }}">{{ $category->category_name }} 
+                            <span class="counts">{{ $totalCounts[$category->total] }}</span>
+                        </h2>
                     </div>
                 @endif                                            
 
                 <div class="modal-body">                                                                                                                                        
                     @if ($categories->isNotEmpty())
                         @if (
+                                $modalType === 'cleaning' ||
+                                $modalType === 'home-painting' ||                                
                                 $modalType === 'pop-work' ||
                                 $modalType === 'carpenter-work' ||
                                 $modalType === 'plumber-work' ||
                                 $modalType === 'electrician-work' ||
                                 $modalType === 'ac-appliance-repair'
                             )
-                            @foreach ($categories->groupBy('appliance_types') as $applianceType => $items)
-                                <h5 class="mb-2">{{ $applianceType }}</h5>
-                                <div class="modal-card">
+                            @foreach ($categories->groupBy('appliance_types') as $applianceType => $items)                                
+                                @if ($applianceType)
+                                    <h5>{{ $applianceType }}</h5>
+                                @endif
+
+                                <div class="services-modal">
                                     @foreach ($items as $category)
-                                        <div class="repeate">
-                                            <div class="thumb">
-                                                <a href="{{ route('front.category', $category->category_slug) }}">
-                                                    <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}" />
-                                                </a>
-                                            </div>
+                                        <div class="service-slide">                                            
+                                            <a href="{{ route('front.category', $category->category_slug) }}">
+                                                <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}" />
+                                            </a>
                                             <p>{{ $category->category_name }}</p>
                                         </div>
                                     @endforeach
                                 </div>
                             @endforeach                                                    
                         @else
-                            <div class="modal-card">
+                            <div class="modal-card">                                
                                 @foreach ($categories as $category)
                                     <div class="repeate">
                                         @if ($category->image)
-                                            <div class="thumb">
+                                            <div class="thumb">                                               
                                                 <a href="{{ route('front.category', $category->category_slug) }}">
                                                     <img src="{{ asset('uploads/category/' . $category->image) }}" alt="{{ $category->category_name }}" />
                                                 </a>
@@ -162,40 +168,43 @@
                             </div>
                         @endif
                     @elseif($allServices)                                                
+                        <h2 class="mb-3">All Services <span class="counts">{{ $category->count() }}</span></h2>
+
                         @foreach ($allServices->groupBy(['category_modal', 'appliance_types']) as $categoryModal => $applianceGroups)
                             @foreach ($applianceGroups as $applianceType => $items)
                                 @php
                                     $section = $items->firstWhere('showHome', 'outside');
                                     $insideItems = $items->where('showHome', 'inside');
-                                @endphp
+                                @endphp                                
 
-                                @if ($section)
-                                    <h4 class="mb-3">{{ $section->category_name }}</h4>
-                                @endif
-
-                                @if ($insideItems->isNotEmpty())
-                                    @if ($applianceType)
-                                        <h6 class="mb-2">{{ $applianceType }}</h6>
+                                <div class="all-service-divider">
+                                    @if ($section)
+                                        <h5 class="mb-3">{{ $section->category_name }} - {{ $totalCounts[$category->total] }}</h5>
                                     @endif
 
-                                    <div class="modal-card">
-                                        @foreach ($insideItems as $category)
-                                            <div class="repeate">
-                                                @if ($category->image)
-                                                    <div class="thumb">
-                                                        <a href="{{ route('front.category', $category->category_slug) }}">
-                                                            <img src="{{ asset('uploads/category/' . $category->image) }}"
-                                                                alt="{{ $category->category_name }}">
-                                                        </a>
-                                                    </div>
-                                                @endif
-                                                <p>{{ $category->category_name }}</p>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif                                                            
-                            @endforeach
-                            <hr>
+                                    @if ($insideItems->isNotEmpty())                                    
+                                        @if ($applianceType)
+                                            <h6 class="mb-2">{{ $applianceType }}</h6>
+                                        @endif
+
+                                        <div class="services-modal mb-4">
+                                            @foreach ($insideItems as $category)
+                                                <div class="service-slide">
+                                                    @if ($category->image)
+                                                        <div class="thumb">
+                                                            <a href="{{ route('front.category', $category->category_slug) }}">
+                                                                <img src="{{ asset('uploads/category/' . $category->image) }}"
+                                                                    alt="{{ $category->category_name }}">
+                                                            </a>
+                                                        </div>
+                                                    @endif
+                                                    <p>{{ $category->category_name }}</p>
+                                                </div>
+                                            @endforeach
+                                        </div>                                    
+                                    @endif
+                                </div>
+                            @endforeach                            
                         @endforeach                                                  
                     @endif                                                
                 </div>
@@ -245,62 +254,66 @@
                     <div class="modal-dialog modal-dialog-centered modal-custom">
                         <div class="modal-content">
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            
+                            @if($process)
+                                @if ($process->banner)
+                                    <img src="{{ asset('uploads/process/' . $process->banner) }}" />
+                                @endif
+                            @endif                          
 
-                            <div class="modal-scroll">
-                                @if($process)                               
-                                    @if ($process->banner)
-                                        <img src="{{ asset('uploads/process/' . $process->banner) }}" />
-                                    @endif
-                                @endif                          
-                                                        
-                                <div class="modal-body-wrapper">
-                                    <div class="left">
-                                        <h3>{{ $item->subCategory->sub_category_name }}</h3>
-                                        {{-- <h3>{{ isset($title_limit) ? Str::limit($title, $title_limit, '...') : $title }}</h3> --}}
+                            <div class="modal-body-wrapper">
+                                <div class="left-details">
+                                    <div class="thumb">
+                                        <img src="{{ asset('uploads/subcategory/' . $item->subCategory->image) }}" />
+                                        <div class="title-details">
+                                            <h3>{{ $item->subCategory->sub_category_name }}</h3>
+                                            {{-- <h3>{{ isset($title_limit) ? Str::limit($title, $title_limit, '...') : $title }}</h3> --}}                                        
 
-                                        @if($ratings->count())
-                                            <div class="ratings">
-                                                <svg class="svg" width="100%" height="100%" viewBox="0 0 20 20" fill="#572AC8" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.333 10a8.333 8.333 0 11-16.667 0 8.333 8.333 0 0116.667 0zm-7.894-4.694A.476.476 0 009.999 5a.476.476 0 00-.438.306L8.414 8.191l-2.977.25a.48.48 0 00-.414.342.513.513 0 00.143.532l2.268 2.033-.693 3.039a.51.51 0 00.183.518.458.458 0 00.528.022L10 13.298l2.548 1.629a.458.458 0 00.527-.022.51.51 0 00.184-.518l-.693-3.04 2.268-2.032a.513.513 0 00.143-.532.48.48 0 00-.415-.342l-2.976-.25-1.147-2.885z" fill="#572AC8"></path></svg>
-                                                @if($ratingCount > 0)
-                                                    <span>{{ number_format($averageRating, 1) }}</span>
-                                                    <span>({{ $ratingCount }} reviews)</span>
+                                            @if($ratings->count())
+                                                <div class="ratings">
+                                                    <svg class="svg" width="100%" height="100%" viewBox="0 0 20 20" fill="#572AC8" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.333 10a8.333 8.333 0 11-16.667 0 8.333 8.333 0 0116.667 0zm-7.894-4.694A.476.476 0 009.999 5a.476.476 0 00-.438.306L8.414 8.191l-2.977.25a.48.48 0 00-.414.342.513.513 0 00.143.532l2.268 2.033-.693 3.039a.51.51 0 00.183.518.458.458 0 00.528.022L10 13.298l2.548 1.629a.458.458 0 00.527-.022.51.51 0 00.184-.518l-.693-3.04 2.268-2.032a.513.513 0 00.143-.532.48.48 0 00-.415-.342l-2.976-.25-1.147-2.885z" fill="#572AC8"></path></svg>
+                                                    @if($ratingCount > 0)
+                                                        <span>{{ number_format($averageRating, 1) }}</span>
+                                                        <span>({{ $ratingCount }} reviews)</span>
+                                                    @endif
+                                                </div>
+                                            @endif        
+                                            
+                                            <div class="price tiny-font">
+                                                @if($discount_percent > 0)
+                                                    <span><b>₹{{ round($discount_price) }}</b></span>
+                                                    <span><del>₹{{ round($price) }}</del></span>
+                                                    <span class="discount">({{ $discount_percent }}% OFF)</span>
+                                                @else
+                                                    <span><b>₹{{ round($price) }}</b></span>
+                                                @endif
+                                                
+                                                @if ($time)
+                                                    <svg style="top:2px; position:relative;" width="12px" height="12px" viewBox="0 0 24 24" fill="#545454" xmlns="http://www.w3.org/2000/svg"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" fill="#545454"></path></svg>
+                                                    <span>{{ $time }}</span>
                                                 @endif
                                             </div>
-                                        @endif        
-                                        
-                                        <div class="price tiny-font">
-                                            @if($discount_percent > 0)
-                                                <span><b>₹{{ round($discount_price) }}</b></span>
-                                                <span><del>₹{{ round($price) }}</del></span>
-                                                <span class="discount">({{ $discount_percent }}% OFF)</span>
-                                            @else
-                                                <span><b>₹{{ round($price) }}</b></span>
-                                            @endif
-                                            
-                                            @if ($time)
-                                                <svg style="top:2px; position:relative;" width="12px" height="12px" viewBox="0 0 24 24" fill="#545454" xmlns="http://www.w3.org/2000/svg"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" fill="#545454"></path></svg>
-                                                <span>{{ $time }}</span>
-                                            @endif
                                         </div>
-                                    </div>
-
-                                    <div class="right">
-                                        @if (in_array($item->id, $cartServiceIds))
-                                            @php
-                                                $item = $cartItems->firstWhere('id', $item->id);
-                                            @endphp                   
-                                            
-                                            <div class="select">
-                                                <a href="javascript:void(0);" class="update-cart-modal" data-type="qty" data-rowid="{{ $item->rowId }}" data-selected="{{ $item->qty }}">
-                                                    Qty: <b>{{ $item->qty }}</b> <span class="caret"></span>
-                                                </a>              
-                                            </div>
-                                        @else
-                                            <a href="javascript:void(0);" class="overlap-btn btn btn-outline-primary add-to-cart-btn" onclick="addToCart({{ $item->id }}, this)">Add</a>
-                                        @endif                                     
                                     </div>
                                 </div>
 
+                                <div class="right">
+                                    @if (in_array($item->id, $cartServiceIds))
+                                        @php
+                                            $item = $cartItems->firstWhere('id', $item->id);
+                                        @endphp
+                                        <div class="select mt-4">
+                                            <a href="javascript:void(0);" class="update-cart-modal" data-type="qty" data-rowid="{{ $item->rowId }}" data-selected="{{ $item->qty }}">
+                                                Qty: <b>{{ $item->qty }}</b> <span class="caret"></span>
+                                            </a>              
+                                        </div>
+                                    @else
+                                        <a href="javascript:void(0);" class="mt-4 btn btn-outline-primary add-to-cart-btn" onclick="addToCart({{ $item->id }}, this)">Add</a>
+                                    @endif                                     
+                                </div>
+                            </div>
+
+                            <div class="modal-scroll">
                                 @if($process)
                                     @if ($process->highlights)
                                         <div class="sections">

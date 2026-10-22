@@ -29,15 +29,13 @@
     <div class="container">
         <div class="alert-relative">
             @if(session('success'))
-                <div class="alert alert-success alert-dismissible">
-                    <button type="button" class="btn-close" data-dismiss="alert" aria-hidden="true">×</button>
+                <div class="alert alert-success alert-dismissible">                    
                     {{ session('success') }}
                 </div>
             @endif
 
             @if(session('error'))
-                <div class="alert alert-danger alert-dismissible">
-                    <button type="button" class="btn-close" data-dismiss="alert" aria-hidden="true">×</button>
+                <div class="alert alert-danger alert-dismissible">                    
                     {{ session('error') }}
                 </div>
             @endif    
@@ -89,7 +87,6 @@
     });
 
     //remove items from cart
-
     $(document).on('click', '.remove-cart-item', function () {        
         let rowId = $(this).data('rowid');
         $.ajax({
@@ -389,7 +386,6 @@
         });
     }
 
-
     function removeProduct(id) {
         $.ajax({
             url: '{{ route("account.removeProductFromWishlist") }}',
@@ -421,34 +417,7 @@
                 console.log(xhr.responseText);
             }
         });
-    }
-
-
-    // $(document).on('click', '.move-to-cart', function () {
-    //     let wishlistId = $(this).data('wishlist-id');
-    //     let serviceId = $(this).data('service-id');
-
-    //     $.ajax({
-    //         url: '{{ route("front.wishlistToCart") }}',
-    //         type: 'POST',
-    //         data: {
-    //             _token: '{{ csrf_token() }}',
-    //             wishlist_id: wishlistId,
-    //             service_id: serviceId
-    //         },
-    //         success: function(response) {
-
-    //             if (response.status) {
-    //                 location.reload();
-    //             } else {
-    //                 showAlert(response.message, 'error');
-    //             }
-    //         },
-    //         error: function(xhr) {
-    //             console.log(xhr.responseText);
-    //         }
-    //     });
-    // });
+    }   
 
     function showAlert(message, type = 'success'){
         let toastEl = $('#commonToast');
@@ -479,8 +448,7 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });         
-        
-    
+            
     function addToCart(id){
         let btn = event.target;        
         let urlParams = new URLSearchParams(window.location.search);        
@@ -496,20 +464,18 @@
 
             success: function(response) {
                 if (response.status == true) {
-                    $('#cartCount').text(response.cartCount);
-                    showAlert(response.message, 'success');
+                    $('#cartCount').text(response.cartCount);                    
                     setTimeout(function() {
                         location.reload();
                     }, 300);
-                } else {
-                    showAlert(response.message, 'error');
+                } else {                    
                 }
             },            
 
             error: function(xhr) {
-                console.log('Status:', xhr.status);
-                console.log('Response:', xhr.responseText);
-                showAlert('Something went wrong while adding to cart.', 'error');
+                // console.log('Status:', xhr.status);
+                // console.log('Response:', xhr.responseText);
+                showAlert('Something went wrong while Service adding to cart.', 'error');
             }
         });
     }  

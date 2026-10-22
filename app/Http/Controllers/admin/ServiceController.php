@@ -8,11 +8,9 @@ use App\Models\Discount;
 use App\Models\DiscountPercentage;
 use App\Models\Service;
 use App\Models\Product;
-use App\Models\ProductImage;
 use App\Models\ServiceImage;
 use App\Models\StockNotification;
 use App\Models\SubCategory;
-use App\Models\SubSubCategory;
 use App\Models\Vendor;
 use App\Models\TempImage;
 use Illuminate\Http\Request;
@@ -36,7 +34,7 @@ class ServiceController extends Controller {
             $vendorId = $user->vendor?->id;
         }
 
-        $services = Service::with(['serviceImages'])
+        $services = Service::with(['serviceImages'])->where('showService', 1)
             ->when($vendorId, function ($query) use ($vendorId) {
                 $query->where('vendor_id', $vendorId);
             })->latest('id')->get();
