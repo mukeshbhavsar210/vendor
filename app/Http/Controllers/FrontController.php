@@ -18,9 +18,22 @@ class FrontController extends Controller {
     public function index(){
         
         $getCategories = Category::with(['subCategories'])->where('status', 1)->where('showHome', 'outside')->orderBy('menu_order', 'ASC')->take(20)->get();
+
+        $thumbCategories = Category::with(['subCategories'])->where('status', 1)->where('showHome', 'outside')->orderBy('menu_order', 'ASC')->take(20)->get();
+
+        $thumbCategories = Category::with('subCategories')
+                ->where('status', 1)
+                ->where('showHome', 'outside')
+                ->whereIn('total', ['count_1','count_2','count_3','count_4','count_5','count_6','count_7','count_8','count_9','count_10'])
+                ->orderBy('total', 'ASC')
+                ->take(10)
+                ->get();
+
+        $totalCounts = Category::selectRaw('total, COUNT(*) as total_count')->groupBy('total')->pluck('total_count', 'total');
+       
         $modalCategories = Category::where('showHome', 'inside')->where('status', 1)->orderBy('menu_order', 'ASC')->get()->groupBy('category_modal');
         $modalCategories2 = Category::where('status', 1)->orderBy('menu_order', 'ASC')->get();
-        $allServices = Category::where('category_modal', '!=', 'services')->orderBy('menu_order', 'ASC')->where('status', 1)->get();        
+        $allServices = Category::where('category_modal', '!=', 'services')->orderBy('menu_order', 'ASC')->where('status', 1)->get();
 
         function getServices($categorySlug) {
             return SubCategory::with(['category','ratings'])
@@ -47,7 +60,11 @@ class FrontController extends Controller {
         $data['cleaning'] = $cleaning;
         $data['men_spa'] = $men_spa;
         $data['appliances'] = $appliances;
-        $data['installation'] = $installation;              
+        $data['installation'] = $installation;
+        $data['thumbCategories'] = $thumbCategories;
+        $data['totalCounts'] = $totalCounts;
+
+        // dd($totalCounts);        
 
         return view("front.home.index",$data);
     }

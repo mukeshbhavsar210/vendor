@@ -60,8 +60,10 @@ Route::controller(ShopController::class)->group(function() {
     //Route::get('/details/{item2?}-{item3?}/{slug}', 'product')->name('front.product');
 
     //Category
-    Route::get('/category/{item1?}','category')->name('front.category');
-    Route::get('/subcategory/{item2?}','subcategory')->name('front.subcategory');    
+    //Route::get('/category/{item1}/sub-category/{item2}', 'subcategory')->name('front.category');
+    //Route::get('/category/{item1?}/sub-category/{item2?}','category')->name('front.category');
+    Route::get('/category/{item1?}','index')->name('front.category');
+    //Route::get('/subcategory/{item2?}','subcategory')->name('front.subcategory');
     
     //Reviews
     Route::get('/product/{id}/reviews', 'allReviews')->name('product.reviews');
@@ -229,12 +231,12 @@ Route::group(['prefix' => 'admin'], function(){
         
         //Services Route
         Route::controller(ServiceController::class)->group(function() {                        
+            Route::get('/services', 'index')->name('services.index');
             Route::post('/service/ser', 'service_store')->name('services.store');
             Route::put('/update_service/{service}', 'service_update')->name('services.update');
             Route::delete('/service/ser/{service}', 'service_destroy')->name('services.delete');            
 
-            Route::get('/services', 'index')->name('services.index');
-            Route::get('/services/create', 'create')->name('services.create');
+            //Route::get('/services/create', 'create')->name('services.create');
             //Route::post('/services', 'store')->name('services.store');
             Route::get('/services/{service}/edit', 'edit')->name('services.edit');
             //Route::put('/services/{service}', 'update')->name('services.update');

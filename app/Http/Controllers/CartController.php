@@ -72,21 +72,20 @@ class CartController extends Controller {
                     'discount_percent' => $discountPercent,
                     'category_id' => $service->category?->id,
                     'category_name' => $service->category?->category_name,
-
                     'subcategory_id' => $subCategory?->id,
                     'subcategory_name' => $subCategory?->sub_category_name,
-
                     'booking_type' => null,
                     'booking_date' => null,
                     'booking_time' => null,
                 ],
             ]);
+
             $status = true;
-            $message = $service->title . ' added to Cart';
+            $message = $service->title . ' Service added to Cart';
             session()->flash('success', $message);
         } else {
             $status = false;
-            $message = $service->title . ' already added in cart';
+            $message = $service->title . ' Service already added in cart';
         }
 
         return response()->json([

@@ -4,11 +4,10 @@
 
 @section('content')
     
-<div class="container">    
+<div class="container mt-4">    
     <div class="row">
-        <div class="col-md-3 col-6 sticky">
-            <h1>{{ $category->category_name }}</h1>
-            <div class="card mt-3">
+        <div class="col-md-3 col-6 sticky">            
+            <div class="card">
                 <div class="card-body">
                     <h5>UC Cover</h5>
                     <p>Upto 30 days warranty on repairs</p>
@@ -35,48 +34,22 @@
         </div>
         
         <div class="col-md-9 col-6">
-            <div class="gallery-big">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="row">
-                            <div class="col-md-4 col-6">
-                                <h2>{{ $category->category_name }} in 60 minutes</h2>
-                                <h4>Start at {{ $category->price }}</h4>
-                            </div>
-                            <div class="col-md-8 col-6">                                
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
             <div class="services">                        
                 <div class="service-listings">
-                    @if($services->isNotEmpty())
-                        @if($category->banner == 'yes')
-                            <div class="category-banner">
-                                <div class="details">
-                                    <div class="left">
-                                        @if ($category->banner_label)
-                                            <p class="label">{{ $category->banner_label }}</p>    
-                                        @endif                                        
-                                        <div class="text">
-                                            <h3>{{ $category->category_name }}</h3>                                            
-                                            <p>{{ $category->banner_details }}</p>
-                                        </div>
-                                    </div>
-
-                                    @if($category->banner_image)
-                                        <div class="right">
-                                            <img src="{{ asset('uploads/category/' . $category->banner_image) }}" alt="{{ $category->banner_title }}" />
-                                        </div>
-                                    @endif
-                                </div>
+                    @if($category->banner_id)
+                        <div class="category-banner">
+                            <div class="details" style="background-image: url('{{ asset('uploads/banner/' . $category->bannerData->image) }}'); background-repeat:no-repeat; background-size:45%; background-position:right top;" >                                
+                                <p class="label">{{ $category->bannerData->label }}</p>
+                                <div class="text">
+                                    <h3>{{ $category->bannerData->title }}</h3>
+                                    <p>{{ $category->bannerData->details }}</p>
+                                </div>                                
                             </div>
-                        @else                            
-                            <h2 class="main-title">{{ $category->category_name }}</h2>
-                        @endif
+                        </div>  
+                    @endif      
 
+                    @if($services->isNotEmpty())
+                        {{-- <h2 class="main-title">{{ $category->category_name }}</h2> --}}
                         @foreach($services as $subCategoryId => $subCategoryServices)                            
                             @php
                                 $subCategory = $subCategoryServices->first()?->subCategory;
@@ -107,7 +80,7 @@
                         <div class="no-services">
                             <p>No services available in this category.</p>
                         </div>
-                    @endif                                                                                 
+                    @endif
                 </div>
                 
                 <div class="service-right">
@@ -121,9 +94,7 @@
                     </div>
                     <div class="cart mt-4">
                         <div class="cart-body {{ $cartContent->count() > 4 ? 'scroll' : '' }}">
-                            @include('front.layouts.toast')
-
-                            @if (Cart::count() > 0)                            
+                            @if (Cart::count() > 0)
                                 <div class="cart-counts">
                                     <h4>Cart <span>{{ Cart::count() }}</span></h4>
                                 </div>

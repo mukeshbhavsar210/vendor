@@ -10,6 +10,14 @@ class Category extends Model {
 
     protected $fillable = ['category_name','category_slug','image','thumb','showHome','price','banner','banner_title','banner_label','banner_details','banner_image','category_modal','menu_order','status'];
 
+    public function banner() {
+        return $this->belongsTo(Banner::class, 'banner_id');
+    }
+
+    public function bannerData(){
+        return $this->belongsTo(Banner::class, 'banner_id');
+    }
+
     public function sub_category(){
         return $this->hasMany(SubCategory::class);
     }      

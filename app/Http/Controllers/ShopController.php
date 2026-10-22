@@ -21,6 +21,43 @@ use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
 
 class ShopController extends Controller {
+    public function index(Request $request, $item1=null) {
+        $selected_category = $item1;
+        
+        $category = Category::with(['banner','bannerData',
+            'subCategories' => function ($query) {
+                $query->orderBy('sort_order', 'asc');
+            },            
+        ])->where('category_slug', $selected_category)->firstOrFail();
+        
+        $services = Service::with(['category','subCategory','subCategory.process','subCategory.discounts.discountPercentage','discounts.discountPercentage','ratings','ratings.user','brand','waranty','include','need','faqs'])
+            ->where('status', 'approved')->where('category_id', $category->id)->get();
+               
+        $services = $services
+            ->sortBy(function ($service) {
+                return $service->subCategory?->sort_order ?? 999999;
+            })->groupBy('sub_category_id');
+       
+        $categories = Category::with(['subCategories','banner',])->where('id', $category->id)->get();
+        $cartContent = Cart::content();
+
+        $selectedIds = $request->cart_ids ?? [];
+        $discount_price = $cartContent->sum(function ($item) {
+            return ($item->options->discount_price ?? 0) * $item->qty;
+        });
+
+        $store_discount = session()->get('coupon_discount');
+        $coupon_discount = session()->get(
+            'coupon_discount.discount',
+            0
+        );
+
+        $coupon_code = session()->get( 'coupon_discount.code', 0 );                
+
+        return view('front.services.index', compact(
+            'services','selected_category','category','categories','coupon_code','cartContent'            
+        ));
+    }
 
     public function listing(Request $request, $item1=null, $item2=null, $item3=null) {    
         $selected_item1 = null;
@@ -319,61 +356,7 @@ class ShopController extends Controller {
         $totalRatings = Review::where('product_id', $product->id)->count();
 
         return view('front.products.reviews', compact('product','reviews','averageRating', 'ratings', 'totalRatings'));
-    }
-
-    public function category(Request $request, $item1 = null) {
-        $selected_category = $item1;
-        
-        $category = Category::with([
-            'subCategories' => function ($query) {
-                $query->orderBy('sort_order', 'asc');
-            },
-            // 'ratings'
-        ])
-        ->where('category_slug', $selected_category)
-        ->firstOrFail();
-
-        // All approved services belonging to this category
-        $services = Service::with(['category','subCategory','subCategory.process','subCategory.discounts.discountPercentage','discounts.discountPercentage','ratings','ratings.user','brand','waranty','include','need','faqs'])
-            ->where('status', 'approved')->where('category_id', $category->id)->get();
-               
-        $services = $services
-            ->sortBy(function ($service) {
-                return $service->subCategory?->sort_order ?? 999999;
-            })
-            ->groupBy('sub_category_id');
-       
-        $categories = Category::with(['subCategories',
-            // 'ratings',
-        ])->where('id', $category->id)->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Cart
-        |--------------------------------------------------------------------------
-        */
-        $cartContent = Cart::content();
-
-        $selectedIds = $request->cart_ids ?? [];
-        $discount_price = $cartContent->sum(function ($item) {
-            return ($item->options->discount_price ?? 0) * $item->qty;
-        });
-        $store_discount = session()->get('coupon_discount');
-        $coupon_discount = session()->get(
-            'coupon_discount.discount',
-            0
-        );
-
-        $coupon_code = session()->get(
-            'coupon_discount.code',
-            0
-        );        
-
-        return view('front.services.index', compact(
-            'services','selected_category','category','categories','coupon_code','cartContent'
-            // 'services','selected_category','category','categories','discount_price','store_discount','coupon_code','coupon_discount','cartContent'
-        ));
-    }
+    }    
    
     public function category_old(Request $request, $item1=null) {    
         $services = Service::with('ratings')->where('status',1);
@@ -389,23 +372,23 @@ class ShopController extends Controller {
         return view('front.services.index', compact('services', 'selected_category' ));
     }
 
-
-    public function subcategory(Request $request, $item2=null) {            
-        $subcategories = Product::with(['subCategory', 'ratings'])->where('status',1);     
-        
-        if (!empty($item2)) {
-            $values = explode(',', $item2);
-            $ids = SubCategory::whereIn('sub_category_slug', $values)->pluck('id')->toArray();
-            $selected_item2 = $values;
-            $subcategories->whereIn('sub_category_id', $ids);
-        }
-        
-        $subcategories = $subcategories->paginate(10);        
-
-        return view('front.products.subcategory', compact('subcategories', 'item2'));
-    }
     
 
+    // public function subcategory(Request $request, $item2=null) {            
+    //     $subcategories = Product::with(['subCategory', 'ratings'])->where('status',1);     
+        
+    //     if (!empty($item2)) {
+    //         $values = explode(',', $item2);
+    //         $ids = SubCategory::whereIn('sub_category_slug', $values)->pluck('id')->toArray();
+    //         $selected_item2 = $values;
+    //         $subcategories->whereIn('sub_category_id', $ids);
+    //     }
+        
+    //     $subcategories = $subcategories->paginate(10);        
+
+    //     return view('front.products.subcategory', compact('subcategories', 'item2'));
+    // }
+    
     public function store(Request $request) {
         Rating::create([
             'product_id' => $request->product_id,
