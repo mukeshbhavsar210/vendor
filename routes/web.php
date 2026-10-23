@@ -29,14 +29,7 @@ Route::controller(FrontController::class)->group(function() {
     Route::post('/send-contact-email', 'sendContactEmail')->name('front.sendContactEmail');
 
     Route::get('/faqs/', 'faqs')->name('front.faqs');
-    Route::get('/deals/', 'deals')->name('front.deals');
-    Route::post('/add-to-affiliate', 'addToAffiliate')->name('front.addToAffiliate');
-
-    Route::post('/notify', 'addToNotify')->name('front.notify');
-    Route::post('/affiliate_notify', 'addToAffiliateNotify')->name('front.affiliate.notify');
-
-    Route::post('/affiliate-product/{id}/like', 'like');
-    Route::post('/affiliate-product/{id}/view', 'view');
+    Route::get('/deals/', 'deals')->name('front.deals');        
 
     //Chat support
     Route::post('/chat-order-status', 'orderStatus')->name('chat.order.status');

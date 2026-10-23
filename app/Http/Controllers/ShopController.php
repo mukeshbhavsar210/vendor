@@ -30,7 +30,7 @@ class ShopController extends Controller {
             },            
         ])->where('category_slug', $selected_category)->firstOrFail();
         
-        $services = Service::with(['category','subCategory','subCategory.process','subCategory.discounts.discountPercentage','discounts.discountPercentage','ratings','ratings.user','brand','waranty','include','need','faqs'])
+        $services = Service::with(['category','subCategory','vendor','subCategory.process','subCategory.discounts.discountPercentage','discounts.discountPercentage','ratings','ratings.user','brand','waranty','include','need','faqs'])
             ->where('status', 'approved')->where('category_id', $category->id)->get();
                
         $services = $services
@@ -52,7 +52,7 @@ class ShopController extends Controller {
             0
         );
 
-        $coupon_code = session()->get( 'coupon_discount.code', 0 );                
+        $coupon_code = session()->get( 'coupon_discount.code', 0 );
 
         return view('front.services.index', compact(
             'services','selected_category','category','categories','coupon_code','cartContent'            

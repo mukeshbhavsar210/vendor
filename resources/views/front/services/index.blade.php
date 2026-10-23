@@ -4,9 +4,9 @@
 
 @section('content')
     
-<div class="container mt-4">    
-    <div class="row">
-        <div class="col-md-3 col-6 sticky">            
+<div class="container mt-4">
+    <div class="services">
+        <div class="thumb-wrapper sticky">
             <div class="card">
                 <div class="card-body">
                     <h5>UC Cover</h5>
@@ -14,142 +14,140 @@
                 </div>
             </div>
 
-            <div class="card mt-3">
-                <div class="card-body">
-                    <h5>Select a service</h5>
-                    <div class="flex-card">
-                        @foreach($categories as $category)
-                            @foreach($category->subCategories as $subcategory)
-                                <a href="#{{ $subcategory->sub_category_slug }}" data-id="{{ $subcategory->id }}" class="subcategory-thumb" >
-                                    <div class="thumb">
-                                        <img src="{{ asset('uploads/subcategory/'.$subcategory->image) }}" alt="{{ $subcategory->category_name }}" />                                        
-                                    </div>
-                                    <p>{{ $subcategory->sub_category_name }}</p>
-                                </a>
+            @if($services->isNotEmpty())
+                <div class="card mt-3">
+                    <div class="card-body">                    
+                        <h5>Select a service</h5>
+                        <div class="flex-card">
+                            @foreach($categories as $category)
+                                @foreach($category->subCategories as $subcategory)
+                                    <a href="#{{ $subcategory->sub_category_slug }}" data-id="{{ $subcategory->id }}" class="subcategory-thumb" >
+                                        <div class="thumb">
+                                            <img src="{{ asset('uploads/subcategory/'.$subcategory->image) }}" alt="{{ $subcategory->category_name }}" />                                        
+                                        </div>
+                                        <p>{{ $subcategory->sub_category_name }}</p>
+                                    </a>
+                                @endforeach
                             @endforeach
-                        @endforeach
+                        </div>                    
                     </div>
                 </div>
-            </div>
+            @endif
+        </div>
+        <div class="listings">
+            @if($category->banner_id)
+                <div class="category-banner">
+                    <div class="details" style="background-image: url('{{ asset('uploads/banner/' . $category->bannerData->image) }}'); background-repeat:no-repeat; background-size:45%; background-position:right top;" >                                
+                        <p class="label">{{ $category->bannerData->label }}</p>
+                        <div class="text">
+                            <h3>{{ $category->bannerData->title }}</h3>
+                            <p>{{ $category->bannerData->details }}</p>
+                        </div>                                
+                    </div>
+                </div>  
+            @endif      
+
+            @if($services->isNotEmpty())                
+                @foreach($services as $subCategoryId => $subCategoryServices)                            
+                    @php
+                        $subCategory = $subCategoryServices->first()?->subCategory;
+                    @endphp
+
+                    <div class="subcategory-right" id="{{ $subCategory->sub_category_slug }}" data-id="{{ $subCategory->id }}" >
+                        <div class="services-list"> 
+                            @foreach($subCategoryServices as $value)                                
+                                <x-services                                            
+                                    :item="$value"
+                                    :category="$category"
+                                    :subcategory="$subCategory"                                    
+                                    :ratings="$value->ratings"
+                                    :discounts="$subCategory->discounts"
+                                    :process="$subCategory->process"
+                                    class="service-card"
+                                    show="category-services"
+                                    :price="true"
+                                    :reviews="true"
+                                    :title_limit="50"
+                                    :short_limit="15"
+                                />                                        
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
+            @else                
+                <div class="card">
+                    <div class="card-body center">
+                        <p>No services available for <b>{{ $category->category_name }}</b></p>
+                    </div>
+                </div>                
+            @endif
         </div>
         
-        <div class="col-md-9 col-6">
-            <div class="services">                        
-                <div class="service-listings">
-                    @if($category->banner_id)
-                        <div class="category-banner">
-                            <div class="details" style="background-image: url('{{ asset('uploads/banner/' . $category->bannerData->image) }}'); background-repeat:no-repeat; background-size:45%; background-position:right top;" >                                
-                                <p class="label">{{ $category->bannerData->label }}</p>
-                                <div class="text">
-                                    <h3>{{ $category->bannerData->title }}</h3>
-                                    <p>{{ $category->bannerData->details }}</p>
-                                </div>                                
-                            </div>
-                        </div>  
-                    @endif      
-
-                    @if($services->isNotEmpty())
-                        {{-- <h2 class="main-title">{{ $category->category_name }}</h2> --}}
-                        @foreach($services as $subCategoryId => $subCategoryServices)                            
-                            @php
-                                $subCategory = $subCategoryServices->first()?->subCategory;
-                            @endphp
-
-                            <div class="subcategory-right" id="{{ $subCategory->sub_category_slug }}" data-id="{{ $subCategory->id }}" >
-                                <div class="services-list"> 
-                                    @foreach($subCategoryServices as $value)
-                                        <x-services                                            
-                                            :item="$value"
-                                            :category="$category"
-                                            :subcategory="$subCategory"
-                                            :ratings="$value->ratings"
-                                            :discounts="$subCategory->discounts"
-                                            :process="$subCategory->process"
-                                            class="service-card"
-                                            show="category-services"
-                                            :price="true"
-                                            :reviews="true"
-                                            :title_limit="50"
-                                            :short_limit="15"
-                                        />                                        
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endforeach
-                    @else
-                        <div class="no-services">
-                            <p>No services available in this category.</p>
+        <div class="cart-wrapper">
+            <div class="card-custom">
+                <h4>UC Promise</h4>
+                <ul>
+                    <li>Verified Professionals</li>
+                    <li>Hassle Free Booking</li>
+                    <li>Transparent Pricing</li>
+                </ul>                        
+            </div>
+            <div class="cart mt-4">
+                <div class="cart-body {{ $cartContent->count() > 4 ? 'scroll' : '' }}">
+                    @if (Cart::count() > 0)
+                        <div class="cart-counts">
+                            <h4>Cart <span>{{ Cart::count() }}</span></h4>
                         </div>
-                    @endif
-                </div>
-                
-                <div class="service-right">
-                    <div class="card-custom">
-                        <h4>UC Promise</h4>
-                        <ul>
-                            <li>Verified Professionals</li>
-                            <li>Hassle Free Booking</li>
-                            <li>Transparent Pricing</li>
-                        </ul>                        
-                    </div>
-                    <div class="cart mt-4">
-                        <div class="cart-body {{ $cartContent->count() > 4 ? 'scroll' : '' }}">
-                            @if (Cart::count() > 0)
-                                <div class="cart-counts">
-                                    <h4>Cart <span>{{ Cart::count() }}</span></h4>
-                                </div>
-                                <div class="{{ $cartContent->count() > 4 ? 'cart-scroll' : '' }}">
-                                    @foreach($cartContent as $item)
-                                        <div class="cart-repeate" id="cart-item-{{ $item->rowId }}">
-                                            <div class="item">
-                                                <div class="title">
-                                                    <a href="javascript:void(0);" class="remove-cart-item delete-icon" data-rowid="{{ $item->rowId }}">
-                                                        <span class="sprites"></span>
-                                                    </a>
-                                                    <div class="text">
-                                                        {{ Str::limit($item->name, 50) }}
-                                                        @if ($item->options->discount_percent > 0)                                                                                            
-                                                            <p class="tiny-font-orange">{{ $item->options->discount_percent }}% OFF</p>
-                                                        @endif
-                                                    </div>
-                                                </div>                                                
+                        <div class="{{ $cartContent->count() > 4 ? 'cart-scroll' : '' }}">
+                            @foreach($cartContent as $item)
+                                <div class="cart-repeate" id="cart-item-{{ $item->rowId }}">
+                                    <div class="item">
+                                        <div class="title">
+                                            <a href="javascript:void(0);" class="remove-cart-item delete-icon" data-rowid="{{ $item->rowId }}">
+                                                <span class="sprites"></span>
+                                            </a>
+                                            <div class="text">
+                                                {{ Str::limit($item->name, 50) }}
+                                                @if ($item->options->discount_percent > 0)                                                                                            
+                                                    <p class="tiny-font-orange">{{ $item->options->discount_percent }}% OFF</p>
+                                                @endif
                                             </div>
-                                            <div class="right">    
-                                                <div class="select">        
-                                                    <a href="javascript:void(0);" class="update-cart-modal" data-type="qty" data-rowid="{{ $item->rowId }}" data-selected="{{ $item->qty }}">
-                                                        {{ $item->qty }} <span class="caret"></span>
-                                                    </a>
-                                                </div>
-                                                <div class="amount">
-                                                    <p><b>₹{{ round($item->options->discount_price) }}</b></p>
-                                                    @if($item->options->discount_percent)
-                                                        <del class="tiny-font">₹{{ $item->options->original_price }}</del>
-                                                    @endif
-                                                </div>
-                                            </div>
+                                        </div>                                                
+                                    </div>
+                                    <div class="right">    
+                                        <div class="select">        
+                                            <a href="javascript:void(0);" class="update-cart-modal" data-type="qty" data-rowid="{{ $item->rowId }}" data-selected="{{ $item->qty }}">
+                                                {{ $item->qty }} <span class="caret"></span>
+                                            </a>
                                         </div>
-                                    @endforeach
-                                </div>
-                                </div>
-                                <div class="cart-footer">
-                                    <a href="{{ route('front.cart') }}" class="view-cart">
                                         <div class="amount">
-                                            ₹{{ Cart::total() }}                                            
+                                            <p><b>₹{{ round($item->options->discount_price) }}</b></p>
+                                            @if($item->options->discount_percent)
+                                                <del class="tiny-font">₹{{ $item->options->original_price }}</del>
+                                            @endif
                                         </div>
-                                        <div class="view">View Cart</div>
-                                    </a>
+                                    </div>
                                 </div>
-                            @else
-                                <div class="empty-cart">
-                                    <svg width="100%" height="100%" viewBox="0 0 128 96" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M77.5 34a.5.5 0 01-.5.5h-2.5V30a.5.5 0 011 0v3.5H77a.5.5 0 01.5.5z" fill="#FFD47F"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M79.5 34a.5.5 0 01-.5.5h-2.5V30a.5.5 0 011 0v3.5H79a.5.5 0 01.5.5z" fill="#FFD47F"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M73 69a1 1 0 011 1v1H61a1 1 0 00-1 1v7h-2v-7a3 3 0 013-3h12zm3 2h9a1 1 0 011 1v7h2v-7a3 3 0 00-3-3h-9.17c.11.313.17.65.17 1v1z" fill="#E2E2E2"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M60 60v10h-2V60h2z" fill="#E2E2E2"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M72 72a1 1 0 00-1-1H47a1 1 0 00-1 1v7h-2v-7a3 3 0 013-3h24a3 3 0 013 3v7h-2v-7z" fill="#E2E2E2"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M74 70v9h-2v-9h2z" fill="#E2E2E2"></path><path d="M50 79a5 5 0 11-10 0 5 5 0 0110 0zM64 79a5 5 0 11-10 0 5 5 0 0110 0zM78 79a5 5 0 11-10 0 5 5 0 0110 0zM92 79a5 5 0 11-10 0 5 5 0 0110 0z" fill="#757575"></path><path d="M48 79a3 3 0 11-6 0 3 3 0 016 0zM62 79a3 3 0 11-6 0 3 3 0 016 0zM76 79a3 3 0 11-6 0 3 3 0 016 0zM90 79a3 3 0 11-6 0 3 3 0 016 0z" fill="#EEE"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M74 60v10h-2V60h2z" fill="#E2E2E2"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M30.832 25.445l8 12-1.664 1.11-8-12 1.664-1.11zm16 0l8 12-1.664 1.11-8-12 1.664-1.11z" fill="#CBCBCB"></path><path d="M44 34h52l-5.694 30.369A2 2 0 0188.34 66H53.32a4 4 0 01-3.932-3.263L44 34z" fill="#CBCBCB"></path><path d="M34 34h48l-6 32H41.66a2 2 0 01-1.966-1.631L34 34z" fill="#E2E2E2"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M46 40h-2v7.059h2V40zm0 12.941h-2V60h2v-7.059zM50 40h2v7.059h-2V40zm2 12.941h-2V60h2v-7.059zM56 40h2v7.059h-2V40zm2 12.941h-2V60h2v-7.059zM62 40h2v7.059h-2V40zm2 12.941h-2V60h2v-7.059zM68 40h2v7.059h-2V40zm2 12.941h-2V60h2v-7.059z" fill="#fff"></path><path d="M24 24h28v4H24v-4z" fill="#97674E"></path><path d="M78 20h6v4a6 6 0 01-6 6V20zM78 15a3 3 0 116 0v5h-6v-5zM78 30V18L66 30h12z" fill="#997BED"></path><path d="M88 16l-4-1v2l4-1z" fill="#FFD47F"></path><path d="M81 15a1 1 0 112 0 1 1 0 01-2 0z" fill="#0F0F0F"></path><path d="M72 30h-6l12-12v6a6 6 0 01-6 6z" fill="#6E42E5"></path></svg>
-                                    <p class="mb-3">No items in your cart</p>
-                                </div>                            
-                            @endif                        
-                    </div>
-                </div>
+                            @endforeach
+                        </div>
+                        </div>
+                        <div class="cart-footer">
+                            <a href="{{ route('front.cart') }}" class="view-cart">
+                                <div class="amount">
+                                    ₹{{ Cart::total() }}                                            
+                                </div>
+                                <div class="view">View Cart</div>
+                            </a>
+                        </div>
+                    @else
+                        <div class="empty-cart">
+                            <svg width="100%" height="100%" viewBox="0 0 128 96" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M77.5 34a.5.5 0 01-.5.5h-2.5V30a.5.5 0 011 0v3.5H77a.5.5 0 01.5.5z" fill="#FFD47F"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M79.5 34a.5.5 0 01-.5.5h-2.5V30a.5.5 0 011 0v3.5H79a.5.5 0 01.5.5z" fill="#FFD47F"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M73 69a1 1 0 011 1v1H61a1 1 0 00-1 1v7h-2v-7a3 3 0 013-3h12zm3 2h9a1 1 0 011 1v7h2v-7a3 3 0 00-3-3h-9.17c.11.313.17.65.17 1v1z" fill="#E2E2E2"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M60 60v10h-2V60h2z" fill="#E2E2E2"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M72 72a1 1 0 00-1-1H47a1 1 0 00-1 1v7h-2v-7a3 3 0 013-3h24a3 3 0 013 3v7h-2v-7z" fill="#E2E2E2"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M74 70v9h-2v-9h2z" fill="#E2E2E2"></path><path d="M50 79a5 5 0 11-10 0 5 5 0 0110 0zM64 79a5 5 0 11-10 0 5 5 0 0110 0zM78 79a5 5 0 11-10 0 5 5 0 0110 0zM92 79a5 5 0 11-10 0 5 5 0 0110 0z" fill="#757575"></path><path d="M48 79a3 3 0 11-6 0 3 3 0 016 0zM62 79a3 3 0 11-6 0 3 3 0 016 0zM76 79a3 3 0 11-6 0 3 3 0 016 0zM90 79a3 3 0 11-6 0 3 3 0 016 0z" fill="#EEE"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M74 60v10h-2V60h2z" fill="#E2E2E2"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M30.832 25.445l8 12-1.664 1.11-8-12 1.664-1.11zm16 0l8 12-1.664 1.11-8-12 1.664-1.11z" fill="#CBCBCB"></path><path d="M44 34h52l-5.694 30.369A2 2 0 0188.34 66H53.32a4 4 0 01-3.932-3.263L44 34z" fill="#CBCBCB"></path><path d="M34 34h48l-6 32H41.66a2 2 0 01-1.966-1.631L34 34z" fill="#E2E2E2"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M46 40h-2v7.059h2V40zm0 12.941h-2V60h2v-7.059zM50 40h2v7.059h-2V40zm2 12.941h-2V60h2v-7.059zM56 40h2v7.059h-2V40zm2 12.941h-2V60h2v-7.059zM62 40h2v7.059h-2V40zm2 12.941h-2V60h2v-7.059zM68 40h2v7.059h-2V40zm2 12.941h-2V60h2v-7.059z" fill="#fff"></path><path d="M24 24h28v4H24v-4z" fill="#97674E"></path><path d="M78 20h6v4a6 6 0 01-6 6V20zM78 15a3 3 0 116 0v5h-6v-5zM78 30V18L66 30h12z" fill="#997BED"></path><path d="M88 16l-4-1v2l4-1z" fill="#FFD47F"></path><path d="M81 15a1 1 0 112 0 1 1 0 01-2 0z" fill="#0F0F0F"></path><path d="M72 30h-6l12-12v6a6 6 0 01-6 6z" fill="#6E42E5"></path></svg>
+                            <p class="mb-3">No items in your cart</p>
+                        </div>                            
+                    @endif                        
             </div>
         </div>
-    </div>
+    </div>                        
 </div>
 @endsection
 

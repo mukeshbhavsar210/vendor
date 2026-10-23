@@ -432,8 +432,8 @@ function initServicesGallery() {
 
         if (!$gallery.hasClass('slick-initialized')) {
             $gallery.slick({
-                slidesToShow: 4,
-                slidesToScroll: 4,
+                slidesToShow: 3,
+                slidesToScroll: 1,
                 infinite: false,
                 arrows: false,
                 dots: true,
