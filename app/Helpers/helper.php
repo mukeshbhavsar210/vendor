@@ -33,7 +33,7 @@ use Illuminate\Support\Facades\Mail;
     }
 
     function getCategories() {
-        return Category::with(['subCategories'])->where('showHome', 'yes')->orderBy('menu_order', 'ASC')->take(20)->get();
+        return Category::with(['subCategories'])->where('showHome', 'yes')->orderBy('total', 'ASC')->take(20)->get();
     }
 
     // function getServices() {

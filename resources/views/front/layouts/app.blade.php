@@ -478,58 +478,11 @@
                 showAlert('Something went wrong while Service adding to cart.', 'error');
             }
         });
-    }  
-
-    function addToWishlist(id){        
-        $.ajax({
-            url: '{{ route("front.addToAffiliate") }}',
-            type: 'POST',
-            data: {
-                id: id,
-                _token: '{{ csrf_token() }}' 
-            },
-            dataType: 'json',
-            success: function(response){
-                if(response.status == true){
-                    $("#wishlistToastBody").html(response.message);
-                    showAlert(response.message,'success');                   
-                } else {
-                    window.location.href= "{{ route('front.home') }}";
-                }
-            },
-            error: function(xhr){
-                console.log(xhr.responseText); 
-            }
-        })
-    }    
+    }      
    
     function toggleChat() {
         $("#chat-box").toggleClass("d-none");
-    }
-
-    function sendMessage() {
-        let msg = $("#chatInput").val();
-
-        if(msg.trim() == '') return;
-
-        $("#messages").append("<div><b>You:</b> " + msg + "</div>");
-
-        $.ajax({
-            url: "{{ route('chat.order.status') }}",
-            type: "POST",
-            data: {
-                message: msg,
-                _token: "{{ csrf_token() }}"
-            },
-            success: function(res) {
-                $("#messages").append("<div><b>Bot:</b> " + res.reply + "</div>");
-                $("#messages").scrollTop($("#messages")[0].scrollHeight);
-            }
-        });
-
-        $("#chatInput").val('');
-    }
-
+    }    
 
     $('#registrationForm').on('submit', function(e) {
 
