@@ -241,9 +241,9 @@
                 </div>            
 
                 <div class="text-details">
-                    <p>{{ isset($short_limit) ? Str::limit($short, $short_limit, '...') : $short }}</p>
+                    <p>{{ $subcategory->description }}</p>                    
                 </div>
-                                    
+
                 <a href="javascript:0" class="view" data-bs-toggle="modal" data-bs-target="#service_{{ $item->id }}">View Details</a>
 
                 <div class="modal fade" id="service_{{ $item->id }}" tabindex="-1" aria-labelledby="serviceLabel_{{ $item->id }}" aria-hidden="true">
